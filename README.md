@@ -12,7 +12,7 @@ wikilinks_collection: "<collection-name>"
 3. Ensure note frontmatter contains a `title` and a `permalink`.
 
 ## Notable
-- [[wikilinks]] matche note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md).
+- [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md).
 - [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
 - Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
 
