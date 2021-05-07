@@ -73,8 +73,8 @@ RSpec.describe(JekyllWikilinks) do
     end
 
     it "full output" do
-      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"garden.testsite.com/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">fish</a> has a littlecar.</p>\n")
-      expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"garden.testsite.com/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> has a little star.</p>\n")
+      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"garden.testsite.com/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
+      expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"garden.testsite.com/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a> has a little star.</p>\n")
     end
 
   end

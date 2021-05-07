@@ -2,28 +2,22 @@
 
 ## Installation
 
-Add this line to your application's Gemfile:
+1. Add `gem 'jekyll-wikilinks'` to your site's Gemfile and run `bundle`.
+2. Add the following to your `_config.yml`:
 
-```ruby
-gem 'jekyll-wikilinks'
-```
-
-And then execute:
-
-    $ bundle install
-
-Or install it yourself as:
-
-    $ gem install jekyll-wikilinks
-
-Add the name of the jekyll collection that contains notes in configs:
 ```
 wikilinks_collection: "<collection-name>"
 ```
 
-## Usage
+3. Ensure note frontmatter contains a `title` and a `permalink`.
 
-TODO: Write usage instructions here
+## Notable
+- [[wikilinks]] matche note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md).
+- [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
+- Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
+
+## Future Features
+- Support wikilinks across multiple collections and posts.
 
 ## Development
 
