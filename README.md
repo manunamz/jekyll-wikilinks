@@ -16,6 +16,9 @@ wikilinks_collection: "<collection-name>"
 ## Notable Usage Details
 - [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md).
 - [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
+- aliasing in both directions is supported:
+  - [[some text|filename]]
+  - [[filename|some text]]  
 - Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
 
 ## Future Features
