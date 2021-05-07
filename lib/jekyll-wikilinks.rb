@@ -34,7 +34,7 @@ class JekyllWikilinks < Jekyll::Generator
 	    # ⬜️ vscode-markdown-notes version: (\[\[)([^\|\]]+)(\]\])
 	    note.content = note.content.gsub(
 	      /\[\[#{namespace_from_filename}\]\]/i,
-	      "<a class='wiki-link' href='#{site.baseurl}#{note_potentially_linked_to.data['permalink']}#{link_extension}'>#{note_potentially_linked_to.title.downcase}</a>"
+	      "<a class='wiki-link' href='#{site.baseurl}#{note_potentially_linked_to.data['permalink']}#{link_extension}'>#{note_potentially_linked_to.data['title'].downcase}</a>"
 	    )
 
 	    # Replace double-bracketed links with alias (right)
