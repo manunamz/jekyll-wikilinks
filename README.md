@@ -16,6 +16,11 @@ Or install it yourself as:
 
     $ gem install jekyll-wikilinks
 
+Add the name of the jekyll collection that contains notes in configs:
+```
+wikilinks_collection: "<collection-name>"
+```
+
 ## Usage
 
 TODO: Write usage instructions here
