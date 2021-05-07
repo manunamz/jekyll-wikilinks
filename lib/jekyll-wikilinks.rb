@@ -10,8 +10,9 @@ class JekyllWikilinks < Jekyll::Generator
 		wikilinks_collection = site.config["wikilinks_collection"]
 		wikilinks_collection = "notes" if wikilinks_collection.nil? || wikilinks_collection.empty?
 		all_notes = site.collections[wikilinks_collection].docs
-		all_pages = site.pages
-		all_docs = all_notes + all_pages
+		# i like the idea, but the solution style isn't robust enough yet...
+		# all_pages = site.pages
+		all_docs = all_notes # + all_pages
 		link_extension = !!site.config["use_html_extension"] ? '.html' : ''
 
 		all_docs.each do |cur_note|
