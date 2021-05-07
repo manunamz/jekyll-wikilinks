@@ -8,6 +8,7 @@ class JekyllWikilinks < Jekyll::Generator
 
 	def generate(site)
 		wikilinks_collection = site.config["wikilinks_collection"]
+		wikilinks_collection = "notes" if wikilinks_collection.nil? || wikilinks_collection.empty?
 		all_notes = site.collections[wikilinks_collection].docs
 		all_pages = site.pages
 		all_docs = all_notes + all_pages
@@ -28,18 +29,15 @@ class JekyllWikilinks < Jekyll::Generator
 	      File.extname(note_potentially_linked_to.basename)
 	    )
 
-	    # regex: extract note name from the end of the string to the first occurring '.'
-	    # ex: 'garden.lifecycle.bamboo-shoot' -> 'bamboo shoot'
-	    name_from_namespace = namespace_from_filename.match('([^.]*$)')[0].gsub('-', ' ')
-	    # Replace double-bracketed links using note filename
+	    # Replace double-bracketed links using note title
 	    # [[feline.cats]]
 	    # ⬜️ vscode-markdown-notes version: (\[\[)([^\|\]]+)(\]\])
 	    note.content = note.content.gsub(
 	      /\[\[#{namespace_from_filename}\]\]/i,
-	      "<a class='wiki-link' href='#{site.baseurl}#{note_potentially_linked_to.data['permalink']}#{link_extension}'>#{name_from_namespace}</a>"
+	      "<a class='wiki-link' href='#{site.baseurl}#{note_potentially_linked_to.data['permalink']}#{link_extension}'>#{note_potentially_linked_to.title.downcase}</a>"
 	    )
 
-	    # Replace double-bracketed links with alias (right) using note title
+	    # Replace double-bracketed links with alias (right)
 	    # [[feline.cats|this is a link to the note about cats]]
 	    # ✅ vscode-markdown-notes version: (\[\[)([^\]\|]+)(\|)([^\]]+)(\]\])
 	    note.content = note.content.gsub(
@@ -47,7 +45,7 @@ class JekyllWikilinks < Jekyll::Generator
 	      "<a class='wiki-link' href='#{site.baseurl}#{note_potentially_linked_to.data['permalink']}#{link_extension}'>\\4</a>"
 	    )
 
-	    # Replace double-bracketed links with alias (left) using note title
+	    # Replace double-bracketed links with alias (left)
 	    # [[this is a link to the note about cats|feline.cats]]
 	    # ✅ vscode-markdown-notes version: (\[\[)([^\]\|]+)(\|)([^\]]+)(\]\])
 	    note.content = note.content.gsub(
