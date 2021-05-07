@@ -1,5 +1,7 @@
 # Jekyll-Wikilinks
 
+I was very excited to publish my first gem, but of course, it happened. Check [this post](https://github.com/jhvanderschee/brackettest) and see if it's not a better solution for you.
+
 ## Installation
 
 1. Add `gem 'jekyll-wikilinks'` to your site's Gemfile and run `bundle`.
@@ -11,13 +13,16 @@ wikilinks_collection: "<collection-name>"
 
 3. Ensure note frontmatter contains a `title` and a `permalink`.
 
-## Notable
+## Notable Usage Details
 - [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md).
 - [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
 - Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
 
 ## Future Features
 - Support wikilinks across multiple collections and posts.
+
+## Note
+- Implementation originally adapted from [digital garden jekyll template](https://github.com/maximevaillancourt/digital-garden-jekyll-template/blob/master/_plugins/bidirectional_links_generator.rb).
 
 ## Development
 
