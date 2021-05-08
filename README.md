@@ -11,15 +11,14 @@ I was very excited to publish my first gem, but of course, it happened. Check [t
 wikilinks_collection: "<collection-name>"
 ```
 
-3. Ensure note frontmatter contains a `title` and a `permalink`.
-
 ## Notable Usage Details
-- [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md).
-- [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
+- Note frontmatter must contain a `title` and a `permalink`.
+    - [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
+- [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md (whitespace has not been tested)).
+  - Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
 - aliasing in both directions is supported:
   - [[some text|filename]]
   - [[filename|some text]]  
-- Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
 
 ## Future Features
 - Support wikilinks across multiple collections and posts.
