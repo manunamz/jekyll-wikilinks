@@ -11,15 +11,14 @@ I was very excited to publish my first gem, but of course, it happened. Check [t
 wikilinks_collection: "<collection-name>"
 ```
 
-3. Ensure note frontmatter contains a `title` and a `permalink`.
-
 ## Notable Usage Details
-- [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md).
-- [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
+- Note frontmatter must contain a `title` and a `permalink`.
+    - [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
+- [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md (whitespace has not been tested)).
+  - Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
 - aliasing in both directions is supported:
   - [[some text|filename]]
   - [[filename|some text]]  
-- Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
 
 ## Future Features
 - Support wikilinks across multiple collections and posts.
@@ -36,3 +35,10 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/shorty25h0r7/jekyll-wikilinks.
+
+## I am Not Reduplicating Work Due-Diligence
+- Wikilinks are part of the [commonmark spec](https://github.com/mity/md4c#markdown-extensions) (see `MD_FLAG_WIKILINKS`).
+- They are not supported by [kramdown](https://github.com/gettalong/kramdown) (searched 'wikilinks' in repo).
+- They are [not supported](https://github.com/gjtorikian/commonmarker#options) by [`jekyll-commonmark`](https://github.com/jekyll/jekyll-commonmark) that I can see (don't see any reference to `MD_FLAG_WIKILINKS`).
+- There are scattered implementations around the internet [here](https://github.com/maximevaillancourt/digital-garden-jekyll-template/blob/master/_plugins/bidirectional_links_generator.rb), [here](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb), are some examples.
+- Stackoverflow [sees lots of interest in this functionality](https://stackoverflow.com/questions/4629675/jekyll-markdown-internal-links), specifically for jekyll, but has no other answers lead to a plugin like this one.
