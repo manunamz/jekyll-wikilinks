@@ -2,8 +2,9 @@
 require "jekyll"
 require_relative "jekyll-wikilinks/version"
 
-# can't use converters because it does not have access to jekyll's 'site' 
+# can't use converters because it does not have access to jekyll's 'site'
 # object -- which we need to build a element's href attribute.
+# from: https://github.com/maximevaillancourt/digital-garden-jekyll-template
 class JekyllWikilinks < Jekyll::Generator
 
 	def generate(site)
@@ -13,7 +14,7 @@ class JekyllWikilinks < Jekyll::Generator
 		# i like the idea, but the solution style isn't robust enough yet...
 		# all_pages = site.pages
 		all_docs = all_notes # + all_pages
-		link_extension = !!site.config["use_html_extension"] ? '.html' : ''
+		link_extension = site.config["permalink"] != "pretty" ? '.html' : ''
 
 		all_docs.each do |cur_note|
 		parse_wiki_links(site, all_docs, cur_note, link_extension)
