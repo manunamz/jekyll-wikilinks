@@ -8,12 +8,13 @@ RSpec.describe(JekyllWikilinks) do
   let(:config) do
     Jekyll.configuration(
       config_overrides.merge(
-        "skip_config_files"    => false,
         "collections"          => { "notes" => { "output" => true } },
+        "wikilinks_collection" => "notes",
+        "permalink"            => "pretty",
+        "skip_config_files"    => false,
         "source"               => fixtures_dir,
         "destination"          => fixtures_dir("_site"),
         "baseurl"              => "garden.testsite.com",
-        "wikilinks_collection" => "notes",
       )
     )
   end
@@ -70,6 +71,12 @@ RSpec.describe(JekyllWikilinks) do
     it "assigns a element's href to site.baseurl + /note/ + note-id" do
       expect(one_note.output).to include("href=\"garden.testsite.com/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\"")
       expect(two_note.output).to include("href=\"garden.testsite.com/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"")
+    end
+
+    # todo: add test for '.html' when 'permalink' is not set to 'pretty'
+    it "generates a clean url when configs assign 'permalink' to 'pretty'" do
+      expect(one_note.output).to_not include(".html")
+      expect(two_note.output).to_not include(".html")
     end
 
     it "full output" do
