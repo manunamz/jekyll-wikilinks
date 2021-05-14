@@ -18,14 +18,16 @@ RSpec.describe(JekyllWikilinks) do
       )
     )
   end
-  let(:site)                { Jekyll::Site.new(config) }
-  let(:one_note_md)         { File.read(fixtures_dir("_notes/one.fish.md")) }
-  let(:one_note)            { find_by_title(site.collections["notes"].docs, "One Fish") }
-  let(:two_note)            { find_by_title(site.collections["notes"].docs, "Two Fish") }
-  let(:missing_link_note)   { find_by_title(site.collections["notes"].docs, "None Fish") }
-  let(:missing_links_note)  { find_by_title(site.collections["notes"].docs, "None School") }
-  let(:right_alias_note)    { find_by_title(site.collections["notes"].docs, "Right Name Fish") }
-  let(:left_alias_note)     { find_by_title(site.collections["notes"].docs, "Left Name Fish") }
+  let(:site)                     { Jekyll::Site.new(config) }
+  let(:one_note_md)              { File.read(fixtures_dir("_notes/one.fish.md")) }
+  let(:one_note)                 { find_by_title(site.collections["notes"].docs, "One Fish") }
+  let(:two_note)                 { find_by_title(site.collections["notes"].docs, "Two Fish") }
+  let(:missing_link_note)        { find_by_title(site.collections["notes"].docs, "None Fish") }
+  let(:missing_links_note)       { find_by_title(site.collections["notes"].docs, "None School") }
+  let(:missing_right_alias_note) { find_by_title(site.collections["notes"].docs, "None Right Name Fish") }
+  let(:missing_left_alias_note)  { find_by_title(site.collections["notes"].docs, "None Left Name Fish") }
+  let(:right_alias_note)         { find_by_title(site.collections["notes"].docs, "Right Name Fish") }
+  let(:left_alias_note)          { find_by_title(site.collections["notes"].docs, "Left Name Fish") }
   
   before(:each) do
     site.process
@@ -114,7 +116,7 @@ RSpec.describe(JekyllWikilinks) do
   
   end
 
-  context "when target [[wikilink]] uses piped aliasing" do
+  context "when target [[wikilink]] uses piped aliasing exists" do
     # [[fish|right alias]]
     # [[left alias|fish]]
 
@@ -130,6 +132,34 @@ RSpec.describe(JekyllWikilinks) do
       expect(left_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"garden.testsite.com/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a left alias.</p>\n")
     end
   
+  end
+
+  context "when target [[wikilink]] uses piped aliasing does not exist" do
+    # [[fish|right alias]]
+    # [[left alias|fish]]
+
+    it "injects a span element with descriptive title" do
+      expect(missing_right_alias_note.output).to include("<span title=\"There is no note that matches this link.\"")
+      expect(missing_right_alias_note.output).to include("</span>")
+      expect(missing_left_alias_note.output).to include("<span title=\"There is no note that matches this link.\"")
+      expect(missing_left_alias_note.output).to include("</span>")
+    end
+
+    it "assigns 'invalid-wiki-link' class to span element" do
+      expect(missing_right_alias_note.output).to include("class=\"invalid-wiki-link\"")
+      expect(missing_left_alias_note.output).to include("class=\"invalid-wiki-link\"")
+    end
+
+    it "leaves original angle brackets and text untouched" do
+      expect(missing_right_alias_note.output).to include("[[no.fish|fish]]")
+      expect(missing_left_alias_note.output).to include("[[fish|no.fish]]")
+    end
+
+    it "full output" do
+      expect(missing_right_alias_note.output).to eq("<p>This <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[no.fish|fish]]</span> uses a right alias.</p>\n")
+      expect(missing_left_alias_note.output).to eq("<p>This <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[fish|no.fish]]</span> uses a left alias.</p>\n")
+    end
+
   end
 
 end
