@@ -23,6 +23,7 @@ RSpec.describe(JekyllWikilinks) do
   let(:one_note)            { find_by_title(site.collections["notes"].docs, "One Fish") }
   let(:two_note)            { find_by_title(site.collections["notes"].docs, "Two Fish") }
   let(:missing_link_note)   { find_by_title(site.collections["notes"].docs, "None Fish") }
+  let(:missing_links_note)  { find_by_title(site.collections["notes"].docs, "None School") }
   let(:right_alias_note)    { find_by_title(site.collections["notes"].docs, "Right Name Fish") }
   let(:left_alias_note)     { find_by_title(site.collections["notes"].docs, "Left Name Fish") }
   
@@ -91,18 +92,24 @@ RSpec.describe(JekyllWikilinks) do
     it "injects a span element with descriptive title" do
       expect(missing_link_note.output).to include("<span title=\"There is no note that matches this link.\"")
       expect(missing_link_note.output).to include("</span>")
+      expect(missing_links_note.output).to include("<span title=\"There is no note that matches this link.\"").twice
+      expect(missing_links_note.output).to include("</span>").twice
     end
 
     it "assigns 'invalid-wiki-link' class to span element" do
       expect(missing_link_note.output).to include("class=\"invalid-wiki-link\"")
+      expect(missing_links_note.output).to include("class=\"invalid-wiki-link\"").twice
     end
 
     it "leaves original angle brackets and text untouched" do
-      expect(missing_link_note.output).to include("[[wat.fish]]")
+      expect(missing_link_note.output).to include("[[no.fish]]")
+      expect(missing_links_note.output).to include("[[no.fish]]")
+      expect(missing_links_note.output).to include("[[not.fish]]")
     end
 
     it "full output" do
-      expect(missing_link_note.output).to eq("<p>This <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[wat.fish]]</span> has no target.</p>\n")
+      expect(missing_link_note.output).to eq("<p>This <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[no.fish]]</span> has no target.</p>\n")
+      expect(missing_links_note.output).to eq("<p>This fish has no targets like <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[no.fish]]</span> and <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[not.fish]]</span>.</p>\n")
     end
   
   end
