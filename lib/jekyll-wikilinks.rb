@@ -66,5 +66,12 @@ class JekyllWikilinks < Jekyll::Generator
 	      <span title='There is no note that matches this link.' class='invalid-wiki-link'>[[\\2]]</span>
 	    HTML
 	  )
+	  # aliases -- both kinds
+	  note.content = note.content.gsub(
+	    /(\[\[)([^\]\|]+)(\|)([^\]]+)(\]\])/i,
+	    <<~HTML.chomp    # replace with this HTML (\\2 is what was inside the brackets)
+	      <span title='There is no note that matches this link.' class='invalid-wiki-link'>[[\\2|\\4]]</span>
+	    HTML
+	  )
 	end
 end
