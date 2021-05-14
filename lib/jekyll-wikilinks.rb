@@ -4,7 +4,11 @@ require_relative "jekyll-wikilinks/version"
 
 # can't use converters because it does not have access to jekyll's 'site'
 # object -- which we need to build a element's href attribute.
-# from: https://github.com/maximevaillancourt/digital-garden-jekyll-template
+
+# refs:
+#   - backlinks generator: https://github.com/maximevaillancourt/digital-garden-jekyll-template
+#   - regex: https://github.com/kortina/vscode-markdown-notes/blob/0ac9205ea909511b708d45cbca39c880688b5969/syntaxes/notes.tmLanguage.json
+#   - refator to converterible: https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb
 class JekyllWikilinks < Jekyll::Generator
 
 	def generate(site)
@@ -33,7 +37,6 @@ class JekyllWikilinks < Jekyll::Generator
 
 	    # Replace double-bracketed links using note title
 	    # [[feline.cats]]
-	    # ⬜️ vscode-markdown-notes version: (\[\[)([^\|\]]+)(\]\])
 	    note.content = note.content.gsub(
 	      /\[\[#{namespace_from_filename}\]\]/i,
 	      "<a class='wiki-link' href='#{site.baseurl}#{note_potentially_linked_to.data['permalink']}#{link_extension}'>#{note_potentially_linked_to.data['title'].downcase}</a>"
@@ -41,7 +44,6 @@ class JekyllWikilinks < Jekyll::Generator
 
 	    # Replace double-bracketed links with alias (right)
 	    # [[feline.cats|this is a link to the note about cats]]
-	    # ✅ vscode-markdown-notes version: (\[\[)([^\]\|]+)(\|)([^\]]+)(\]\])
 	    note.content = note.content.gsub(
 	      /(\[\[)(#{namespace_from_filename})(\|)([^\]]+)(\]\])/i,
 	      "<a class='wiki-link' href='#{site.baseurl}#{note_potentially_linked_to.data['permalink']}#{link_extension}'>\\4</a>"
@@ -49,7 +51,6 @@ class JekyllWikilinks < Jekyll::Generator
 
 	    # Replace double-bracketed links with alias (left)
 	    # [[this is a link to the note about cats|feline.cats]]
-	    # ✅ vscode-markdown-notes version: (\[\[)([^\]\|]+)(\|)([^\]]+)(\]\])
 	    note.content = note.content.gsub(
 	      /(\[\[)([^\]\|]+)(\|)(#{namespace_from_filename})(\]\])/i,
 	      "<a class='wiki-link' href='#{site.baseurl}#{note_potentially_linked_to.data['permalink']}#{link_extension}'>\\2</a>"
@@ -60,9 +61,9 @@ class JekyllWikilinks < Jekyll::Generator
 	  # pointing to non-existing pages, so let's turn them into disabled
 	  # links by greying them out and changing the cursor
 	  note.content = note.content.gsub(
-	    /\[\[(.*)\]\]/i, # match on the remaining double-bracket links
-	    <<~HTML.chomp    # replace with this HTML (\\1 is what was inside the brackets)
-	      <span title='There is no note that matches this link.' class='invalid-wiki-link'>[[\\1]]</span>
+	    /(\[\[)([^\|\]]+)(\]\])/i, # match on the remaining double-bracket links
+	    <<~HTML.chomp    # replace with this HTML (\\2 is what was inside the brackets)
+	      <span title='There is no note that matches this link.' class='invalid-wiki-link'>[[\\2]]</span>
 	    HTML
 	  )
 	end
