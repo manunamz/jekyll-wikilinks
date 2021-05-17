@@ -116,7 +116,7 @@ RSpec.describe(JekyllWikilinks) do
   
   end
 
-  context "when target [[wikilink]] uses piped aliasing exists" do
+  context "when target [[wikilink]] using piped aliasing exists" do
     # [[fish|right alias]]
     # [[left alias|fish]]
 
@@ -134,7 +134,7 @@ RSpec.describe(JekyllWikilinks) do
   
   end
 
-  context "when target [[wikilink]] uses piped aliasing does not exist" do
+  context "when target [[wikilink]] using piped aliasing does not exist" do
     # [[fish|right alias]]
     # [[left alias|fish]]
 
