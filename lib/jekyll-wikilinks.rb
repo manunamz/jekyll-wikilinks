@@ -30,7 +30,7 @@ class JekyllWikilinks < Jekyll::Generator
 
 	def old_config_warn()
 		if site.config.include?("wikilinks_collection")
-			Jekyll.logger.warn "'wikilinks_collection' is no longer used for configs.\n"
+			Jekyll.logger.warn "Deprecated: As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details: https://shorty25h0r7.github.io/jekyll-wikilinks/"
 		end
 	end
 
