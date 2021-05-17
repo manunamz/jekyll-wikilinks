@@ -10,8 +10,11 @@ require_relative "jekyll-wikilinks/version"
 #   - regex: https://github.com/kortina/vscode-markdown-notes/blob/0ac9205ea909511b708d45cbca39c880688b5969/syntaxes/notes.tmLanguage.json
 #   - refator to converterible: https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb
 class JekyllWikilinks < Jekyll::Generator
+	attr_accessor :site
 
 	def generate(site)
+		@site = site
+
 		wikilinks_collection = site.config["wikilinks_collection"]
 		wikilinks_collection = "notes" if wikilinks_collection.nil? || wikilinks_collection.empty?
 		all_notes = site.collections[wikilinks_collection].docs
@@ -21,11 +24,11 @@ class JekyllWikilinks < Jekyll::Generator
 		link_extension = site.config["permalink"] != "pretty" ? '.html' : ''
 
 		all_docs.each do |cur_note|
-		parse_wiki_links(site, all_docs, cur_note, link_extension)
+			parse_wiki_links(all_docs, cur_note, link_extension)
 		end
 	end
 
-	def parse_wiki_links(site, all_notes, note, link_extension)
+	def parse_wiki_links(all_notes, note, link_extension)
 	  # some regex taken from vscode-markdown-notes: https://github.com/kortina/vscode-markdown-notes/blob/master/syntaxes/notes.tmLanguage.json   
 	  # Convert all Wiki/Roam-style double-bracket link syntax to plain HTML
 	  # anchor tag elements (<a>) with "internal-link" CSS class
