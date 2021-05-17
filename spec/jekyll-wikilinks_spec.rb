@@ -3,7 +3,7 @@ require "jekyll"
 require "jekyll-wikilinks"
 require "spec_helper"
 
-RSpec.describe(JekyllWikilinks) do
+RSpec.describe(JekyllWikiLinks::Generator) do
   let(:config_overrides) { {} }
   let(:config) do
     Jekyll.configuration(
