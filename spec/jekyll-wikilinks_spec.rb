@@ -9,7 +9,6 @@ RSpec.describe(JekyllWikilinks) do
     Jekyll.configuration(
       config_overrides.merge(
         "collections"          => { "notes" => { "output" => true } },
-        "wikilinks_collection" => "notes",
         "permalink"            => "pretty",
         "skip_config_files"    => false,
         "source"               => fixtures_dir,
@@ -34,10 +33,6 @@ RSpec.describe(JekyllWikilinks) do
   end
 
   context "run requirements" do
-
-  	it "may define 'wikilinks_collection' in configs" do
-  		expect(site.config['wikilinks_collection']).to eql("notes")
-  	end
 
     it "processes markdown files" do
       expect(one_note.data['ext']).to eql(".md")

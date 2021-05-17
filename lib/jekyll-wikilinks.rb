@@ -6,33 +6,39 @@ require_relative "jekyll-wikilinks/version"
 # object -- which we need to build a element's href attribute.
 
 # refs:
+# 	- use ruby classes more fully: https://github.com/benbalter/jekyll-relative-links
 #   - backlinks generator: https://github.com/maximevaillancourt/digital-garden-jekyll-template
 #   - regex: https://github.com/kortina/vscode-markdown-notes/blob/0ac9205ea909511b708d45cbca39c880688b5969/syntaxes/notes.tmLanguage.json
-#   - refator to converterible: https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb
+#   - converterible example: https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb
 class JekyllWikilinks < Jekyll::Generator
-	attr_accessor :site
+	attr_accessor :site, :md_docs
+
+	CONVERTER_CLASS = Jekyll::Converters::Markdown
 
 	def generate(site)
-		@site = site
-
-		wikilinks_collection = site.config["wikilinks_collection"]
-		wikilinks_collection = "notes" if wikilinks_collection.nil? || wikilinks_collection.empty?
-		all_notes = site.collections[wikilinks_collection].docs
-		# i like the idea, but the solution style isn't robust enough yet...
-		# all_pages = site.pages
-		all_docs = all_notes # + all_pages
+		@site = site		
+		documents = site.pages + site.docs_to_write
+		@md_docs = documents.select {|doc| markdown_extension?(doc.extname) } # if collections?
 		link_extension = site.config["permalink"] != "pretty" ? '.html' : ''
+		
+		old_config_warn()
 
-		all_docs.each do |cur_note|
-			parse_wiki_links(all_docs, cur_note, link_extension)
+		md_docs.each do |document|
+			parse_wiki_links(document, link_extension)
 		end
 	end
 
-	def parse_wiki_links(all_notes, note, link_extension)
+	def old_config_warn()
+		if site.config.include?("wikilinks_collection")
+			Jekyll.logger.warn "'wikilinks_collection' is no longer used for configs.\n"
+		end
+	end
+
+	def parse_wiki_links(note, link_extension)
 	  # some regex taken from vscode-markdown-notes: https://github.com/kortina/vscode-markdown-notes/blob/master/syntaxes/notes.tmLanguage.json   
 	  # Convert all Wiki/Roam-style double-bracket link syntax to plain HTML
 	  # anchor tag elements (<a>) with "internal-link" CSS class
-	  all_notes.each do |note_potentially_linked_to|
+	  md_docs.each do |note_potentially_linked_to|
 	    namespace_from_filename = File.basename(
 	      note_potentially_linked_to.basename,
 	      File.extname(note_potentially_linked_to.basename)
@@ -76,5 +82,13 @@ class JekyllWikilinks < Jekyll::Generator
 	      <span title='There is no note that matches this link.' class='invalid-wiki-link'>[[\\2|\\4]]</span>
 	    HTML
 	  )
+	end
+
+	def markdown_extension?(extension)
+		markdown_converter.matches(extension)
+	end
+
+	def markdown_converter
+		@markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
 	end
 end
