@@ -13,7 +13,8 @@ RSpec.describe(JekyllWikilinks) do
         "skip_config_files"    => false,
         "source"               => fixtures_dir,
         "destination"          => fixtures_dir("_site"),
-        "baseurl"              => "garden.testsite.com",
+        "url"                  => "garden.testsite.com",
+        "baseurl"              => "/bonsai",
       )
     )
   end
@@ -67,8 +68,8 @@ RSpec.describe(JekyllWikilinks) do
     end
 
     it "assigns a element's href to site.baseurl + /note/ + note-id" do
-      expect(one_note.output).to include("href=\"garden.testsite.com/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\"")
-      expect(two_note.output).to include("href=\"garden.testsite.com/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"")
+      expect(one_note.output).to include("href=\"/bonsai/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\"")
+      expect(two_note.output).to include("href=\"/bonsai/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"")
     end
 
     # todo: add test for '.html' when 'permalink' is not set to 'pretty'
@@ -78,8 +79,8 @@ RSpec.describe(JekyllWikilinks) do
     end
 
     it "full output" do
-      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"garden.testsite.com/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
-      expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"garden.testsite.com/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a> has a little star.</p>\n")
+      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/bonsai/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
+      expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/bonsai/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a> has a little star.</p>\n")
     end
 
   end
@@ -123,8 +124,8 @@ RSpec.describe(JekyllWikilinks) do
     end
 
     it "full output" do
-      expect(right_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"garden.testsite.com/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a right alias.</p>\n")
-      expect(left_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"garden.testsite.com/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a left alias.</p>\n")
+      expect(right_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/bonsai/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a right alias.</p>\n")
+      expect(left_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/bonsai/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a left alias.</p>\n")
     end
   
   end
