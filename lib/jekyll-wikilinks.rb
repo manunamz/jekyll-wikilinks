@@ -4,9 +4,6 @@ require_relative "jekyll-wikilinks/context"
 require_relative "jekyll-wikilinks/version"
 
 
-# can't use converter plugin because it does not have access to jekyll's 'site'
-# object -- which we need to build a element's href attribute.
-
 # refs:
 # 	- github wiki: https://docs.github.com/en/communities/documenting-your-project-with-wikis/editing-wiki-content
 # 	- use ruby classes more fully: https://github.com/benbalter/jekyll-relative-links
@@ -49,46 +46,48 @@ module JekyllWikiLinks
 		      note_potentially_linked_to.basename,
 		      File.extname(note_potentially_linked_to.basename)
 		    )
-
+		    
 		    note_url = relative_url(note_potentially_linked_to.url) if note_potentially_linked_to&.url
 
 		    # Replace double-bracketed links using note title
 		    # [[feline.cats]]
+		    regex_wl, cap_gr = regex_wiki_link(namespace_from_filename)
 		    note.content = note.content.gsub(
-		      regex_wiki_link(namespace_from_filename),
-		      "<a class='wiki-link' href='#{note_url}'>#{note_potentially_linked_to.data['title'].downcase}</a>"
+		      regex_wl,
+		      "<a class='wiki-link' href='#{note_url}'>#{note_potentially_linked_to.title.downcase}</a>"
 		    )
 
 		    # Replace double-bracketed links with alias (right)
 		    # [[feline.cats|this is a link to the note about cats]]
+		    regex_wl, cap_gr = regex_wiki_link_w_alias_right(namespace_from_filename)
 		    note.content = note.content.gsub(
-		      regex_wiki_link_w_alias_right(namespace_from_filename),
-		      "<a class='wiki-link' href='#{note_url}'>\\4</a>"
+		      regex_wl,
+		      "<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
 		    )
 
 		    # Replace double-bracketed links with alias (left)
 		    # [[this is a link to the note about cats|feline.cats]]
+		    regex_wl, cap_gr = regex_wiki_link_w_alias_left(namespace_from_filename)
 		    note.content = note.content.gsub(
-		      regex_wiki_link_w_alias_left(namespace_from_filename),
-		      "<a class='wiki-link' href='#{note_url}'>\\2</a>"
+		      regex_wl,
+		      "<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
 		    )
 		  end
 
 		  # At this point, all remaining double-bracket-wrapped words are
 		  # pointing to non-existing pages, so let's turn them into disabled
 		  # links by greying them out and changing the cursor
+		  # vanilla wiki-links
+		  regex_wl, cap_gr = regex_wiki_link()
 		  note.content = note.content.gsub(
-		    regex_wiki_link(),
-		    <<~HTML.chomp    # replace with this HTML (\\2 is what was inside the brackets)
-		      <span title='There is no note that matches this link.' class='invalid-wiki-link'>[[\\2]]</span>
-		    HTML
+		    regex_wl,
+		    "<span title='There is no note that matches this link.' class='invalid-wiki-link'>[[#{cap_gr}]]</span>"
 		  )
 		  # aliases -- both kinds
+		  regex_wl, cap_gr = regex_wiki_link_w_alias()		  
 		  note.content = note.content.gsub(
-		    regex_wiki_link_w_alias(),
-		    <<~HTML.chomp    # replace with this HTML (\\2|\\4 is what was inside the brackets)
-		      <span title='There is no note that matches this link.' class='invalid-wiki-link'>[[\\2|\\4]]</span>
-		    HTML
+		    regex_wl,
+		    "<span title='There is no note that matches this link.' class='invalid-wiki-link'>[[#{cap_gr}]]</span>"
 		  )
 		end
 
@@ -105,29 +104,44 @@ module JekyllWikiLinks
 		end
 
 		# regex
-		# using functions instead of constants because of left/right aliasing.
+		# returns two items: regex and a target capture group (text to be rendered)
+		# using functions instead of constants because of the need to access 'wiki_link_text'
+		#   -- esp. when aliasing.
 
 		def regex_wiki_link(wiki_link_text='')
-			return /(\[\[)([^\|\]]+)(\]\])/i if wiki_link_text.empty?
-			return /\[\[#{wiki_link_text}\]\]/i
+			if wiki_link_text.empty?
+				regex = /(\[\[)([^\|\]]+)(\]\])/i
+				cap_gr = "\\2" 
+				return regex, cap_gr
+			else 
+				regex = /\[\[#{wiki_link_text}\]\]/i
+				cap_gr = wiki_link_text
+				return regex, cap_gr
+			end
 		end
 
 		def regex_wiki_link_w_alias()
-			return /(\[\[)([^\]\|]+)(\|)([^\]]+)(\]\])/i
+			regex = /(\[\[)([^\]\|]+)(\|)([^\]]+)(\]\])/i
+			cap_gr = "\\2|\\4"
+			return regex, cap_gr 
 		end
 
 		def regex_wiki_link_w_alias_left(wiki_link_text)
 			raise ArgumentError.new(
 		    "Expected a value for 'wiki_link_text'"
 		  ) if wiki_link_text.nil?
-			return /(\[\[)([^\]\|]+)(\|)(#{wiki_link_text})(\]\])/i
+		  regex = /(\[\[)([^\]\|]+)(\|)(#{wiki_link_text})(\]\])/i
+		  cap_gr = "\\2"
+			return regex, cap_gr
 		end
 
 		def regex_wiki_link_w_alias_right(wiki_link_text)
 			raise ArgumentError.new(
 		    "Expected a value for 'wiki_link_text'"
 		  ) if wiki_link_text.nil?
-			return /(\[\[)(#{wiki_link_text})(\|)([^\]]+)(\]\])/i
+		  regex = /(\[\[)(#{wiki_link_text})(\|)([^\]]+)(\]\])/i
+		  cap_gr = "\\4"
+			return regex, cap_gr
 		end
 
 	end
