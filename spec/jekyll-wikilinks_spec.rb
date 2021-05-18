@@ -14,7 +14,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
         "source"               => fixtures_dir,
         "destination"          => fixtures_dir("_site"),
         "url"                  => "garden.testsite.com",
-        "baseurl"              => "/bonsai",
+        # "baseurl"              => "",
       )
     )
   end
@@ -29,7 +29,12 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:right_alias_note)         { find_by_title(site.collections["notes"].docs, "Right Name Fish") }
   let(:left_alias_note)          { find_by_title(site.collections["notes"].docs, "Left Name Fish") }
   
+  # check: https://github.com/benbalter/jekyll-relative-links/blob/ed1fe60243ef24769f442c0366647e2d1c8f50fe/spec/jekyll-relative-links/generator_spec.rb
+  # how are 'detecting markdown' tests working without this?
+  # subject { described_class.new(site.config) }
+
   before(:each) do
+    site.reset
     site.process
   end
 
@@ -39,15 +44,33 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(one_note.data['ext']).to eql(".md")
     end
 
-    it "expects these data in note's frontmatter" do
-      # file
-      expect(one_note_md).to include("id:")
-      expect(one_note_md).to include("title:")
-      expect(one_note_md).to include("permalink:")
-      # note data
-      expect(one_note.data).to include("id")
-      expect(one_note.data).to include("title")
-      expect(one_note.data).to include("permalink")      
+    context "detecting markdown" do
+      before { subject.instance_variable_set "@site", site }
+
+      it "knows when an extension is markdown" do
+        expect(subject.send(:markdown_extension?, ".md")).to eql(true)
+      end
+
+      it "knows when an extension isn't markdown" do
+        expect(subject.send(:markdown_extension?, ".html")).to eql(false)
+      end
+
+      it "knows the markdown converter" do
+        expect(subject.send(:markdown_converter)).to be_a(Jekyll::Converters::Markdown)
+      end
+    end
+
+  end
+
+  context "when 'baseurl' is set in configs" do
+    let(:config_overrides) { { "baseurl" => "/wikilinks" } }
+
+    it "baseurl included in href" do
+      expect(one_note.output).to include("/wikilinks")
+    end
+
+    it "wiki-links are parsed and a element is generated" do
+      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/wikilinks/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
     end
 
   end
@@ -68,8 +91,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "assigns a element's href to site.baseurl + /note/ + note-id" do
-      expect(one_note.output).to include("href=\"/bonsai/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\"")
-      expect(two_note.output).to include("href=\"/bonsai/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"")
+      expect(one_note.output).to include("href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\"")
+      expect(two_note.output).to include("href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"")
     end
 
     # todo: add test for '.html' when 'permalink' is not set to 'pretty'
@@ -79,8 +102,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "full output" do
-      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/bonsai/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
-      expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/bonsai/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a> has a little star.</p>\n")
+      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
+      expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a> has a little star.</p>\n")
     end
 
   end
@@ -124,8 +147,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "full output" do
-      expect(right_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/bonsai/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a right alias.</p>\n")
-      expect(left_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/bonsai/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a left alias.</p>\n")
+      expect(right_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a right alias.</p>\n")
+      expect(left_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a left alias.</p>\n")
     end
   
   end
