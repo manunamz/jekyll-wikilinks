@@ -26,6 +26,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:missing_links_note)       { find_by_title(site.collections["notes"].docs, "None School") }
   let(:missing_right_alias_note) { find_by_title(site.collections["notes"].docs, "None Right Name Fish") }
   let(:missing_left_alias_note)  { find_by_title(site.collections["notes"].docs, "None Left Name Fish") }
+  let(:note_link_whitespace)     { find_by_title(site.collections["notes"].docs, "Link Name With Whitespace") }
+  let(:note_name_whitespace)     { find_by_title(site.collections["notes"].docs, "Note Name With Whitespace") }
   let(:right_alias_note)         { find_by_title(site.collections["notes"].docs, "Right Name Fish") }
   let(:left_alias_note)          { find_by_title(site.collections["notes"].docs, "Left Name Fish") }
   
@@ -104,6 +106,14 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     it "full output" do
       expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
       expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a> has a little star.</p>\n")
+    end
+
+  end
+
+  context "when target [[wiki link]] note exists and contains whitespace" do
+    
+    it "full output" do
+      expect(note_link_whitespace.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/note/fb6bf728-948f-489e-9c9f-bb2b92677192/\">note name with whitespace</a>.</p>\n")
     end
 
   end
