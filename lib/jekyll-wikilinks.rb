@@ -42,7 +42,7 @@ module JekyllWikiLinks
 		  # Convert all Wiki/Roam-style double-bracket link syntax to plain HTML
 		  # anchor tag elements (<a>) with "wiki-link" CSS class
 		  md_docs.each do |note_potentially_linked_to|
-		    namespace_from_filename = File.basename(
+		    title_from_filename = File.basename(
 		      note_potentially_linked_to.basename,
 		      File.extname(note_potentially_linked_to.basename)
 		    )
@@ -51,15 +51,16 @@ module JekyllWikiLinks
 
 		    # Replace double-bracketed links using note title
 		    # [[feline.cats]]
-		    regex_wl, cap_gr = regex_wiki_link(namespace_from_filename)
+		    regex_wl, cap_gr = regex_wiki_link(title_from_filename)
+		    render_txt = note_potentially_linked_to.data['title'].downcase
 		    note.content = note.content.gsub(
 		      regex_wl,
-		      "<a class='wiki-link' href='#{note_url}'>#{note_potentially_linked_to.title.downcase}</a>"
+		      "<a class='wiki-link' href='#{note_url}'>#{render_txt}</a>"
 		    )
 
 		    # Replace double-bracketed links with alias (right)
 		    # [[feline.cats|this is a link to the note about cats]]
-		    regex_wl, cap_gr = regex_wiki_link_w_alias_right(namespace_from_filename)
+		    regex_wl, cap_gr = regex_wiki_link_w_alias_right(title_from_filename)
 		    note.content = note.content.gsub(
 		      regex_wl,
 		      "<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
@@ -67,7 +68,7 @@ module JekyllWikiLinks
 
 		    # Replace double-bracketed links with alias (left)
 		    # [[this is a link to the note about cats|feline.cats]]
-		    regex_wl, cap_gr = regex_wiki_link_w_alias_left(namespace_from_filename)
+		    regex_wl, cap_gr = regex_wiki_link_w_alias_left(title_from_filename)
 		    note.content = note.content.gsub(
 		      regex_wl,
 		      "<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
