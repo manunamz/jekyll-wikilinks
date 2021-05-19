@@ -100,11 +100,13 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(two_note.data).to include("backlinks")
     end
 
-    it "adds 'backlinkposts' metadata" do
-      expect(one_note.data).to include("backlinkposts")
-      expect(two_note.data).to include("backlinkposts")
+    it "'backlinks' metadata includes all jekyll types -- pages, docs (posts and collections)" do
+      expect(one_note.data["backlinks"]).to include(Jekyll::Page)
+      expect(one_note.data["backlinks"]).to include(Jekyll::Document)
+      # 'two_note' does not include any pages in its backlinks
+      # expect(two_note.data["backlinks"]).to include(Jekyll::Page)
+      expect(two_note.data["backlinks"]).to include(Jekyll::Document)
     end
-
 
     it "full output" do
       expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
