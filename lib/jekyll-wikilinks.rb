@@ -36,7 +36,6 @@ module JekyllWikiLinks
 			graph_nodes, graph_links = [], []
 			md_docs.each do |document|
 				document.data['backlinks'] = add_backlinks_json(site.baseurl, '', md_docs, document, graph_nodes, graph_links)
-				document.data['backlinkposts'] = get_backlinkposts(site.posts, document)
 			end
 		end
 
@@ -98,16 +97,6 @@ module JekyllWikiLinks
 				regex_wl,
 				"<span title='There is no note that matches this link.' class='invalid-wiki-link'>[[#{cap_gr}]]</span>"
 			)
-		end
-
-		def get_backlinkposts(all_posts, note)
-			backlinkposts = []
-			all_posts.docs.each do |post|
-				if post.content.include?(note.url)
-					backlinkposts << post
-				end
-			end
-			return backlinkposts
 		end
 
 		def add_backlinks_json(baseurl, link_extension, all_notes, note, graph_nodes, graph_links)
