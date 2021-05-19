@@ -12,7 +12,7 @@ require_relative "jekyll-wikilinks/version"
 #   - converterible example: https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb 
 module JekyllWikiLinks
 	class Generator < Jekyll::Generator
-		attr_accessor :site, :md_docs
+		attr_accessor :site, :md_docs, :graph_nodes, :graph_links
 
 		# Use Jekyll's native relative_url filter
 		include Jekyll::Filters::URLFilters
@@ -33,9 +33,9 @@ module JekyllWikiLinks
 			end
 
 			# extract link graph/metadata
-			graph_nodes, graph_links = [], []
+			@graph_nodes, @graph_links = [], []
 			md_docs.each do |document|
-				document.data['backlinks'] = add_backlinks_json(site.baseurl, '', md_docs, document, graph_nodes, graph_links)
+				document.data['backlinks'] = add_backlinks_json(document)
 			end
 		end
 
@@ -99,10 +99,10 @@ module JekyllWikiLinks
 			)
 		end
 
-		def add_backlinks_json(baseurl, link_extension, all_notes, note, graph_nodes, graph_links)
+		def add_backlinks_json(note)
 			# net-web: Identify note backlinks and add them to each note
 			backlinks = []
-			all_notes.each do |backlinked_note|
+			md_docs.each do |backlinked_note|
 				if backlinked_note.content.include?(note.url)
 					backlinks << backlinked_note
 				end
@@ -130,9 +130,10 @@ module JekyllWikiLinks
 				end
 			end
 			# graph
+			safe_url = relative_url(note.url) if note&.url
 			graph_nodes << {
 				id: note.data['id'],
-				url: "#{baseurl}#{note.url}#{link_extension}", # relative_url(note.url) if note&.url
+				url: safe_url,
 				label: note.data['title'],
 			}
 			backlinks.each do |b|
