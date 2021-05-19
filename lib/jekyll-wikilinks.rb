@@ -14,8 +14,8 @@ module JekyllWikiLinks
 	class Generator < Jekyll::Generator
 		attr_accessor :site, :md_docs
 
-	  # Use Jekyll's native relative_url filter
-	  include Jekyll::Filters::URLFilters
+		# Use Jekyll's native relative_url filter
+		include Jekyll::Filters::URLFilters
 
 		CONVERTER_CLASS = Jekyll::Converters::Markdown
 
@@ -35,9 +35,9 @@ module JekyllWikiLinks
 			# extract link graph/metadata
 			graph_nodes, graph_links = [], []
 			md_docs.each do |document|
-        document.data['backlinks'] = add_backlinks_json(site.baseurl, '', md_docs, document, graph_nodes, graph_links)
-        document.data['backlinkposts'] = get_backlinkposts(site.posts, document)
-	    end
+				document.data['backlinks'] = add_backlinks_json(site.baseurl, '', md_docs, document, graph_nodes, graph_links)
+				document.data['backlinkposts'] = get_backlinkposts(site.posts, document)
+			end
 		end
 
 		def old_config_warn()
@@ -47,117 +47,117 @@ module JekyllWikiLinks
 		end
 
 		def parse_wiki_links(note)
-		  # Convert all Wiki/Roam-style double-bracket link syntax to plain HTML
-		  # anchor tag elements (<a>) with "wiki-link" CSS class
-		  md_docs.each do |note_potentially_linked_to|
-		    title_from_filename = File.basename(
-		      note_potentially_linked_to.basename,
-		      File.extname(note_potentially_linked_to.basename)
-		    )
-		    
-		    note_url = relative_url(note_potentially_linked_to.url) if note_potentially_linked_to&.url
+			# Convert all Wiki/Roam-style double-bracket link syntax to plain HTML
+			# anchor tag elements (<a>) with "wiki-link" CSS class
+			md_docs.each do |note_potentially_linked_to|
+				title_from_filename = File.basename(
+					note_potentially_linked_to.basename,
+					File.extname(note_potentially_linked_to.basename)
+				)
+				
+				note_url = relative_url(note_potentially_linked_to.url) if note_potentially_linked_to&.url
 
-		    # Replace double-bracketed links using note title
-		    # [[feline.cats]]
-		    regex_wl, cap_gr = regex_wiki_link(title_from_filename)
-		    render_txt = note_potentially_linked_to.data['title'].downcase
-		    note.content = note.content.gsub(
-		      regex_wl,
-		      "<a class='wiki-link' href='#{note_url}'>#{render_txt}</a>"
-		    )
+				# Replace double-bracketed links using note title
+				# [[feline.cats]]
+				regex_wl, cap_gr = regex_wiki_link(title_from_filename)
+				render_txt = note_potentially_linked_to.data['title'].downcase
+				note.content = note.content.gsub(
+					regex_wl,
+					"<a class='wiki-link' href='#{note_url}'>#{render_txt}</a>"
+				)
 
-		    # Replace double-bracketed links with alias (right)
-		    # [[feline.cats|this is a link to the note about cats]]
-		    regex_wl, cap_gr = regex_wiki_link_w_alias_right(title_from_filename)
-		    note.content = note.content.gsub(
-		      regex_wl,
-		      "<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
-		    )
+				# Replace double-bracketed links with alias (right)
+				# [[feline.cats|this is a link to the note about cats]]
+				regex_wl, cap_gr = regex_wiki_link_w_alias_right(title_from_filename)
+				note.content = note.content.gsub(
+					regex_wl,
+					"<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
+				)
 
-		    # Replace double-bracketed links with alias (left)
-		    # [[this is a link to the note about cats|feline.cats]]
-		    regex_wl, cap_gr = regex_wiki_link_w_alias_left(title_from_filename)
-		    note.content = note.content.gsub(
-		      regex_wl,
-		      "<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
-		    )
-		  end
+				# Replace double-bracketed links with alias (left)
+				# [[this is a link to the note about cats|feline.cats]]
+				regex_wl, cap_gr = regex_wiki_link_w_alias_left(title_from_filename)
+				note.content = note.content.gsub(
+					regex_wl,
+					"<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
+				)
+			end
 
-		  # At this point, all remaining double-bracket-wrapped words are
-		  # pointing to non-existing pages, so let's turn them into disabled
-		  # links by greying them out and changing the cursor
-		  # vanilla wiki-links
-		  regex_wl, cap_gr = regex_wiki_link()
-		  note.content = note.content.gsub(
-		    regex_wl,
-		    "<span title='There is no note that matches this link.' class='invalid-wiki-link'>[[#{cap_gr}]]</span>"
-		  )
-		  # aliases -- both kinds
-		  regex_wl, cap_gr = regex_wiki_link_w_alias()		  
-		  note.content = note.content.gsub(
-		    regex_wl,
-		    "<span title='There is no note that matches this link.' class='invalid-wiki-link'>[[#{cap_gr}]]</span>"
-		  )
+			# At this point, all remaining double-bracket-wrapped words are
+			# pointing to non-existing pages, so let's turn them into disabled
+			# links by greying them out and changing the cursor
+			# vanilla wiki-links
+			regex_wl, cap_gr = regex_wiki_link()
+			note.content = note.content.gsub(
+				regex_wl,
+				"<span title='There is no note that matches this link.' class='invalid-wiki-link'>[[#{cap_gr}]]</span>"
+			)
+			# aliases -- both kinds
+			regex_wl, cap_gr = regex_wiki_link_w_alias()		  
+			note.content = note.content.gsub(
+				regex_wl,
+				"<span title='There is no note that matches this link.' class='invalid-wiki-link'>[[#{cap_gr}]]</span>"
+			)
 		end
 
 		def get_backlinkposts(all_posts, note)
-	    backlinkposts = []
-	    all_posts.docs.each do |post|
-	      if post.content.include?(note.url)
-	        backlinkposts << post
-	      end
-	    end
-	    return backlinkposts
-	  end
+			backlinkposts = []
+			all_posts.docs.each do |post|
+				if post.content.include?(note.url)
+					backlinkposts << post
+				end
+			end
+			return backlinkposts
+		end
 
-	  def add_backlinks_json(baseurl, link_extension, all_notes, note, graph_nodes, graph_links)
-	    # net-web: Identify note backlinks and add them to each note
-	    backlinks = []
-	    all_notes.each do |backlinked_note|
-	      if backlinked_note.content.include?(note.url)
-	        backlinks << backlinked_note
-	      end
-	    end
-	    # identify missing links in note via .invalid-wiki-link class and nested note-name.
-	    missing_node_names = note.content.scan(/invalid-wiki-link[^\]]+\[\[([^\]]+)\]\]/i)
-	    if !missing_node_names.nil?
-	      missing_node_names.each do |missing_no_name_in_array| 
-	        missing_no_namespace = missing_no_name_in_array[0]
-	        # add missing nodes
-	        if graph_nodes.none? { |node| node[:id] == missing_no_namespace }
-	          Jekyll.logger.warn "Net-Web node missing: ", missing_no_namespace
-	          Jekyll.logger.warn " in: ", note.data['slug']  
-	          graph_nodes << {
-	            id: missing_no_namespace,
-	            url: '',
-	            label: missing_no_namespace,
-	          }
-	        end
-	        # add missing links
-	        graph_links << {
-	          source: note.data['id'],
-	          target: missing_no_namespace,
-	        }
-	      end
-	    end
-	    # graph
-	    graph_nodes << {
-	      id: note.data['id'],
-	      url: "#{baseurl}#{note.url}#{link_extension}", # relative_url(note.url) if note&.url
-	      label: note.data['title'],
-	    }
-	    backlinks.each do |b|
-	      graph_links << {
-	        source: b.data['id'],
-	        target: note.data['id'],
-	      }
-	    end
-	    return backlinks
-	  end
+		def add_backlinks_json(baseurl, link_extension, all_notes, note, graph_nodes, graph_links)
+			# net-web: Identify note backlinks and add them to each note
+			backlinks = []
+			all_notes.each do |backlinked_note|
+				if backlinked_note.content.include?(note.url)
+					backlinks << backlinked_note
+				end
+			end
+			# identify missing links in note via .invalid-wiki-link class and nested note-name.
+			missing_node_names = note.content.scan(/invalid-wiki-link[^\]]+\[\[([^\]]+)\]\]/i)
+			if !missing_node_names.nil?
+				missing_node_names.each do |missing_no_name_in_array| 
+					missing_no_namespace = missing_no_name_in_array[0]
+					# add missing nodes
+					if graph_nodes.none? { |node| node[:id] == missing_no_namespace }
+						Jekyll.logger.warn "Net-Web node missing: ", missing_no_namespace
+						Jekyll.logger.warn " in: ", note.data['slug']  
+						graph_nodes << {
+							id: missing_no_namespace,
+							url: '',
+							label: missing_no_namespace,
+						}
+					end
+					# add missing links
+					graph_links << {
+						source: note.data['id'],
+						target: missing_no_namespace,
+					}
+				end
+			end
+			# graph
+			graph_nodes << {
+				id: note.data['id'],
+				url: "#{baseurl}#{note.url}#{link_extension}", # relative_url(note.url) if note&.url
+				label: note.data['title'],
+			}
+			backlinks.each do |b|
+				graph_links << {
+					source: b.data['id'],
+					target: note.data['id'],
+				}
+			end
+			return backlinks
+		end
 
-	  def context
-	    @context ||= JekyllWikiLinks::Context.new(site)
-	  end
+		def context
+			@context ||= JekyllWikiLinks::Context.new(site)
+		end
 
 		def markdown_extension?(extension)
 			markdown_converter.matches(extension)
@@ -192,19 +192,19 @@ module JekyllWikiLinks
 
 		def regex_wiki_link_w_alias_left(wiki_link_text)
 			raise ArgumentError.new(
-		    "Expected a value for 'wiki_link_text'"
-		  ) if wiki_link_text.nil?
-		  regex = /(\[\[)([^\]\|]+)(\|)(#{wiki_link_text})(\]\])/i
-		  cap_gr = "\\2"
+				"Expected a value for 'wiki_link_text'"
+			) if wiki_link_text.nil?
+			regex = /(\[\[)([^\]\|]+)(\|)(#{wiki_link_text})(\]\])/i
+			cap_gr = "\\2"
 			return regex, cap_gr
 		end
 
 		def regex_wiki_link_w_alias_right(wiki_link_text)
 			raise ArgumentError.new(
-		    "Expected a value for 'wiki_link_text'"
-		  ) if wiki_link_text.nil?
-		  regex = /(\[\[)(#{wiki_link_text})(\|)([^\]]+)(\]\])/i
-		  cap_gr = "\\4"
+				"Expected a value for 'wiki_link_text'"
+			) if wiki_link_text.nil?
+			regex = /(\[\[)(#{wiki_link_text})(\|)([^\]]+)(\]\])/i
+			cap_gr = "\\4"
 			return regex, cap_gr
 		end
 
