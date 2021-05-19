@@ -27,9 +27,17 @@ module JekyllWikiLinks
 
 			old_config_warn()
 
+			# build links
 			md_docs.each do |document|
 				parse_wiki_links(document)
 			end
+
+			# extract link graph/metadata
+			graph_nodes, graph_links = [], []
+			md_docs.each do |document|
+        document.data['backlinks'] = add_backlinks_json(site.baseurl, '', md_docs, document, graph_nodes, graph_links)
+        document.data['backlinkposts'] = get_backlinkposts(site.posts, document)
+	    end
 		end
 
 		def old_config_warn()
@@ -91,6 +99,61 @@ module JekyllWikiLinks
 		    "<span title='There is no note that matches this link.' class='invalid-wiki-link'>[[#{cap_gr}]]</span>"
 		  )
 		end
+
+		def get_backlinkposts(all_posts, note)
+	    backlinkposts = []
+	    all_posts.docs.each do |post|
+	      if post.content.include?(note.url)
+	        backlinkposts << post
+	      end
+	    end
+	    return backlinkposts
+	  end
+
+	  def add_backlinks_json(baseurl, link_extension, all_notes, note, graph_nodes, graph_links)
+	    # net-web: Identify note backlinks and add them to each note
+	    backlinks = []
+	    all_notes.each do |backlinked_note|
+	      if backlinked_note.content.include?(note.url)
+	        backlinks << backlinked_note
+	      end
+	    end
+	    # identify missing links in note via .invalid-wiki-link class and nested note-name.
+	    missing_node_names = note.content.scan(/invalid-wiki-link[^\]]+\[\[([^\]]+)\]\]/i)
+	    if !missing_node_names.nil?
+	      missing_node_names.each do |missing_no_name_in_array| 
+	        missing_no_namespace = missing_no_name_in_array[0]
+	        # add missing nodes
+	        if graph_nodes.none? { |node| node[:id] == missing_no_namespace }
+	          Jekyll.logger.warn "Net-Web node missing: ", missing_no_namespace
+	          Jekyll.logger.warn " in: ", note.data['slug']  
+	          graph_nodes << {
+	            id: missing_no_namespace,
+	            url: '',
+	            label: missing_no_namespace,
+	          }
+	        end
+	        # add missing links
+	        graph_links << {
+	          source: note.data['id'],
+	          target: missing_no_namespace,
+	        }
+	      end
+	    end
+	    # graph
+	    graph_nodes << {
+	      id: note.data['id'],
+	      url: "#{baseurl}#{note.url}#{link_extension}", # relative_url(note.url) if note&.url
+	      label: note.data['title'],
+	    }
+	    backlinks.each do |b|
+	      graph_links << {
+	        source: b.data['id'],
+	        target: note.data['id'],
+	      }
+	    end
+	    return backlinks
+	  end
 
 	  def context
 	    @context ||= JekyllWikiLinks::Context.new(site)
