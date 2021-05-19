@@ -14,8 +14,8 @@ RSpec.configure do |config|
     File.join(FIXTURES_DIR, *files)
   end
 
-  def find_by_title(notes, title)
-    notes.find { |n| n.data["title"] == title }
+  def find_by_title(docs, title)
+    docs.find { |d| d.data["title"] == title }
   end
 
   # These two settings work together to allow you to limit a spec run

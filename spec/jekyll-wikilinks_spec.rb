@@ -19,9 +19,12 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     )
   end
   let(:site)                     { Jekyll::Site.new(config) }
-  let(:one_note_md)              { File.read(fixtures_dir("_notes/one.fish.md")) }
+  let(:one_page)                 { find_by_title(site.pages, "One Page") }
+  let(:one_post)                 { find_by_title(site.collections["posts"].docs, "One Post") }
   let(:one_note)                 { find_by_title(site.collections["notes"].docs, "One Fish") }
   let(:two_note)                 { find_by_title(site.collections["notes"].docs, "Two Fish") }
+  let(:link_to_page_note)        { find_by_title(site.collections["notes"].docs, "Link Page") }
+  let(:link_to_post_note)        { find_by_title(site.collections["notes"].docs, "Link Post") }
   let(:missing_link_note)        { find_by_title(site.collections["notes"].docs, "None Fish") }
   let(:missing_links_note)       { find_by_title(site.collections["notes"].docs, "None School") }
   let(:missing_right_alias_note) { find_by_title(site.collections["notes"].docs, "None Right Name Fish") }
@@ -110,11 +113,34 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   end
 
-  context "when target [[wiki link]] note exists and contains whitespace" do
+  context "when target [[wikilink]] note exists and contains whitespace" do
     
-    it "full output" do
+    it "[[wikilinks]] work as expected; full output" do
       expect(note_link_whitespace.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/note/fb6bf728-948f-489e-9c9f-bb2b92677192/\">note name with whitespace</a>.</p>\n")
     end
+
+  end
+
+  context "when [[wikilink]]s references cross jekyll types (collection item, post, or page)" do
+
+    it "work as expected when post targets collection item; full output" do
+      expect(one_post.output).to eq("<p>Posts support links, like to <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a>.</p>\n")
+    end
+    
+    it "work as expected when collection item targets a post; full output" do
+      expect(link_to_post_note.output).to eq("<p>This note links to <a class=\"wiki-link\" href=\"/2020/12/08/one-post/\">one post</a>.</p>\n")
+    end
+
+    it "work as expected when page targets collection item; full output" do
+      expect(one_page.output).to eq("<p>This page links to a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a>.</p>\n")
+    end
+    
+    it "work as expected when collection item targets a page; full output" do
+      expect(link_to_page_note.output).to eq("<p>This note links to <a class=\"wiki-link\" href=\"/one-page/\">one page</a>.</p>\n")
+    end
+
+    # todo: collection-type-1 <-> collection-type-2
+    # todo: page <-> post
 
   end
 
