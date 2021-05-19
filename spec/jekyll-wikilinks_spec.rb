@@ -106,6 +106,17 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(two_note.output).to_not include(".html")
     end
 
+    it "adds 'backlinks' metadata" do
+      expect(one_note.data).to include("backlinks")
+      expect(two_note.data).to include("backlinks")
+    end
+
+    it "adds 'backlinkposts' metadata" do
+      expect(one_note.data).to include("backlinkposts")
+      expect(two_note.data).to include("backlinkposts")
+    end
+
+
     it "full output" do
       expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
       expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a> has a little star.</p>\n")
