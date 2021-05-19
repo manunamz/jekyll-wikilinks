@@ -67,18 +67,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   end
 
-  context "when 'baseurl' is set in configs" do
-    let(:config_overrides) { { "baseurl" => "/wikilinks" } }
-
-    it "baseurl included in href" do
-      expect(one_note.output).to include("/wikilinks")
-    end
-
-    it "wiki-links are parsed and a element is generated" do
-      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/wikilinks/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
-    end
-
-  end
+  # happy-path
 
   context "when target [[wikilink]] note exists" do
 
@@ -124,6 +113,19 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   end
 
+  context "when 'baseurl' is set in configs" do
+    let(:config_overrides) { { "baseurl" => "/wikilinks" } }
+
+    it "baseurl included in href" do
+      expect(one_note.output).to include("/wikilinks")
+    end
+
+    it "wiki-links are parsed and a element is generated" do
+      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/wikilinks/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
+    end
+
+  end
+
   context "when target [[wikilink]] note exists and contains whitespace" do
     
     it "[[wikilinks]] work as expected; full output" do
@@ -154,6 +156,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # todo: page <-> post
 
   end
+
+  # /happy-path
 
   context "when target [[wikilink]] note does not exist" do
     
