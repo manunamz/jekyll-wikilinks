@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "json"
 require "jekyll"
 require "jekyll-wikilinks"
 
@@ -8,14 +9,38 @@ Jekyll.logger.log_level = :error
 # comments from: https://github.com/jekyll/jekyll-mentions/blob/master/spec/spec_helper.rb
 RSpec.configure do |config|
   FIXTURES_DIR = File.expand_path("fixtures", __dir__)
-  DEST_DIR   = File.expand_path("dest",     __dir__)
 
   def fixtures_dir(*files)
     File.join(FIXTURES_DIR, *files)
   end
 
+  def find_staticfile(relative_path)
+    site.static_files.find { |sf| sf.relative_path == relative_path }
+  end
+
   def find_by_title(docs, title)
     docs.find { |d| d.data["title"] == title }
+  end
+
+  def graph_file_content()
+    graph_file = File.read(fixtures_dir("_site/assets/graph-net-web.json"))
+    JSON.parse(graph_file)
+  end
+
+  def a_graph_node()
+    graph_file = File.read(fixtures_dir("_site/assets/graph-net-web.json"))
+    JSON.parse(graph_file)["nodes"].find { |n| n["id"] == "/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/" } # "One Fish" note
+  end
+
+  def a_graph_link()
+    graph_file = File.read(fixtures_dir("_site/assets/graph-net-web.json"))
+    all_links = JSON.parse(graph_file)["links"]
+    target_link = all_links.find_all { |l| l["source"] == "/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/" } # "One Fish" note link as source
+    if target_link.size > 1
+      raise "Expected only one link with 'source' as \"One Fish\" note to exist."
+    else
+      return target_link[0]
+    end
   end
 
   # These two settings work together to allow you to limit a spec run

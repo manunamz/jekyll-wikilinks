@@ -19,6 +19,10 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     )
   end
   let(:site)                     { Jekyll::Site.new(config) }
+  let(:graph_static_file)        { find_staticfile("/assets/graph-net-web.json") }
+  let(:graph_data)               { graph_file_content() }
+  let(:graph_node)               { a_graph_node() }
+  let(:graph_link)               { a_graph_link() }
   let(:one_page)                 { find_by_title(site.pages, "One Page") }
   let(:one_post)                 { find_by_title(site.collections["posts"].docs, "One Post") }
   let(:one_note)                 { find_by_title(site.collections["notes"].docs, "One Fish") }
@@ -41,6 +45,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   before(:each) do
     site.reset
     site.process
+    # todo:
+    #   - cleanup _site/ dir 
+    #   - cleanup assets/graph-net-web.json
   end
 
   context "run requirements" do
@@ -112,6 +119,44 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
       expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a> has a little star.</p>\n")
     end
+
+    # graph
+
+    it "generates graph data" do
+      expect(graph_static_file).to be_a(Jekyll::StaticFile)
+      expect(graph_static_file.relative_path).not_to be(nil)
+      expect(graph_data.class).to be(Hash)
+    end
+
+    it "generated graph data contains nodes of format: { nodes: [ {id: '', url: '', label: ''}, ... ] }" do
+      expect(graph_node.keys).to include("id")
+      expect(graph_node.keys).to include("url")
+      expect(graph_node.keys).to include("label")
+    end
+
+    it "nodes' 'id's equal their url (since urls should be unique)" do
+      expect(graph_node["id"]).to eq(graph_node["url"])
+    end
+
+    it "nodes' 'label's equal their doc title" do
+      expect(graph_node["label"]).to eq(one_note.data["title"])
+    end
+
+    it "nodes' 'url's equal their doc urls" do
+      expect(graph_node["url"]).to eq(one_note.url)
+    end
+
+    it "generated graph data contains links of format: { links: [ { source: '', target: ''}, ... ] }" do
+      expect(graph_link.keys).to include("source")
+      expect(graph_link.keys).to include("target")
+    end
+
+    it "links' 'source' and 'target' attributes equal some nodes' id" do
+      expect(graph_link["source"]).to eq(graph_node["id"])
+      expect(graph_link["target"]).to eq("/note/e0c824b6-0b8c-4595-8032-b6889edd815f/")
+    end
+
+    # /graph
 
   end
 
