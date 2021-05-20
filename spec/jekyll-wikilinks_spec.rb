@@ -12,7 +12,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
         "permalink"            => "pretty",
         "skip_config_files"    => false,
         "source"               => fixtures_dir,
-        "destination"          => fixtures_dir("_site"),
+        "destination"          => site_dir,
         "url"                  => "garden.testsite.com",
         # "baseurl"              => "",
       )
@@ -47,11 +47,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     site.process
   end
 
-  after(:each) do
+  after(:all) do
     # cleanup generated assets
-    FileUtils.rm_rf(Dir["#{config["destination"]}/assets/graph-net-web.json"])
+    FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
     # cleanup _site/ dir
-    FileUtils.rm_rf(Dir["#{config["destination"]}"])
+    FileUtils.rm_rf(Dir["#{site_dir()}"])
   end
 
   it "saves the config" do
@@ -175,12 +175,16 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   context "when graph is disabled in configs" do
     let(:config_overrides) { { "d3_graph_data" => { "enabled" => false } } }
-
+    before(:each) do
+      # cleanup generated assets
+      FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
+      # cleanup site_dir dir
+      FileUtils.rm_rf(Dir["#{site_dir()}"])
+    end
+    
     it "does not generate graph data" do
-      # expect(graph_generated_file).to raise_error(Errno)
-      # expect(graph_static_file).to raise_error(Errno)
-      expect(File.read(fixtures_dir("assets/graph-net-web.json"))).to raise_error(Errno)
-      expect(site.static_files.find { |sf| sf.relative_path == "/assets/graph-net-web.json" }).to raise_error(Errno)
+      expect { File.read("#{fixtures_dir("/assets/graph-net-web.json")}") }.to raise_error(Errno::ENOENT)
+      expect { File.read("#{site_dir("/assets/graph-net-web.json")}") }.to raise_error(Errno::ENOENT)
     end
 
   end

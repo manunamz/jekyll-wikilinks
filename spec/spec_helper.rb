@@ -9,9 +9,14 @@ Jekyll.logger.log_level = :error
 # comments from: https://github.com/jekyll/jekyll-mentions/blob/master/spec/spec_helper.rb
 RSpec.configure do |config|
   FIXTURES_DIR = File.expand_path("fixtures", __dir__)
+  SITE_DIR = File.expand_path("_site", __dir__)
 
   def fixtures_dir(*files)
     File.join(FIXTURES_DIR, *files)
+  end
+
+  def site_dir(*files)
+    File.join(SITE_DIR, *files)
   end
 
   def find_by_title(docs, title)
@@ -27,17 +32,17 @@ RSpec.configure do |config|
   end
 
   def static_graph_file_content()
-    graph_file = File.read(fixtures_dir("_site/assets/graph-net-web.json"))
+    graph_file = File.read(site_dir("/assets/graph-net-web.json"))
     JSON.parse(graph_file)
   end
 
   def a_graph_node()
-    graph_file = File.read(fixtures_dir("_site/assets/graph-net-web.json"))
+    graph_file = File.read(site_dir("/assets/graph-net-web.json"))
     JSON.parse(graph_file)["nodes"].find { |n| n["id"] == "/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/" } # "One Fish" note
   end
 
   def a_graph_link()
-    graph_file = File.read(fixtures_dir("_site/assets/graph-net-web.json"))
+    graph_file = File.read(site_dir("/assets/graph-net-web.json"))
     all_links = JSON.parse(graph_file)["links"]
     target_link = all_links.find_all { |l| l["source"] == "/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/" } # "One Fish" note link as source
     if target_link.size > 1
