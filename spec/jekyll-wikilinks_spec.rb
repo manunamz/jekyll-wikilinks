@@ -19,8 +19,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     )
   end
   let(:site)                     { Jekyll::Site.new(config) }
-  let(:graph_static_file)        { find_staticfile("/assets/graph-net-web.json") }
-  let(:graph_data)               { graph_file_content() }
+  let(:graph_generated_file)     { find_generated_file("/assets/graph-net-web.json") }
+  let(:graph_static_file)        { find_static_file("/assets/graph-net-web.json") }
+  let(:graph_data)               { static_graph_file_content() }
   let(:graph_node)               { a_graph_node() }
   let(:graph_link)               { a_graph_link() }
   let(:one_page)                 { find_by_title(site.pages, "One Page") }
@@ -44,9 +45,17 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   before(:each) do
     site.reset
     site.process
-    # todo:
-    #   - cleanup _site/ dir 
-    #   - cleanup assets/graph-net-web.json
+  end
+
+  after(:each) do
+    # cleanup generated assets
+    FileUtils.rm_rf(Dir["#{config["destination"]}/assets/graph-net-web.json"])
+    # cleanup _site/ dir
+    FileUtils.rm_rf(Dir["#{config["destination"]}"])
+  end
+
+  it "saves the config" do
+    expect(subject.config).to eql(site.config)
   end
 
   context "processes markdown" do
@@ -118,6 +127,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # graph
 
     it "generates graph data" do
+      # expect(graph_generated_file.class).to be(File)
+      # expect(graph_generated_file.ext).to be(".json")
       expect(graph_static_file).to be_a(Jekyll::StaticFile)
       expect(graph_static_file.relative_path).not_to be(nil)
       expect(graph_data.class).to be(Hash)
@@ -151,8 +162,6 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(graph_link["target"]).to eq("/note/e0c824b6-0b8c-4595-8032-b6889edd815f/")
     end
 
-    # /graph
-
   end
 
   context "when jekyll-wikilinks is disabled in configs" do
@@ -165,13 +174,18 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   end
 
   context "when graph is disabled in configs" do
-    let(:config_overrides) { { "wikilinks" => { "graph_data" => { "enabled" => false } } } }
+    let(:config_overrides) { { "d3_graph_data" => { "enabled" => false } } }
 
     it "does not generate graph data" do
-      expect(graph_static_file).to be(nil)
+      # expect(graph_generated_file).to raise_error(Errno)
+      # expect(graph_static_file).to raise_error(Errno)
+      expect(File.read(fixtures_dir("assets/graph-net-web.json"))).to raise_error(Errno)
+      expect(site.static_files.find { |sf| sf.relative_path == "/assets/graph-net-web.json" }).to raise_error(Errno)
     end
 
   end
+
+  # /graph
 
   context "when 'baseurl' is set in configs" do
     let(:config_overrides) { { "baseurl" => "/wikilinks" } }

@@ -21,7 +21,7 @@ module JekyllWikiLinks
 		CONVERTER_CLASS = Jekyll::Converters::Markdown
 		ENABLED_KEY = "enabled"
 		ENABLED_GRAPH_DATA_KEY = "enabled"
-		GRAPH_DATA_KEY = "graph_data"
+		GRAPH_DATA_KEY = "d3_graph_data"
 
     def initialize(config)
       @config = config
@@ -51,8 +51,9 @@ module JekyllWikiLinks
 				generate_graph_data(document)
 			end
 
-			return if disabled_graph_data?
-			write_graph_data()
+			if !disabled_graph_data?
+				write_graph_data()
+			end
 		end
 
 		def old_config_warn()
@@ -192,7 +193,7 @@ module JekyllWikiLinks
     end
 
     def option_graph(key)
-    	config[CONFIG_KEY] && config[CONFIG_KEY][GRAPH_DATA_KEY] && config[CONFIG_KEY][GRAPH_DATA_KEY][key]
+    	config[GRAPH_DATA_KEY] && config[GRAPH_DATA_KEY][key]
     end
 
     def disabled?
