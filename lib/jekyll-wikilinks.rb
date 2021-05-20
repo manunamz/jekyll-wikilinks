@@ -5,8 +5,8 @@ require_relative "jekyll-wikilinks/version"
 
 
 # refs:
-# 	- github wiki: https://docs.github.com/en/communities/documenting-your-project-with-wikis/editing-wiki-content
-# 	- use ruby classes more fully: https://github.com/benbalter/jekyll-relative-links
+#   - github wiki: https://docs.github.com/en/communities/documenting-your-project-with-wikis/editing-wiki-content
+#   - use ruby classes more fully: https://github.com/benbalter/jekyll-relative-links
 #   - backlinks generator: https://github.com/maximevaillancourt/digital-garden-jekyll-template
 #   - regex: https://github.com/kortina/vscode-markdown-notes/blob/0ac9205ea909511b708d45cbca39c880688b5969/syntaxes/notes.tmLanguage.json
 #   - converterible example: https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb 
@@ -20,7 +20,7 @@ module JekyllWikiLinks
 		CONVERTER_CLASS = Jekyll::Converters::Markdown
 
 		def generate(site)
-			@site = site		
+			@site = site    
 			@context = context
 			documents = site.pages + site.docs_to_write
 			@md_docs = documents.select {|doc| markdown_extension?(doc.extname) } # if collections?
@@ -32,11 +32,15 @@ module JekyllWikiLinks
 				parse_wiki_links(document)
 			end
 
-			# extract link graph/metadata
+			# backlinks data handling
 			@graph_nodes, @graph_links = [], []
 			md_docs.each do |document|
-				document.data['backlinks'] = add_backlinks_json(document)
+				# extract link metadata
+				document.data['backlinks'] = get_backlinks(document)
+				# generate graph data
+				generate_graph_data(document)
 			end
+			write_graph_data()
 		end
 
 		def old_config_warn()
@@ -92,57 +96,71 @@ module JekyllWikiLinks
 				"<span title='There is no note that matches this link.' class='invalid-wiki-link'>[[#{cap_gr}]]</span>"
 			)
 			# aliases -- both kinds
-			regex_wl, cap_gr = regex_wiki_link_w_alias()		  
+			regex_wl, cap_gr = regex_wiki_link_w_alias()      
 			note.content = note.content.gsub(
 				regex_wl,
 				"<span title='There is no note that matches this link.' class='invalid-wiki-link'>[[#{cap_gr}]]</span>"
 			)
 		end
 
-		def add_backlinks_json(note)
-			# net-web: Identify note backlinks and add them to each note
+		def get_backlinks(doc)
+			# identify doc backlinks and add them to each note
 			backlinks = []
-			md_docs.each do |backlinked_note|
-				if backlinked_note.content.include?(note.url)
-					backlinks << backlinked_note
+			md_docs.each do |backlinked_doc|
+				if backlinked_doc.content.include?(doc.url)
+					backlinks << backlinked_doc
 				end
 			end
-			# identify missing links in note via .invalid-wiki-link class and nested note-name.
-			missing_node_names = note.content.scan(/invalid-wiki-link[^\]]+\[\[([^\]]+)\]\]/i)
+			return backlinks
+		end
+
+		def invalid_wiki_links(doc)
+			regex, _ = regex_invalid_wiki_link()
+			return doc.content.scan(regex)[0]
+		end
+
+		def generate_graph_data(note)
+			# missing nodes
+			missing_node_names = invalid_wiki_links(note)
 			if !missing_node_names.nil?
-				missing_node_names.each do |missing_no_name_in_array| 
-					missing_no_namespace = missing_no_name_in_array[0]
-					# add missing nodes
-					if graph_nodes.none? { |node| node[:id] == missing_no_namespace }
-						Jekyll.logger.warn "Net-Web node missing: ", missing_no_namespace
+				missing_node_names.each do |missing_node_name| 
+					if graph_nodes.none? { |node| node[:id] == missing_node_name }
+						Jekyll.logger.warn "Net-Web node missing: ", missing_node_name
 						Jekyll.logger.warn " in: ", note.data['slug']  
 						graph_nodes << {
-							id: missing_no_namespace,
+							id: missing_node_name,
 							url: '',
-							label: missing_no_namespace,
+							label: missing_node_name,
 						}
 					end
-					# add missing links
 					graph_links << {
 						source: note.data['id'],
-						target: missing_no_namespace,
+						target: missing_node_name,
 					}
 				end
 			end
-			# graph
+			# existing nodes
 			safe_url = relative_url(note.url) if note&.url
 			graph_nodes << {
-				id: note.data['id'],
+				id: relative_url(note.url),
 				url: safe_url,
 				label: note.data['title'],
 			}
-			backlinks.each do |b|
+			get_backlinks(note).each do |b|
 				graph_links << {
-					source: b.data['id'],
-					target: note.data['id'],
+					source: relative_url(b.url),
+					target: relative_url(note.url),
 				}
 			end
-			return backlinks
+		end
+
+		def write_graph_data()
+			# from: https://github.com/jekyll/jekyll/issues/7195#issuecomment-415696200
+			static_file = Jekyll::StaticFile.new(site, site.source, "/assets", "graph-net-web.json")
+			File.write(@site.source + static_file.relative_path, JSON.dump({
+				links: graph_links,
+				nodes: graph_nodes,
+			}))
 		end
 
 		def context
@@ -161,6 +179,13 @@ module JekyllWikiLinks
 		# returns two items: regex and a target capture group (text to be rendered)
 		# using functions instead of constants because of the need to access 'wiki_link_text'
 		#   -- esp. when aliasing.
+
+		def regex_invalid_wiki_link()
+			# identify missing links in note via .invalid-wiki-link class and nested note-name.
+			regex = /invalid-wiki-link[^\]]+\[\[([^\]]+)\]\]/i
+			cap_gr = "\\1" # this is mostly just to remain consistent with other regex functions
+			return regex, cap_gr
+		end
 
 		def regex_wiki_link(wiki_link_text='')
 			if wiki_link_text.empty?
