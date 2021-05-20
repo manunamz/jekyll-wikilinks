@@ -38,9 +38,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:right_alias_note)         { find_by_title(site.collections["notes"].docs, "Right Name Fish") }
   let(:left_alias_note)          { find_by_title(site.collections["notes"].docs, "Left Name Fish") }
   
-  # check: https://github.com/benbalter/jekyll-relative-links/blob/ed1fe60243ef24769f442c0366647e2d1c8f50fe/spec/jekyll-relative-links/generator_spec.rb
-  # how are 'detecting markdown' tests working without this?
-  # subject { described_class.new(site.config) }
+  # makes markdown tests work
+  subject { described_class.new(site.config) }
 
   before(:each) do
     site.reset
@@ -50,11 +49,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     #   - cleanup assets/graph-net-web.json
   end
 
-  context "run requirements" do
-
-    it "processes markdown files" do
-      expect(one_note.data['ext']).to eql(".md")
-    end
+  context "processes markdown" do
 
     context "detecting markdown" do
       before { subject.instance_variable_set "@site", site }
@@ -157,6 +152,24 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     # /graph
+
+  end
+
+  context "when jekyll-wikilinks is disabled in configs" do
+    let(:config_overrides) { { "wikilinks" => { "enabled" => false } } }
+
+    it "does not process [[wikilinks]]" do
+      expect(one_note.content).to include("[[two.fish]]")
+    end
+
+  end
+
+  context "when graph is disabled in configs" do
+    let(:config_overrides) { { "wikilinks" => { "graph_data" => { "enabled" => false } } } }
+
+    it "does not generate graph data" do
+      expect(graph_static_file).to be(nil)
+    end
 
   end
 

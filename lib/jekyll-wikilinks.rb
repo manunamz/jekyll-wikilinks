@@ -12,14 +12,24 @@ require_relative "jekyll-wikilinks/version"
 #   - converterible example: https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb 
 module JekyllWikiLinks
 	class Generator < Jekyll::Generator
-		attr_accessor :site, :md_docs, :graph_nodes, :graph_links
+		attr_accessor :site, :config, :md_docs, :graph_nodes, :graph_links
 
 		# Use Jekyll's native relative_url filter
 		include Jekyll::Filters::URLFilters
 
+		CONFIG_KEY = "wikilinks"
 		CONVERTER_CLASS = Jekyll::Converters::Markdown
+		ENABLED_KEY = "enabled"
+		ENABLED_GRAPH_DATA_KEY = "enabled"
+		GRAPH_DATA_KEY = "graph_data"
+
+    def initialize(config)
+      @config = config
+    end
 
 		def generate(site)
+      return if disabled?
+
 			@site = site    
 			@context = context
 			documents = site.pages + site.docs_to_write
@@ -40,11 +50,13 @@ module JekyllWikiLinks
 				# generate graph data
 				generate_graph_data(document)
 			end
+
+			return if disabled_graph_data?
 			write_graph_data()
 		end
 
 		def old_config_warn()
-			if site.config.include?("wikilinks_collection")
+			if config.include?("wikilinks_collection")
 				Jekyll.logger.warn "Deprecated: As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details: https://shorty25h0r7.github.io/jekyll-wikilinks/"
 			end
 		end
@@ -174,6 +186,22 @@ module JekyllWikiLinks
 		def markdown_converter
 			@markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
 		end
+
+    def option(key)
+      config[CONFIG_KEY] && config[CONFIG_KEY][key]
+    end
+
+    def option_graph(key)
+    	config[CONFIG_KEY] && config[CONFIG_KEY][GRAPH_DATA_KEY] && config[CONFIG_KEY][GRAPH_DATA_KEY][key]
+    end
+
+    def disabled?
+      option(ENABLED_KEY) == false
+    end
+
+    def disabled_graph_data?
+    	option_graph(ENABLED_GRAPH_DATA_KEY) == false
+    end
 
 		# regex
 		# returns two items: regex and a target capture group (text to be rendered)
