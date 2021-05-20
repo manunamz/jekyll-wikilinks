@@ -8,20 +8,24 @@ I was very excited to publish my first gem, but of course, it happened. Check [t
 2. Add the following to your `_config.yml`:
 
 ```
-wikilinks_collection: "<collection-name>"
+wikilinks:
+	enable: true
+	exclude: []
+d3_graph_data:
+	enabled: true
+	exclude: []
 ```
 
+pages, posts, <collection-name>.
+
 ## Notable Usage Details
-- Note frontmatter must contain a `title` and a `permalink`.
-    - [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
-- [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md (whitespace has not been tested)).
+- scans all post, page, and collection markdown files for [[wikilinks]].
+- [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
+- [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md).
   - Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
 - aliasing in both directions is supported:
   - [[some text|filename]]
-  - [[filename|some text]]  
-
-## Future Features
-- Support wikilinks across multiple collections and posts.
+  - [[filename|some text]]
 
 ## Note
 - Implementation originally adapted from [digital garden jekyll template](https://github.com/maximevaillancourt/digital-garden-jekyll-template/blob/master/_plugins/bidirectional_links_generator.rb).

@@ -14,15 +14,19 @@ RSpec.configure do |config|
     File.join(FIXTURES_DIR, *files)
   end
 
-  def find_staticfile(relative_path)
-    site.static_files.find { |sf| sf.relative_path == relative_path }
-  end
-
   def find_by_title(docs, title)
     docs.find { |d| d.data["title"] == title }
   end
 
-  def graph_file_content()
+  def find_generated_file(relative_path)
+    fixtures_dir("assets/graph-net-web.json")
+  end
+
+  def find_static_file(relative_path)
+    site.static_files.find { |sf| sf.relative_path == relative_path }
+  end
+
+  def static_graph_file_content()
     graph_file = File.read(fixtures_dir("_site/assets/graph-net-web.json"))
     JSON.parse(graph_file)
   end
