@@ -123,7 +123,6 @@ module JekyllWikiLinks
 		end
 
 		def get_backlinks(doc)
-			# identify doc backlinks and add them to each note
 			backlinks = []
 			md_docs.each do |backlinked_doc|
 				if backlinked_doc.content.include?(doc.url)
@@ -189,12 +188,12 @@ module JekyllWikiLinks
 
 		def exclude?(type)
 			return false unless option(EXCLUDE_KEY)
-			return option(EXCLUDE_KEY).include?(type)
+			return option(EXCLUDE_KEY).include?(type.to_s)
 		end
 
 		def exclude_graph?(type)
 			return false unless option_graph(EXCLUDE_KEY)
-			return option_graph(EXCLUDE_KEY).include?(type)
+			return option_graph(EXCLUDE_KEY).include?(type.to_s)
 		end
 
 		def markdown_extension?(extension)
