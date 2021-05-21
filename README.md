@@ -7,11 +7,11 @@
 
 ```
 wikilinks:
-	enable: true
-	exclude: []
+  enable: true
+  exclude: []
 d3_graph_data:
-	enabled: true
-	exclude: []
+  enabled: true
+  exclude: []
 ```
 
 The `enable` flags may be toggled to turn off the plugin or turn off d3_graph_data generation. Any jekyll type ("pages", "posts", or collection names such as "notes") may be added to a list of `exclude`s for either wikilinks or graph generation.
