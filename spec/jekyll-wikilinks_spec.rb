@@ -175,7 +175,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   end
 
   context "when certain jekyll types are excluded in configs" do
-    let(:config_overrides) { { "wikilinks" => { "exclude" => [:notes, :pages, :posts] } } }
+    let(:config_overrides) { { "wikilinks" => { "exclude" => ["notes", "pages", "posts"] } } }
 
     it "does not process [[wikilinks]] for those types" do
       expect(one_note.content).to include("[[two.fish]]")
@@ -202,7 +202,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   end
 
   context "when certain jekyll types are excluded in graph configs" do
-    let(:config_overrides) { { "d3_graph_data" => { "exclude" => [:pages, :posts] } } }
+    let(:config_overrides) { { "d3_graph_data" => { "exclude" => ["pages", "posts"] } } }
     # before(:each) do
     #   # cleanup generated assets
     #   FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
