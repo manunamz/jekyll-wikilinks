@@ -5,12 +5,6 @@ require_relative "jekyll-wikilinks/filter"
 require_relative "jekyll-wikilinks/version"
 
 
-# refs:
-#   - github wiki: https://docs.github.com/en/communities/documenting-your-project-with-wikis/editing-wiki-content
-#   - use ruby classes more fully: https://github.com/benbalter/jekyll-relative-links
-#   - backlinks generator: https://github.com/maximevaillancourt/digital-garden-jekyll-template
-#   - regex: https://github.com/kortina/vscode-markdown-notes/blob/0ac9205ea909511b708d45cbca39c880688b5969/syntaxes/notes.tmLanguage.json
-#   - converterible example: https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb 
 module JekyllWikiLinks
 	class Generator < Jekyll::Generator
 		attr_accessor :site, :config, :md_docs, :graph_nodes, :graph_links
