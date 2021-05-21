@@ -35,7 +35,7 @@ Since all documents are processed, it may be useful to filter backlinks based on
 ```
 <!-- show post backlink titles -->
 {% assign post_backlinks = page.backlinks | backlink_type: "posts" %}
-{% for blink in post_backlinks %}
+{% for backlink in post_backlinks %}
   {{ backlink.title }}
 {% endfor %}
 <!-- show note backlink titles -->
@@ -50,8 +50,8 @@ Graph data is generated and output to a `.json` file in your `/assets` directory
 
 ```
 {
-	"nodes": ["id": "<some-id>", "url": "<relative-url>", "label": "<note's-title>"],
-	"links": ["source": "<a-node-id>", "target": "<another-node-id>"]
+  "nodes": ["id": "<some-id>", "url": "<relative-url>", "label": "<note's-title>"],
+  "links": ["source": "<a-node-id>", "target": "<another-node-id>"]
 }
 ```
 
