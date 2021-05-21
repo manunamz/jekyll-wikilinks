@@ -26,6 +26,25 @@ The `enable` flags may be toggled to turn off the plugin or turn off d3_graph_da
   - [[some text|filename]]
   - [[filename|some text]]
 
+### MetaData
+All backlinks detected by the plugin will add a `backlinks` metadata field to each document processed. You can then access the entire document from that field. 
+
+### Liquid Template Filter
+Since all documents are processed, it may be useful to filter backlinks based on their jekyll type, as they may not share all the same attributes. So, there is a liquid template filter provided for that purpose. For example, say you want to display 'post' backlinks and 'note' backlinks separately. Just filter the `backlinks` metadata like so:
+
+```
+<!-- show post backlink titles -->
+{% assign post_backlinks = page.backlinks | backlink_type: "posts" %}
+{% for blink in post_backlinks %}
+  {{ backlink.title }}
+{% endfor %}
+<!-- show note backlink titles -->
+{% assign note_backlinks = page.backlinks | backlink_type: "notes" %}
+{% for backlink in note_backlinks %}
+  {{ backlink.title }}
+{% endfor %}
+```
+
 ### D3 Graph Data
 Graph data is generated and output to a `.json` file in your `/assets` directory in the following format:
 
