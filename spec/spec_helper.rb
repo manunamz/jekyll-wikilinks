@@ -6,7 +6,6 @@ require "jekyll-wikilinks"
 
 Jekyll.logger.log_level = :error
 
-# comments from: https://github.com/jekyll/jekyll-mentions/blob/master/spec/spec_helper.rb
 RSpec.configure do |config|
   FIXTURES_DIR = File.expand_path("fixtures", __dir__)
   SITE_DIR = File.expand_path("_site", __dir__)
@@ -18,6 +17,13 @@ RSpec.configure do |config|
   def site_dir(*files)
     File.join(SITE_DIR, *files)
   end
+
+  def render_liquid(content, variables)
+    template = Liquid::Template.parse(content)
+    template.render(variables)
+  end
+
+  # expected retrieval helpers
 
   def find_by_title(docs, title)
     docs.find { |d| d.data["title"] == title }
@@ -67,6 +73,19 @@ RSpec.configure do |config|
       return target_link[0]
     end
   end
+
+  # comments from: https://github.com/jekyll/jekyll-mentions/blob/master/spec/spec_helper.rb
+
+  # rspec-mocks config goes here. You can use an alternate test double
+  # library (such as bogus or mocha) by changing the `mock_with` option here.
+  config.mock_with :rspec do |mocks|
+    # Prevents you from mocking or stubbing a method that does not exist on
+    # a real object. This is generally recommended, and will default to
+    # `true` in RSpec 4.
+    mocks.verify_partial_doubles = true
+  end
+
+  # comments from: https://github.com/jekyll/jekyll-mentions/blob/master/spec/spec_helper.rb
 
   # These two settings work together to allow you to limit a spec run
   # to individual examples or groups you care about by tagging them with

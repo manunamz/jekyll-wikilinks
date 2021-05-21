@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-require "jekyll"
 
-module Jekyll
+module JekyllWikiLinks
   module BackLinkTypeFilters
     # usage:
     # {% assign note_backlinks = page.backlinks | backlink_type = "notes" %}
@@ -26,4 +25,4 @@ module Jekyll
   end
 end
 
-Liquid::Template.register_filter(Jekyll::BackLinkTypeFilters)
+Liquid::Template.register_filter(JekyllWikiLinks::BackLinkTypeFilters)
