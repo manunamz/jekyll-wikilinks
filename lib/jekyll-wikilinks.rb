@@ -31,6 +31,8 @@ module JekyllWikiLinks
 
 		def generate(site)
 			return if disabled?
+			Jekyll.logger.debug "Excluded jekyll types: ", option(EXCLUDE_KEY)
+			Jekyll.logger.debug "Excluded jekyll types in graph: ", option_graph(EXCLUDE_GRAPH_KEY)
 
 			@site = site    
 			@context = context
@@ -137,14 +139,15 @@ module JekyllWikiLinks
 			return doc.content.scan(regex)[0]
 		end
 
-		def generate_graph_data(note)
+		def generate_graph_data(doc)
+			Jekyll.logger.debug "Processing graph nodes for doc: ", doc.data['title']
 			# missing nodes
-			missing_node_names = invalid_wiki_links(note)
+			missing_node_names = invalid_wiki_links(doc)
 			if !missing_node_names.nil?
 				missing_node_names.each do |missing_node_name| 
 					if graph_nodes.none? { |node| node[:id] == missing_node_name }
 						Jekyll.logger.warn "Net-Web node missing: ", missing_node_name
-						Jekyll.logger.warn " in: ", note.data['slug']  
+						Jekyll.logger.warn " in: ", doc.data['slug']  
 						graph_nodes << {
 							id: missing_node_name,
 							url: '',
@@ -152,23 +155,24 @@ module JekyllWikiLinks
 						}
 					end
 					graph_links << {
-						source: note.data['id'],
+						source: relative_url(doc.url),
 						target: missing_node_name,
 					}
 				end
 			end
 			# existing nodes
-			safe_url = relative_url(note.url) if note&.url
 			graph_nodes << {
-				id: relative_url(note.url),
-				url: safe_url,
-				label: note.data['title'],
+				id: relative_url(doc.url),
+				url: relative_url(doc.url),
+				label: doc.data['title'],
 			}
-			get_backlinks(note).each do |b|
-				graph_links << {
-					source: relative_url(b.url),
-					target: relative_url(note.url),
-				}
+			get_backlinks(doc).each do |b|
+				if !exclude_graph?(b.type)
+					graph_links << {
+						source: relative_url(b.url),
+						target: relative_url(doc.url),
+					}
+				end
 			end
 		end
 
