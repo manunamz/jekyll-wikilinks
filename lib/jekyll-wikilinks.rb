@@ -21,19 +21,25 @@ module JekyllWikiLinks
 		CONVERTER_CLASS = Jekyll::Converters::Markdown
 		ENABLED_KEY = "enabled"
 		ENABLED_GRAPH_DATA_KEY = "enabled"
+		EXCLUDE_KEY = "exclude"
+		EXCLUDE_GRAPH_KEY = "exclude"
 		GRAPH_DATA_KEY = "d3_graph_data"
 
-    def initialize(config)
-      @config = config
-    end
+		def initialize(config)
+			@config = config
+		end
 
 		def generate(site)
-      return if disabled?
+			return if disabled?
 
 			@site = site    
 			@context = context
-			documents = site.pages + site.docs_to_write
-			@md_docs = documents.select {|doc| markdown_extension?(doc.extname) } # if collections?
+
+			documents = []
+			documents += site.pages if !exclude?(:pages)
+			included_docs = site.docs_to_write.filter { |d| !exclude?(d.type) }
+			documents += included_docs
+			@md_docs = documents.select {|doc| markdown_extension?(doc.extname) }
 
 			old_config_warn()
 
@@ -45,10 +51,10 @@ module JekyllWikiLinks
 			# backlinks data handling
 			@graph_nodes, @graph_links = [], []
 			md_docs.each do |document|
-				# extract link metadata
 				document.data['backlinks'] = get_backlinks(document)
-				# generate graph data
-				generate_graph_data(document)
+				if !disabled_graph_data? && !exclude_graph?(document.type)
+					generate_graph_data(document) 
+				end
 			end
 
 			if !disabled_graph_data?
@@ -180,6 +186,17 @@ module JekyllWikiLinks
 			@context ||= JekyllWikiLinks::Context.new(site)
 		end
 
+
+		def exclude?(type)
+			return false unless option(EXCLUDE_KEY)
+			return option(EXCLUDE_KEY).include?(type)
+		end
+
+		def exclude_graph?(type)
+			return false unless option_graph(EXCLUDE_KEY)
+			return option_graph(EXCLUDE_KEY).include?(type)
+		end
+
 		def markdown_extension?(extension)
 			markdown_converter.matches(extension)
 		end
@@ -188,21 +205,21 @@ module JekyllWikiLinks
 			@markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
 		end
 
-    def option(key)
-      config[CONFIG_KEY] && config[CONFIG_KEY][key]
-    end
+		def option(key)
+			config[CONFIG_KEY] && config[CONFIG_KEY][key]
+		end
 
-    def option_graph(key)
-    	config[GRAPH_DATA_KEY] && config[GRAPH_DATA_KEY][key]
-    end
+		def option_graph(key)
+			config[GRAPH_DATA_KEY] && config[GRAPH_DATA_KEY][key]
+		end
 
-    def disabled?
-      option(ENABLED_KEY) == false
-    end
+		def disabled?
+			option(ENABLED_KEY) == false
+		end
 
-    def disabled_graph_data?
-    	option_graph(ENABLED_GRAPH_DATA_KEY) == false
-    end
+		def disabled_graph_data?
+			option_graph(ENABLED_GRAPH_DATA_KEY) == false
+		end
 
 		# regex
 		# returns two items: regex and a target capture group (text to be rendered)

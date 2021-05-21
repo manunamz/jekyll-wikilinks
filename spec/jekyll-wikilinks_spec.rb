@@ -47,6 +47,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     site.process
   end
 
+  # todo: change to :each
   after(:all) do
     # cleanup generated assets
     FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
@@ -173,6 +174,17 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   end
 
+  context "when certain jekyll types are excluded in configs" do
+    let(:config_overrides) { { "wikilinks" => { "exclude" => [:notes, :pages, :posts] } } }
+
+    it "does not process [[wikilinks]] for those types" do
+      expect(one_note.content).to include("[[two.fish]]")
+      expect(one_page.content).to include("[[one.fish]]")
+      expect(one_post.content).to include("[[one.fish]]")
+    end
+
+  end
+
   context "when graph is disabled in configs" do
     let(:config_overrides) { { "d3_graph_data" => { "enabled" => false } } }
     before(:each) do
@@ -185,6 +197,25 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     it "does not generate graph data" do
       expect { File.read("#{fixtures_dir("/assets/graph-net-web.json")}") }.to raise_error(Errno::ENOENT)
       expect { File.read("#{site_dir("/assets/graph-net-web.json")}") }.to raise_error(Errno::ENOENT)
+    end
+
+  end
+
+  context "when certain jekyll types are excluded in graph configs" do
+    let(:config_overrides) { { "d3_graph_data" => { "exclude" => [:pages, :posts] } } }
+    # before(:each) do
+    #   # cleanup generated assets
+    #   FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
+    #   # cleanup site_dir dir
+    #   FileUtils.rm_rf(Dir["#{site_dir()}"])
+    # end
+
+    it "does not generate graph data for those jekyll types" do
+      expect(graph_data["nodes"].find { |n| n["title"] == "One Page" }).to eql(nil)
+      expect(graph_data["nodes"].find { |n| n["title"] == "One Post" }).to eql(nil)
+
+      expect(graph_data["links"].find { |n| n["source"] == "One Page" }).to eql(nil)
+      expect(graph_data["links"].find { |n| n["source"] == "One Post" }).to eql(nil)
     end
 
   end
