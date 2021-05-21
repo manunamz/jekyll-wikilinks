@@ -6,6 +6,8 @@
 - d3 graph data generation for network graphs.
 - `enable` config for graph data generation.
 - `exclude` config for graph data generation (works similarly to above).
+- `backlinks` metadata added to each item processed.
+- `backlink_type` liquid template filter added.
 
 ### Changed
 - All markdown files (jekyll types: pages, posts, and collections) are processed by default.
