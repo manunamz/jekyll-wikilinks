@@ -22,8 +22,10 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:graph_generated_file)     { find_generated_file("/assets/graph-net-web.json") }
   let(:graph_static_file)        { find_static_file("/assets/graph-net-web.json") }
   let(:graph_data)               { static_graph_file_content() }
-  let(:graph_node)               { a_graph_node() }
-  let(:graph_link)               { a_graph_link() }
+  let(:graph_node)               { get_graph_node() }
+  let(:graph_link)               { get_graph_link_match_source() }
+  let(:missing_link_graph_node)  { get_missing_link_graph_node() }
+  let(:missing_target_graph_link){ get_missing_target_graph_link() }
   let(:one_page)                 { find_by_title(site.pages, "One Page") }
   let(:one_post)                 { find_by_title(site.collections["posts"].docs, "One Post") }
   let(:one_note)                 { find_by_title(site.collections["notes"].docs, "One Fish") }
@@ -187,6 +189,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   context "when graph is disabled in configs" do
     let(:config_overrides) { { "d3_graph_data" => { "enabled" => false } } }
+
     before(:each) do
       # cleanup generated assets
       FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
@@ -292,7 +295,42 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(missing_link_note.output).to eq("<p>This <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[no.fish]]</span> has no target.</p>\n")
       expect(missing_links_note.output).to eq("<p>This fish has no targets like <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[no.fish]]</span> and <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[not.fish]]</span>.</p>\n")
     end
-  
+
+    it "generates graph data" do
+      # expect(graph_generated_file.class).to be(File)
+      # expect(graph_generated_file.ext).to be(".json")
+      expect(graph_static_file).to be_a(Jekyll::StaticFile)
+      expect(graph_static_file.relative_path).not_to be(nil)
+      expect(graph_data.class).to be(Hash)
+    end
+
+    it "generated graph data contains nodes of format: { nodes: [ {id: '', url: '', label: ''}, ... ] }" do
+      expect(missing_link_graph_node.keys).to include("id")
+      expect(missing_link_graph_node.keys).to include("url")
+      expect(missing_link_graph_node.keys).to include("label")
+    end
+
+    it "nodes' 'id's equal their url (since urls should be unique)" do
+      expect(missing_link_graph_node["id"]).to eq(missing_link_graph_node["url"])
+    end
+
+    it "nodes' 'label's equal their doc title" do
+      expect(missing_link_graph_node["label"]).to eq(missing_link_note.data["title"])
+    end
+
+    it "nodes' 'url's equal their doc urls" do
+      expect(missing_link_graph_node["url"]).to eq(missing_link_note.url)
+    end
+
+    it "generated graph data contains links of format: { links: [ { source: '', target: ''}, ... ] }" do
+      expect(missing_target_graph_link.keys).to include("source")
+      expect(missing_target_graph_link.keys).to include("target")
+    end
+
+    it "links' missing 'target' equals the [[wikitext]] in brackets." do
+      expect(missing_target_graph_link["target"]).to eq("no.fish")
+    end
+
   end
 
   context "when target [[wikilink]] using piped aliasing exists" do
