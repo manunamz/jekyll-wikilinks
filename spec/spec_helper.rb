@@ -36,17 +36,33 @@ RSpec.configure do |config|
     JSON.parse(graph_file)
   end
 
-  def a_graph_node()
+  def get_graph_node()
     graph_file = File.read(site_dir("/assets/graph-net-web.json"))
     JSON.parse(graph_file)["nodes"].find { |n| n["id"] == "/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/" } # "One Fish" note
   end
 
-  def a_graph_link()
+  def get_graph_link_match_source()
     graph_file = File.read(site_dir("/assets/graph-net-web.json"))
     all_links = JSON.parse(graph_file)["links"]
     target_link = all_links.find_all { |l| l["source"] == "/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/" } # "One Fish" note link as source
     if target_link.size > 1
       raise "Expected only one link with 'source' as \"One Fish\" note to exist."
+    else
+      return target_link[0]
+    end
+  end
+
+  def get_missing_link_graph_node()
+    graph_file = File.read(site_dir("/assets/graph-net-web.json"))
+    JSON.parse(graph_file)["nodes"].find { |n| n["id"] == "/note/a2157bb4-d3a6-4301-8984-b267074c45f3/" } # "None Fish" note
+  end
+
+  def get_missing_target_graph_link()
+    graph_file = File.read(site_dir("/assets/graph-net-web.json"))
+    all_links = JSON.parse(graph_file)["links"]
+    target_link = all_links.find_all { |l| l["source"] == "/note/a2157bb4-d3a6-4301-8984-b267074c45f3/" } # "None Fish" note link as source
+    if target_link.size > 1
+      raise "Expected only one link with 'source' as \"None Fish\" note to exist."
     else
       return target_link[0]
     end
