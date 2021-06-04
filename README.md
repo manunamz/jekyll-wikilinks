@@ -3,7 +3,7 @@
 ## Installation
 
 1. Add `gem 'jekyll-wikilinks'` to your site's Gemfile and run `bundle`.
-2. You may edit `_config.yml` to toggle the plugin and graph generation on/off or exclude certain jekyll types. Defaults look like this:
+2. You may edit `_config.yml` to toggle the plugin and graph generation on/off or exclude certain jekyll types[^type]. Defaults look like this:
 
 ```
 wikilinks:
@@ -85,3 +85,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/shorty
 - They are [not supported](https://github.com/gjtorikian/commonmarker#options) by [`jekyll-commonmark`](https://github.com/jekyll/jekyll-commonmark) that I can see (don't see any reference to `MD_FLAG_WIKILINKS`).
 - There are scattered implementations around the internet: [here](https://github.com/maximevaillancourt/digital-garden-jekyll-template/blob/master/_plugins/bidirectional_links_generator.rb), [here](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb), are some examples.
 - Stackoverflow [sees lots of interest in this functionality](https://stackoverflow.com/questions/4629675/jekyll-markdown-internal-links), specifically for jekyll, but no other answers lead to a plugin like this one. (But who knows...SO deleted my answer pointing to this plugin 👻)
+
+[^type]: I refer to pages, posts, and collections as "jekyll types". [Here](https://ben.balter.com/2015/02/20/jekyll-collections/) is a great blog post about them.
+
