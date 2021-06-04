@@ -50,8 +50,8 @@ Graph data is generated and output to a `.json` file in your `/assets` directory
 
 ```
 {
-  "nodes": ["id": "<some-id>", "url": "<relative-url>", "label": "<note's-title>"],
-  "links": ["source": "<a-node-id>", "target": "<another-node-id>"]
+  "nodes": [{"id": "<some-id>", "url": "<relative-url>", "label": "<note's-title>", ...}],
+  "links": [{"source": "<a-node-id>", "target": "<another-node-id>", ...}]
 }
 ```
 
@@ -77,7 +77,7 @@ A note on testing -- all tests pass if they are run in certain orders. As far as
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/shorty25h0r7/jekyll-wikilinks.
+Bug reports and pull requests are welcome on GitHub at https://github.com/manunamz/jekyll-wikilinks.
 
 ## I am Not Reduplicating Work Due-Diligence
 - Wikilinks are part of the [commonmark spec](https://github.com/mity/md4c#markdown-extensions) (see `MD_FLAG_WIKILINKS`).
