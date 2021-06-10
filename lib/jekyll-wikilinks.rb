@@ -83,7 +83,7 @@ module JekyllWikiLinks
 				# Replace double-bracketed links using note title
 				# [[feline.cats]]
 				regex_wl, cap_gr = regex_wiki_link(title_from_filename)
-				note.content = note.content.gsub(
+				note.content.gsub!(
 					regex_wl,
 					"<a class='wiki-link' href='#{note_url}'>#{render_txt}</a>"
 				)
@@ -91,7 +91,7 @@ module JekyllWikiLinks
 				# Replace double-bracketed links with alias (right)
 				# [[feline.cats|this is a link to the note about cats]]
 				regex_wl, cap_gr = regex_wiki_link_w_alias_right(title_from_filename)
-				note.content = note.content.gsub(
+				note.content.gsub!(
 					regex_wl,
 					"<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
 				)
@@ -99,7 +99,7 @@ module JekyllWikiLinks
 				# Replace double-bracketed links with alias (left)
 				# [[this is a link to the note about cats|feline.cats]]
 				regex_wl, cap_gr = regex_wiki_link_w_alias_left(title_from_filename)
-				note.content = note.content.gsub(
+				note.content.gsub!(
 					regex_wl,
 					"<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
 				)
@@ -116,7 +116,7 @@ module JekyllWikiLinks
 					fragment_text = m[1]
 					downcased_fragment_text = fragment_text.downcase
 					if has_header?(fragment_text, note_potentially_linked_to)
-						note.content = note.content.gsub(
+						note.content.gsub!(
 							/\[\[(#{wiki_link_text})#(#{fragment_text})\]\]/i,
 							"<a class='wiki-link' href='#{note_url}\##{downcased_fragment_text}'>#{render_txt} > #{fragment_text}</a>"
 						)
@@ -132,7 +132,7 @@ module JekyllWikiLinks
 					aliased_text = m[4]
 					downcased_fragment_text = fragment_text.downcase
 					if has_header?(fragment_text, note_potentially_linked_to)
-						note.content = note.content.gsub(
+						note.content.gsub!(
 							/(\[\[)(#{title_from_filename})#(#{fragment_text})(\|)([^\]]+)(\]\])/i,
 							"<a class='wiki-link' href='#{note_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
 						)
@@ -148,7 +148,7 @@ module JekyllWikiLinks
 					fragment_text = m[4]
 					downcased_fragment_text = fragment_text.downcase
 					if has_header?(fragment_text, note_potentially_linked_to)
-						note.content = note.content.gsub(
+						note.content.gsub!(
 							/(\[\[)([^\]\|]+)(\|)(#{title_from_filename})#(#{fragment_text})(\]\])/i,
 							"<a class='wiki-link' href='#{note_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
 						)
@@ -163,13 +163,13 @@ module JekyllWikiLinks
 			# At this point, all remaining double-bracket-wrapped words are
 			# pointing to non-existing pages, so let's disable them
 			regex_wl, cap_gr = regex_wiki_link()
-			note.content = note.content.gsub(
+			note.content.gsub!(
 				regex_wl,
 				"<span title=\"Content not found.\" class=\"invalid-wiki-link\">[[#{cap_gr}]]</span>"
 			)
 			# aliases -- both kinds
 			regex_wl, cap_gr = regex_wiki_link_w_alias()
-			note.content = note.content.gsub(
+			note.content.gsub!(
 				regex_wl,
 				"<span title=\"Content not found.\" class=\"invalid-wiki-link\">[[#{cap_gr}]]</span>"
 			)
