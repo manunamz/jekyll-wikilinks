@@ -32,10 +32,15 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:two_note)                 { find_by_title(site.collections["notes"].docs, "Two Fish") }
   let(:link_to_page_note)        { find_by_title(site.collections["notes"].docs, "Link Page") }
   let(:link_to_post_note)        { find_by_title(site.collections["notes"].docs, "Link Post") }
+  let(:link_to_url_fragment)     { find_by_title(site.collections["notes"].docs, "Link URL Fragment") }
+  let(:right_alias_url_fragment) { find_by_title(site.collections["notes"].docs, "Right Alias Link URL Fragment") }
+  let(:left_alias_url_fragment)  { find_by_title(site.collections["notes"].docs, "Left Alias Link URL Fragment") }
   let(:missing_link_note)        { find_by_title(site.collections["notes"].docs, "None Fish") }
   let(:missing_links_note)       { find_by_title(site.collections["notes"].docs, "None School") }
   let(:missing_right_alias_note) { find_by_title(site.collections["notes"].docs, "None Right Name Fish") }
   let(:missing_left_alias_note)  { find_by_title(site.collections["notes"].docs, "None Left Name Fish") }
+  let(:missing_right_alias_url_fragment) { find_by_title(site.collections["notes"].docs, "Missing Right Alias Link URL Fragment") }
+  let(:missing_left_alias_url_fragment)  { find_by_title(site.collections["notes"].docs, "Missing Left Alias Link URL Fragment") }
   let(:note_link_whitespace)     { find_by_title(site.collections["notes"].docs, "Link Name With Whitespace") }
   let(:note_name_whitespace)     { find_by_title(site.collections["notes"].docs, "Note Name With Whitespace") }
   let(:right_alias_note)         { find_by_title(site.collections["notes"].docs, "Right Name Fish") }
@@ -125,6 +130,20 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     it "full output" do
       expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
       expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a> has a little star.</p>\n")
+    end
+
+    # fragment
+
+    it "url fragments contain note name and header text" do
+      expect(link_to_url_fragment.output).to include("long note &gt; Two")
+    end
+
+    it "url fragment in url" do
+      expect(link_to_url_fragment.output).to include("/notes/long-note/#two")
+    end
+
+    it "processes url fragments; full output" do
+      expect(link_to_url_fragment.output).to eq("<p>This note contains a link fragment to <a class=\"wiki-link\" href=\"/notes/long-note/#two\">long note &gt; Two</a>.</p>\n")
     end
 
     # graph
@@ -274,9 +293,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   context "when target [[wikilink]] note does not exist" do
     
     it "injects a span element with descriptive title" do
-      expect(missing_link_note.output).to include("<span title=\"There is no note that matches this link.\"")
+      expect(missing_link_note.output).to include("<span title=\"Content not found.\"")
       expect(missing_link_note.output).to include("</span>")
-      expect(missing_links_note.output).to include("<span title=\"There is no note that matches this link.\"").twice
+      expect(missing_links_note.output).to include("<span title=\"Content not found.\"").twice
       expect(missing_links_note.output).to include("</span>").twice
     end
 
@@ -292,9 +311,14 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "full output" do
-      expect(missing_link_note.output).to eq("<p>This <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[no.fish]]</span> has no target.</p>\n")
-      expect(missing_links_note.output).to eq("<p>This fish has no targets like <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[no.fish]]</span> and <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[not.fish]]</span>.</p>\n")
+      expect(missing_link_note.output).to eq("<p>This <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.fish]]</span> has no target.</p>\n")
+      expect(missing_links_note.output).to eq("<p>This fish has no targets like <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.fish]]</span> and <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[not.fish]]</span>.</p>\n")
     end
+
+    # TODO
+    # it "handles url fragments; full output" do
+    #   expect(missing_link_note.output).to eq("")
+    # end
 
     it "generates graph data" do
       # expect(graph_generated_file.class).to be(File)
@@ -348,6 +372,23 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(right_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a right alias.</p>\n")
       expect(left_alias_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">fish</a> uses a left alias.</p>\n")
     end
+
+    # fragment
+
+    it "url fragments contain note name and header text" do
+      expect(right_alias_url_fragment.output).to include("aliased text")
+      expect(left_alias_url_fragment.output).to include("aliased text")
+    end
+
+    it "url fragment in url" do
+      expect(right_alias_url_fragment.output).to include("/notes/long-note/#two")
+      expect(left_alias_url_fragment.output).to include("/notes/long-note/#two")
+    end
+
+    it "processes url fragments; full output" do
+      expect(right_alias_url_fragment.output).to eq("<p>This note contains a link fragment to <a class=\"wiki-link\" href=\"/notes/long-note/#two\">aliased text</a>.</p>\n")
+      expect(left_alias_url_fragment.output).to eq("<p>This note contains a link fragment to <a class=\"wiki-link\" href=\"/notes/long-note/#two\">aliased text</a>.</p>\n")
+    end
   
   end
 
@@ -356,9 +397,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # [[left alias|fish]]
 
     it "injects a span element with descriptive title" do
-      expect(missing_right_alias_note.output).to include("<span title=\"There is no note that matches this link.\"")
+      expect(missing_right_alias_note.output).to include("<span title=\"Content not found.\"")
       expect(missing_right_alias_note.output).to include("</span>")
-      expect(missing_left_alias_note.output).to include("<span title=\"There is no note that matches this link.\"")
+      expect(missing_left_alias_note.output).to include("<span title=\"Content not found.\"")
       expect(missing_left_alias_note.output).to include("</span>")
     end
 
@@ -373,10 +414,26 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "full output" do
-      expect(missing_right_alias_note.output).to eq("<p>This <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[no.fish|fish]]</span> uses a right alias.</p>\n")
-      expect(missing_left_alias_note.output).to eq("<p>This <span title=\"There is no note that matches this link.\" class=\"invalid-wiki-link\">[[fish|no.fish]]</span> uses a left alias.</p>\n")
+      expect(missing_right_alias_note.output).to eq("<p>This <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.fish|fish]]</span> uses a right alias.</p>\n")
+      expect(missing_left_alias_note.output).to eq("<p>This <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[fish|no.fish]]</span> uses a left alias.</p>\n")
     end
 
+    # fragment
+
+    it "assigns 'invalid-wiki-link' class to span element" do
+      expect(missing_right_alias_url_fragment.output).to include("class=\"invalid-wiki-link\"")
+      expect(missing_left_alias_url_fragment.output).to include("class=\"invalid-wiki-link\"")
+    end
+
+    it "leaves original angle brackets and text untouched" do
+      expect(missing_right_alias_url_fragment.output).to include("[[long-note#Zero|aliased text]]")
+      expect(missing_left_alias_url_fragment.output).to include("[[aliased text|long-note#Zero]]")
+    end
+
+    it "processes url fragments; full output" do
+      expect(missing_right_alias_url_fragment.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-note#Zero|aliased text]]</span>.</p>\n")
+      expect(missing_left_alias_url_fragment.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[aliased text|long-note#Zero]]</span>.</p>\n")
+    end
   end
 
 end
