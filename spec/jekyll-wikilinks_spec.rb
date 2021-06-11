@@ -29,7 +29,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:one_page)                 { find_by_title(site.pages, "One Page") }
   let(:one_post)                 { find_by_title(site.collections["posts"].docs, "One Post") }
   let(:base_case_a)                 { find_by_title(site.collections["notes"].docs, "Base Case A") }
-  let(:two_note)                 { find_by_title(site.collections["notes"].docs, "Two Fish") }
+  let(:base_case_b)                 { find_by_title(site.collections["notes"].docs, "Base Case B") }
   let(:link_to_page_note)        { find_by_title(site.collections["notes"].docs, "Link Page") }
   let(:link_to_post_note)        { find_by_title(site.collections["notes"].docs, "Link Post") }
   let(:link_to_url_fragment)     { find_by_title(site.collections["notes"].docs, "Link URL Fragment") }
@@ -94,42 +94,42 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(base_case_a.output).to include("<a")
       expect(base_case_a.output).to include("</a>")
 
-      expect(two_note.output).to include("<a")
-      expect(two_note.output).to include("</a>")
+      expect(base_case_b.output).to include("<a")
+      expect(base_case_b.output).to include("</a>")
     end
 
     it "assigns 'wiki-link' class to a element" do
       expect(base_case_a.output).to include("class=\"wiki-link\"")
-      expect(two_note.output).to include("class=\"wiki-link\"")
+      expect(base_case_b.output).to include("class=\"wiki-link\"")
     end
 
     it "assigns a element's href to site.baseurl + /note/ + note-id" do
       expect(base_case_a.output).to include("href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\"")
-      expect(two_note.output).to include("href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"")
+      expect(base_case_b.output).to include("href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"")
     end
 
     # todo: add test for '.html' when 'permalink' is not set to 'pretty'
     it "generates a clean url when configs assign 'permalink' to 'pretty'" do
       expect(base_case_a.output).to_not include(".html")
-      expect(two_note.output).to_not include(".html")
+      expect(base_case_b.output).to_not include(".html")
     end
 
     it "adds 'backlinks' metadata" do
       expect(base_case_a.data).to include("backlinks")
-      expect(two_note.data).to include("backlinks")
+      expect(base_case_b.data).to include("backlinks")
     end
 
     it "'backlinks' metadata includes all jekyll types -- pages, docs (posts and collections)" do
       expect(base_case_a.data["backlinks"]).to include(Jekyll::Page)
       expect(base_case_a.data["backlinks"]).to include(Jekyll::Document)
-      # 'two_note' does not include any pages in its backlinks
-      # expect(two_note.data["backlinks"]).to include(Jekyll::Page)
-      expect(two_note.data["backlinks"]).to include(Jekyll::Document)
+      # 'base_case_b' does not include any pages in its backlinks
+      # expect(base_case_b.data["backlinks"]).to include(Jekyll::Page)
+      expect(base_case_b.data["backlinks"]).to include(Jekyll::Document)
     end
 
     it "full output" do
-      expect(base_case_a.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
-      expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a> has a little star.</p>\n")
+      expect(base_case_a.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">base case b</a> has a littlecar.</p>\n")
+      expect(base_case_b.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a> has a little star.</p>\n")
     end
 
     # fragment
@@ -190,7 +190,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     let(:config_overrides) { { "wikilinks" => { "enabled" => false } } }
 
     it "does not process [[wikilinks]]" do
-      expect(base_case_a.content).to include("[[two.fish]]")
+      expect(base_case_a.content).to include("[[base-case.b]]")
     end
 
   end
@@ -199,9 +199,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     let(:config_overrides) { { "wikilinks" => { "exclude" => ["notes", "pages", "posts"] } } }
 
     it "does not process [[wikilinks]] for those types" do
-      expect(base_case_a.content).to include("[[two.fish]]")
+      expect(base_case_a.content).to include("[[base-case.b]]")
       expect(one_page.content).to include("[[base-case.a]]")
-      expect(one_post.content).to include("[[base-case.a]]")
     end
 
   end
@@ -252,7 +251,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "wiki-links are parsed and a element is generated" do
-      expect(base_case_a.output).to eq("<p>This <a class=\"wiki-link\" href=\"/wikilinks/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
+      expect(base_case_a.output).to eq("<p>This <a class=\"wiki-link\" href=\"/wikilinks/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">base case b</a> has a littlecar.</p>\n")
     end
 
   end
