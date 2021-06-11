@@ -28,7 +28,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:missing_target_graph_link){ get_missing_target_graph_link() }
   let(:one_page)                 { find_by_title(site.pages, "One Page") }
   let(:one_post)                 { find_by_title(site.collections["posts"].docs, "One Post") }
-  let(:one_note)                 { find_by_title(site.collections["notes"].docs, "One Fish") }
+  let(:base_case_a)                 { find_by_title(site.collections["notes"].docs, "Base Case A") }
   let(:two_note)                 { find_by_title(site.collections["notes"].docs, "Two Fish") }
   let(:link_to_page_note)        { find_by_title(site.collections["notes"].docs, "Link Page") }
   let(:link_to_post_note)        { find_by_title(site.collections["notes"].docs, "Link Post") }
@@ -91,45 +91,45 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   context "when target [[wikilink]] note exists" do
 
     it "injects a element" do
-      expect(one_note.output).to include("<a")
-      expect(one_note.output).to include("</a>")
+      expect(base_case_a.output).to include("<a")
+      expect(base_case_a.output).to include("</a>")
 
       expect(two_note.output).to include("<a")
       expect(two_note.output).to include("</a>")
     end
 
     it "assigns 'wiki-link' class to a element" do
-      expect(one_note.output).to include("class=\"wiki-link\"")
+      expect(base_case_a.output).to include("class=\"wiki-link\"")
       expect(two_note.output).to include("class=\"wiki-link\"")
     end
 
     it "assigns a element's href to site.baseurl + /note/ + note-id" do
-      expect(one_note.output).to include("href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\"")
+      expect(base_case_a.output).to include("href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\"")
       expect(two_note.output).to include("href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"")
     end
 
     # todo: add test for '.html' when 'permalink' is not set to 'pretty'
     it "generates a clean url when configs assign 'permalink' to 'pretty'" do
-      expect(one_note.output).to_not include(".html")
+      expect(base_case_a.output).to_not include(".html")
       expect(two_note.output).to_not include(".html")
     end
 
     it "adds 'backlinks' metadata" do
-      expect(one_note.data).to include("backlinks")
+      expect(base_case_a.data).to include("backlinks")
       expect(two_note.data).to include("backlinks")
     end
 
     it "'backlinks' metadata includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(one_note.data["backlinks"]).to include(Jekyll::Page)
-      expect(one_note.data["backlinks"]).to include(Jekyll::Document)
+      expect(base_case_a.data["backlinks"]).to include(Jekyll::Page)
+      expect(base_case_a.data["backlinks"]).to include(Jekyll::Document)
       # 'two_note' does not include any pages in its backlinks
       # expect(two_note.data["backlinks"]).to include(Jekyll::Page)
       expect(two_note.data["backlinks"]).to include(Jekyll::Document)
     end
 
     it "full output" do
-      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
-      expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a> has a little star.</p>\n")
+      expect(base_case_a.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
+      expect(two_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a> has a little star.</p>\n")
     end
 
     # fragment
@@ -167,11 +167,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "nodes' 'label's equal their doc title" do
-      expect(graph_node["label"]).to eq(one_note.data["title"])
+      expect(graph_node["label"]).to eq(base_case_a.data["title"])
     end
 
     it "nodes' 'url's equal their doc urls" do
-      expect(graph_node["url"]).to eq(one_note.url)
+      expect(graph_node["url"]).to eq(base_case_a.url)
     end
 
     it "generated graph data contains links of format: { links: [ { source: '', target: ''}, ... ] }" do
@@ -190,7 +190,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     let(:config_overrides) { { "wikilinks" => { "enabled" => false } } }
 
     it "does not process [[wikilinks]]" do
-      expect(one_note.content).to include("[[two.fish]]")
+      expect(base_case_a.content).to include("[[two.fish]]")
     end
 
   end
@@ -199,9 +199,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     let(:config_overrides) { { "wikilinks" => { "exclude" => ["notes", "pages", "posts"] } } }
 
     it "does not process [[wikilinks]] for those types" do
-      expect(one_note.content).to include("[[two.fish]]")
-      expect(one_page.content).to include("[[one.fish]]")
-      expect(one_post.content).to include("[[one.fish]]")
+      expect(base_case_a.content).to include("[[two.fish]]")
+      expect(one_page.content).to include("[[base-case.a]]")
+      expect(one_post.content).to include("[[base-case.a]]")
     end
 
   end
@@ -248,11 +248,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     let(:config_overrides) { { "baseurl" => "/wikilinks" } }
 
     it "baseurl included in href" do
-      expect(one_note.output).to include("/wikilinks")
+      expect(base_case_a.output).to include("/wikilinks")
     end
 
     it "wiki-links are parsed and a element is generated" do
-      expect(one_note.output).to eq("<p>This <a class=\"wiki-link\" href=\"/wikilinks/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
+      expect(base_case_a.output).to eq("<p>This <a class=\"wiki-link\" href=\"/wikilinks/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">two fish</a> has a littlecar.</p>\n")
     end
 
   end
@@ -268,7 +268,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   context "when [[wikilink]]s references cross jekyll types (collection item, post, or page)" do
 
     it "work as expected when post targets collection item; full output" do
-      expect(one_post.output).to eq("<p>Posts support links, like to <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a>.</p>\n")
+      expect(one_post.output).to eq("<p>Posts support links, like to <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.</p>\n")
     end
     
     it "work as expected when collection item targets a post; full output" do
@@ -276,7 +276,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "work as expected when page targets collection item; full output" do
-      expect(one_page.output).to eq("<p>This page links to a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">one fish</a>.</p>\n")
+      expect(one_page.output).to eq("<p>This page links to a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.</p>\n")
     end
     
     it "work as expected when collection item targets a page; full output" do
@@ -363,9 +363,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
     it "renders the alias text, not the note's filename" do
       expect(right_alias_note.output).to include("fish")
-      expect(right_alias_note.output).to_not include("one.fish")
+      expect(right_alias_note.output).to_not include("base-case.a")
       expect(left_alias_note.output).to include("fish")
-      expect(left_alias_note.output).to_not include("one.fish")
+      expect(left_alias_note.output).to_not include("base-case.a")
     end
 
     it "full output" do
