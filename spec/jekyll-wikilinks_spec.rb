@@ -33,8 +33,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:link_to_page_note)        { find_by_title(site.collections["notes"].docs, "Link Page") }
   let(:link_to_post_note)        { find_by_title(site.collections["notes"].docs, "Link Post") }
   let(:link_header)              { find_by_title(site.collections["notes"].docs, "Link Header") }
-  let(:right_alias_url_fragment) { find_by_title(site.collections["notes"].docs, "Right Alias Link URL Fragment") }
-  let(:left_alias_url_fragment)  { find_by_title(site.collections["notes"].docs, "Left Alias Link URL Fragment") }
+  let(:link_header_local_alias_right) { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Right") }
+  let(:link_header_local_alias_left)  { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Left") }
   let(:missing_doc)              { find_by_title(site.collections["notes"].docs, "Missing Doc") }
   let(:missing_doc_many)         { find_by_title(site.collections["notes"].docs, "Missing Doc Many") }
   let(:local_right_alias_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Right Missing Doc") }
@@ -375,18 +375,18 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # fragment
 
     it "url fragments contain note name and header text" do
-      expect(right_alias_url_fragment.output).to include("aliased text")
-      expect(left_alias_url_fragment.output).to include("aliased text")
+      expect(link_header_local_alias_right.output).to include("aliased text")
+      expect(link_header_local_alias_left.output).to include("aliased text")
     end
 
     it "url fragment in url" do
-      expect(right_alias_url_fragment.output).to include("/notes/long-note/#two")
-      expect(left_alias_url_fragment.output).to include("/notes/long-note/#two")
+      expect(link_header_local_alias_right.output).to include("/notes/long-note/#two")
+      expect(link_header_local_alias_left.output).to include("/notes/long-note/#two")
     end
 
     it "processes url fragments; full output" do
-      expect(right_alias_url_fragment.output).to eq("<p>This note contains a link fragment to <a class=\"wiki-link\" href=\"/notes/long-note/#two\">aliased text</a>.</p>\n")
-      expect(left_alias_url_fragment.output).to eq("<p>This note contains a link fragment to <a class=\"wiki-link\" href=\"/notes/long-note/#two\">aliased text</a>.</p>\n")
+      expect(link_header_local_alias_right.output).to eq("<p>This note contains a link to a header with <a class=\"wiki-link\" href=\"/notes/long-note/#two\">aliased text</a>.</p>\n")
+      expect(link_header_local_alias_left.output).to eq("<p>This note contains a link to a header with <a class=\"wiki-link\" href=\"/notes/long-note/#two\">aliased text</a>.</p>\n")
     end
   
   end
