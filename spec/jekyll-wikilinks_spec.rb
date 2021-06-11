@@ -20,39 +20,38 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   end
   let(:site)                     { Jekyll::Site.new(config) }
   
-  # base cases
-  let(:base_case_a)              { find_by_title(site.collections["notes"].docs, "Base Case A") }
-  let(:base_case_b)              { find_by_title(site.collections["notes"].docs, "Base Case B") }
-  let(:one_page)                 { find_by_title(site.pages, "One Page") }
-  let(:one_post)                 { find_by_title(site.collections["posts"].docs, "One Post") }
-  let(:link_to_page_note)        { find_by_title(site.collections["notes"].docs, "Link Page") }
-  let(:link_to_post_note)        { find_by_title(site.collections["notes"].docs, "Link Post") }
-  let(:missing_doc)              { find_by_title(site.collections["notes"].docs, "Missing Doc") }
-  let(:missing_doc_many)         { find_by_title(site.collections["notes"].docs, "Missing Doc Many") }
+  # base link
+  let(:base_case_a)                     { find_by_title(site.collections["notes"].docs, "Base Case A") }
+  let(:base_case_b)                     { find_by_title(site.collections["notes"].docs, "Base Case B") }
+  let(:one_page)                        { find_by_title(site.pages, "One Page") }
+  let(:one_post)                        { find_by_title(site.collections["posts"].docs, "One Post") }
+  let(:link_to_page_note)               { find_by_title(site.collections["notes"].docs, "Link Page") }
+  let(:link_to_post_note)               { find_by_title(site.collections["notes"].docs, "Link Post") }
+  let(:missing_doc)                     { find_by_title(site.collections["notes"].docs, "Missing Doc") }
+  let(:missing_doc_many)                { find_by_title(site.collections["notes"].docs, "Missing Doc Many") }
   let(:link_whitespace_in_filename)     { find_by_title(site.collections["notes"].docs, "Link Whitespace In Filename") }
-  let(:whitespace_in_filename)   { find_by_title(site.collections["notes"].docs, "Whitespace In Filename") }
+  let(:whitespace_in_filename)          { find_by_title(site.collections["notes"].docs, "Whitespace In Filename") }
   # header link/url fragments
-  let(:link_header)              { find_by_title(site.collections["notes"].docs, "Link Header") }
-  let(:link_header_missing_doc)  { find_by_title(site.collections["notes"].docs, "Link Header Missing") }
-  let(:link_header_local_alias_right) { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Right") }
-  let(:link_header_local_alias_left)  { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Left") }
+  let(:link_header)                     { find_by_title(site.collections["notes"].docs, "Link Header") }
+  let(:link_header_missing_doc)         { find_by_title(site.collections["notes"].docs, "Link Header Missing") }
+  let(:link_header_local_alias_left)    { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Left") }
+  let(:link_header_local_alias_right)   { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Right") }
   # local aliases
-  let(:local_alias_right)        { find_by_title(site.collections["notes"].docs, "Local Alias Right") }
-  let(:local_alias_left)         { find_by_title(site.collections["notes"].docs, "Local Alias Left") }
-  let(:local_alias_right_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Right Missing Doc") }
-  let(:local_alias_left_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Left Missing Doc") }
-  let(:local_alias_right_link_header_missing) { find_by_title(site.collections["notes"].docs, "Local Alias Right Link Header Missing") }
+  let(:local_alias_left)                { find_by_title(site.collections["notes"].docs, "Local Alias Left") }
+  let(:local_alias_left_missing_doc)    { find_by_title(site.collections["notes"].docs, "Local Alias Left Missing Doc") }
   let(:local_alias_left_link_header_missing)  { find_by_title(site.collections["notes"].docs, "Local Alias Left Link Header Missing") }
+  let(:local_alias_right)               { find_by_title(site.collections["notes"].docs, "Local Alias Right") }
+  let(:local_alias_right_missing_doc)   { find_by_title(site.collections["notes"].docs, "Local Alias Right Missing Doc") }
+  let(:local_alias_right_link_header_missing) { find_by_title(site.collections["notes"].docs, "Local Alias Right Link Header Missing") }  
   # graph
-  let(:graph_generated_file)     { find_generated_file("/assets/graph-net-web.json") }
-  let(:graph_static_file)        { find_static_file("/assets/graph-net-web.json") }
-  let(:graph_data)               { static_graph_file_content() }
-  let(:graph_node)               { get_graph_node() }
-  let(:graph_link)               { get_graph_link_match_source() }
-  let(:missing_link_graph_node)  { get_missing_link_graph_node() }
-  let(:missing_target_graph_link){ get_missing_target_graph_link() }
+  let(:graph_generated_file)            { find_generated_file("/assets/graph-net-web.json") }
+  let(:graph_static_file)               { find_static_file("/assets/graph-net-web.json") }
+  let(:graph_data)                      { static_graph_file_content() }
+  let(:graph_node)                      { get_graph_node() }
+  let(:graph_link)                      { get_graph_link_match_source() }
+  let(:missing_link_graph_node)         { get_missing_link_graph_node() }
+  let(:missing_target_graph_link)       { get_missing_target_graph_link() }
   
-
   # makes markdown tests work
   subject { described_class.new(site.config) }
 
