@@ -284,7 +284,7 @@ module JekyllWikiLinks
 		#   -- esp. when aliasing.
 
 		def regex_header()
-			regex = /^#+(.*)$/i
+			regex = /^\#{1,6}[\t ]*([^ \t].*)\n/i
 			cap_gr = "\\1"
 			return regex, cap_gr
 		end
