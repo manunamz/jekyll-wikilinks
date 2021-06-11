@@ -28,15 +28,15 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:missing_target_graph_link){ get_missing_target_graph_link() }
   let(:one_page)                 { find_by_title(site.pages, "One Page") }
   let(:one_post)                 { find_by_title(site.collections["posts"].docs, "One Post") }
-  let(:base_case_a)                 { find_by_title(site.collections["notes"].docs, "Base Case A") }
-  let(:base_case_b)                 { find_by_title(site.collections["notes"].docs, "Base Case B") }
+  let(:base_case_a)              { find_by_title(site.collections["notes"].docs, "Base Case A") }
+  let(:base_case_b)              { find_by_title(site.collections["notes"].docs, "Base Case B") }
   let(:link_to_page_note)        { find_by_title(site.collections["notes"].docs, "Link Page") }
   let(:link_to_post_note)        { find_by_title(site.collections["notes"].docs, "Link Post") }
   let(:link_to_url_fragment)     { find_by_title(site.collections["notes"].docs, "Link URL Fragment") }
   let(:right_alias_url_fragment) { find_by_title(site.collections["notes"].docs, "Right Alias Link URL Fragment") }
   let(:left_alias_url_fragment)  { find_by_title(site.collections["notes"].docs, "Left Alias Link URL Fragment") }
-  let(:missing_doc)        { find_by_title(site.collections["notes"].docs, "Missing Doc") }
-  let(:missing_links_note)       { find_by_title(site.collections["notes"].docs, "None School") }
+  let(:missing_doc)              { find_by_title(site.collections["notes"].docs, "Missing Doc") }
+  let(:missing_doc_many)         { find_by_title(site.collections["notes"].docs, "Missing Doc Many") }
   let(:missing_right_alias_note) { find_by_title(site.collections["notes"].docs, "None Right Name Fish") }
   let(:missing_left_alias_note)  { find_by_title(site.collections["notes"].docs, "None Left Name Fish") }
   let(:missing_right_alias_url_fragment) { find_by_title(site.collections["notes"].docs, "Missing Right Alias Link URL Fragment") }
@@ -294,24 +294,24 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     it "injects a span element with descriptive title" do
       expect(missing_doc.output).to include("<span title=\"Content not found.\"")
       expect(missing_doc.output).to include("</span>")
-      expect(missing_links_note.output).to include("<span title=\"Content not found.\"").twice
-      expect(missing_links_note.output).to include("</span>").twice
+      expect(missing_doc_many.output).to include("<span title=\"Content not found.\"").twice
+      expect(missing_doc_many.output).to include("</span>").twice
     end
 
     it "assigns 'invalid-wiki-link' class to span element" do
       expect(missing_doc.output).to include("class=\"invalid-wiki-link\"")
-      expect(missing_links_note.output).to include("class=\"invalid-wiki-link\"").twice
+      expect(missing_doc_many.output).to include("class=\"invalid-wiki-link\"").twice
     end
 
     it "leaves original angle brackets and text untouched" do
       expect(missing_doc.output).to include("[[no.doc]]")
-      expect(missing_links_note.output).to include("[[no.fish]]")
-      expect(missing_links_note.output).to include("[[not.fish]]")
+      expect(missing_doc_many.output).to include("[[no.doc.1]]")
+      expect(missing_doc_many.output).to include("[[no.doc.2]]")
     end
 
     it "full output" do
       expect(missing_doc.output).to eq("<p>This <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc]]</span> has no target.</p>\n")
-      expect(missing_links_note.output).to eq("<p>This fish has no targets like <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.fish]]</span> and <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[not.fish]]</span>.</p>\n")
+      expect(missing_doc_many.output).to eq("<p>This fish has no targets like <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc.1]]</span> and <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc.2]]</span>.</p>\n")
     end
 
     # TODO
