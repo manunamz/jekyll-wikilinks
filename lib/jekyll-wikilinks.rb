@@ -64,98 +64,98 @@ module JekyllWikiLinks
 			end
 		end
 
-		def parse_wiki_links(note)
+		def parse_wiki_links(doc)
 			# Convert all Wiki/Roam-style double-bracket link syntax to plain HTML
 			# anchor tag elements (<a>) with "wiki-link" CSS class
-			md_docs.each do |note_potentially_linked_to|
+			md_docs.each do |doc_potentially_linked_to|
 				title_from_filename = File.basename(
-					note_potentially_linked_to.basename,
-					File.extname(note_potentially_linked_to.basename)
+					doc_potentially_linked_to.basename,
+					File.extname(doc_potentially_linked_to.basename)
 				)
 				
-				render_txt = note_potentially_linked_to.data['title'].downcase
-				note_url = relative_url(note_potentially_linked_to.url) if note_potentially_linked_to&.url
+				render_txt = doc_potentially_linked_to.data['title'].downcase
+				doc_url = relative_url(doc_potentially_linked_to.url) if doc_potentially_linked_to&.url
 
 				# 
 				# links
 				# 
 
-				# Replace double-bracketed links using note title
+				# Replace double-bracketed links using doc title
 				# [[feline.cats]]
 				regex_wl, cap_gr = regex_wiki_link(title_from_filename)
-				note.content.gsub!(
+				doc.content.gsub!(
 					regex_wl,
-					"<a class='wiki-link' href='#{note_url}'>#{render_txt}</a>"
+					"<a class='wiki-link' href='#{doc_url}'>#{render_txt}</a>"
 				)
 
 				# Replace double-bracketed links with alias (right)
-				# [[feline.cats|this is a link to the note about cats]]
+				# [[feline.cats|this is a link to the doc about cats]]
 				regex_wl, cap_gr = regex_wiki_link_w_alias_right(title_from_filename)
-				note.content.gsub!(
+				doc.content.gsub!(
 					regex_wl,
-					"<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
+					"<a class='wiki-link' href='#{doc_url}'>#{cap_gr}</a>"
 				)
 
 				# Replace double-bracketed links with alias (left)
-				# [[this is a link to the note about cats|feline.cats]]
+				# [[this is a link to the doc about cats|feline.cats]]
 				regex_wl, cap_gr = regex_wiki_link_w_alias_left(title_from_filename)
-				note.content.gsub!(
+				doc.content.gsub!(
 					regex_wl,
-					"<a class='wiki-link' href='#{note_url}'>#{cap_gr}</a>"
+					"<a class='wiki-link' href='#{doc_url}'>#{cap_gr}</a>"
 				)
 
 				# 
 				# anchors/fragments/header
 				# 
 
-				# Replace double-bracketed header links using note title and header
+				# Replace double-bracketed header links using doc title and header
 				# [[feline.cats#meow]] -> "cats > meow"
-				matches = note.content.scan(/\[\[(#{title_from_filename})#(.+?)\]\]/i)
+				matches = doc.content.scan(/\[\[(#{title_from_filename})#(.+?)\]\]/i)
 				matches.each do |m|
 					wiki_link_text = m[0]
 					fragment_text = m[1]
 					downcased_fragment_text = fragment_text.downcase
-					if header_exists?(fragment_text, note_potentially_linked_to)
-						note.content.gsub!(
+					if header_exists?(fragment_text, doc_potentially_linked_to)
+						doc.content.gsub!(
 							/\[\[(#{wiki_link_text})#(#{fragment_text})\]\]/i,
-							"<a class='wiki-link' href='#{note_url}\##{downcased_fragment_text}'>#{render_txt} > #{fragment_text}</a>"
+							"<a class='wiki-link' href='#{doc_url}\##{downcased_fragment_text}'>#{render_txt} > #{fragment_text}</a>"
 						)
 					end
 				end
 
 				# Replace double-bracketed header links with alias (right)
-				# [[feline.cats#meow|this is a link to the note about cats]]
-				matches = note.content.scan(/(\[\[)(#{title_from_filename})#(.+?)(\|)([^\]]+)(\]\])/i)
+				# [[feline.cats#meow|this is a link to the doc about cats]]
+				matches = doc.content.scan(/(\[\[)(#{title_from_filename})#(.+?)(\|)([^\]]+)(\]\])/i)
 				matches.each do |m|
 					# wiki_link_text = m[1] (which == title_from_filename)
 					fragment_text = m[2]
 					aliased_text = m[4]
 					downcased_fragment_text = fragment_text.downcase
-					if header_exists?(fragment_text, note_potentially_linked_to)
-						note.content.gsub!(
+					if header_exists?(fragment_text, doc_potentially_linked_to)
+						doc.content.gsub!(
 							/(\[\[)(#{title_from_filename})#(#{fragment_text})(\|)([^\]]+)(\]\])/i,
-							"<a class='wiki-link' href='#{note_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
+							"<a class='wiki-link' href='#{doc_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
 						)
 					end
 				end
 
 				# Replace double-bracketed header links with alias (left)
-				# [[this is a link to the note about cats|feline.cats#meow]]
-				matches = note.content.scan(/(\[\[)([^\]\|]+)(\|)(#{title_from_filename})#(.+?)(\]\])/i)
+				# [[this is a link to the doc about cats|feline.cats#meow]]
+				matches = doc.content.scan(/(\[\[)([^\]\|]+)(\|)(#{title_from_filename})#(.+?)(\]\])/i)
 				matches.each do |m|
 					aliased_text = m[1]
 					# wiki_link_text = m[3] (which == title_from_filename)
 					fragment_text = m[4]
 					downcased_fragment_text = fragment_text.downcase
-					if header_exists?(fragment_text, note_potentially_linked_to)
-						note.content.gsub!(
+					if header_exists?(fragment_text, doc_potentially_linked_to)
+						doc.content.gsub!(
 							/(\[\[)([^\]\|]+)(\|)(#{title_from_filename})#(#{fragment_text})(\]\])/i,
-							"<a class='wiki-link' href='#{note_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
+							"<a class='wiki-link' href='#{doc_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
 						)
 					end
 				end
 
-				# Replace double-bracketed block links using note title and block id
+				# Replace double-bracketed block links using doc title and block id
 				# [[feline.cats#^id]] -> "cats > ^id"
 
 			end
@@ -163,7 +163,7 @@ module JekyllWikiLinks
 			# At this point, all remaining double-bracket-wrapped words are
 			# pointing to non-existing pages, so let's disable them
 			regex_wl, cap_gr = regex_wiki_link()
-			note.content.gsub!(
+			doc.content.gsub!(
 				regex_wl,
 				"<span title=\"Content not found.\" class=\"invalid-wiki-link\">[[#{cap_gr}]]</span>"
 			)
@@ -179,12 +179,12 @@ module JekyllWikiLinks
 			return backlinks
 		end
 
-		def header_exists?(header, note)
-			# note: leading + trailing whitespace is ignored when matching headers
+		def header_exists?(header, doc)
+			# doc: leading + trailing whitespace is ignored when matching headers
 			regex_header, _ = regex_header()
 			regex_setext_header, _ = regex_setext_header()
-			header_results = note.content.scan(regex_header).flatten.map { |r| r.strip } 
-			setext_header_results = note.content.scan(regex_setext_header).flatten.map { |r| r.strip } 
+			header_results = doc.content.scan(regex_header).flatten.map { |r| r.strip } 
+			setext_header_results = doc.content.scan(regex_setext_header).flatten.map { |r| r.strip } 
 			return header_results.include?(header.strip) || setext_header_results.include?(header.strip)
 		end
 
@@ -296,7 +296,7 @@ module JekyllWikiLinks
 		end
 
 		def regex_invalid_wiki_link()
-			# identify missing links in note via .invalid-wiki-link class and nested note-name.
+			# identify missing links in doc via .invalid-wiki-link class and nested doc-name.
 			regex = /invalid-wiki-link[^\]]+\[\[([^\]]+)\]\]/i
 			cap_gr = "\\1" # this is mostly just to remain consistent with other regex functions
 			return regex, cap_gr
