@@ -19,6 +19,31 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     )
   end
   let(:site)                     { Jekyll::Site.new(config) }
+  
+  # base cases
+  let(:base_case_a)              { find_by_title(site.collections["notes"].docs, "Base Case A") }
+  let(:base_case_b)              { find_by_title(site.collections["notes"].docs, "Base Case B") }
+  let(:one_page)                 { find_by_title(site.pages, "One Page") }
+  let(:one_post)                 { find_by_title(site.collections["posts"].docs, "One Post") }
+  let(:link_to_page_note)        { find_by_title(site.collections["notes"].docs, "Link Page") }
+  let(:link_to_post_note)        { find_by_title(site.collections["notes"].docs, "Link Post") }
+  let(:missing_doc)              { find_by_title(site.collections["notes"].docs, "Missing Doc") }
+  let(:missing_doc_many)         { find_by_title(site.collections["notes"].docs, "Missing Doc Many") }
+  let(:link_whitespace_in_filename)     { find_by_title(site.collections["notes"].docs, "Link Whitespace In Filename") }
+  let(:whitespace_in_filename)   { find_by_title(site.collections["notes"].docs, "Whitespace In Filename") }
+  # header link
+  let(:link_header)              { find_by_title(site.collections["notes"].docs, "Link Header") }
+  let(:link_header_missing_doc)  { find_by_title(site.collections["notes"].docs, "Link Header Missing") }
+  let(:link_header_local_alias_right) { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Right") }
+  let(:link_header_local_alias_left)  { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Left") }
+  # aliased
+  let(:local_right_alias_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Right Missing Doc") }
+  let(:local_left_alias_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Left Missing Doc") }
+  let(:local_alias_right_link_header_missing) { find_by_title(site.collections["notes"].docs, "Local Alias Right Link Header Missing") }
+  let(:local_alias_left_link_header_missing)  { find_by_title(site.collections["notes"].docs, "Local Alias Left Link Header Missing") }
+  let(:local_right_alias)        { find_by_title(site.collections["notes"].docs, "Local Alias Right") }
+  let(:local_left_alias)         { find_by_title(site.collections["notes"].docs, "Local Alias Left") }
+  # graph
   let(:graph_generated_file)     { find_generated_file("/assets/graph-net-web.json") }
   let(:graph_static_file)        { find_static_file("/assets/graph-net-web.json") }
   let(:graph_data)               { static_graph_file_content() }
@@ -26,26 +51,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:graph_link)               { get_graph_link_match_source() }
   let(:missing_link_graph_node)  { get_missing_link_graph_node() }
   let(:missing_target_graph_link){ get_missing_target_graph_link() }
-  let(:one_page)                 { find_by_title(site.pages, "One Page") }
-  let(:one_post)                 { find_by_title(site.collections["posts"].docs, "One Post") }
-  let(:base_case_a)              { find_by_title(site.collections["notes"].docs, "Base Case A") }
-  let(:base_case_b)              { find_by_title(site.collections["notes"].docs, "Base Case B") }
-  let(:link_to_page_note)        { find_by_title(site.collections["notes"].docs, "Link Page") }
-  let(:link_to_post_note)        { find_by_title(site.collections["notes"].docs, "Link Post") }
-  let(:link_header)              { find_by_title(site.collections["notes"].docs, "Link Header") }
-  let(:link_header_local_alias_right) { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Right") }
-  let(:link_header_local_alias_left)  { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Left") }
-  let(:missing_doc)              { find_by_title(site.collections["notes"].docs, "Missing Doc") }
-  let(:missing_doc_many)         { find_by_title(site.collections["notes"].docs, "Missing Doc Many") }
-  let(:local_right_alias_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Right Missing Doc") }
-  let(:local_left_alias_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Left Missing Doc") }
-  let(:local_alias_right_link_header_missing) { find_by_title(site.collections["notes"].docs, "Local Alias Right Link Header Missing") }
-  let(:local_alias_left_link_header_missing)  { find_by_title(site.collections["notes"].docs, "Local Alias Left Link Header Missing") }
-  let(:link_whitespace_in_filename)     { find_by_title(site.collections["notes"].docs, "Link Whitespace In Filename") }
-  let(:whitespace_in_filename)   { find_by_title(site.collections["notes"].docs, "Whitespace In Filename") }
-  let(:local_right_alias)        { find_by_title(site.collections["notes"].docs, "Local Alias Right") }
-  let(:local_left_alias)         { find_by_title(site.collections["notes"].docs, "Local Alias Left") }
   
+
   # makes markdown tests work
   subject { described_class.new(site.config) }
 
@@ -314,10 +321,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(missing_doc_many.output).to eq("<p>This fish has no targets like <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc.1]]</span> and <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc.2]]</span>.</p>\n")
     end
 
-    # TODO
-    # it "handles url fragments; full output" do
-    #   expect(missing_doc.output).to eq("")
-    # end
+    it "handles url fragments; full output" do
+      expect(link_header_missing_doc.output).to eq("<p>This note contains an invalid link with an invalid header <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-note#Zero]]</span>.</p>\n")
+    end
 
     it "generates graph data" do
       # expect(graph_generated_file.class).to be(File)
