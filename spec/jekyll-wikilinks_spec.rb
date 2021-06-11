@@ -35,7 +35,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:link_to_url_fragment)     { find_by_title(site.collections["notes"].docs, "Link URL Fragment") }
   let(:right_alias_url_fragment) { find_by_title(site.collections["notes"].docs, "Right Alias Link URL Fragment") }
   let(:left_alias_url_fragment)  { find_by_title(site.collections["notes"].docs, "Left Alias Link URL Fragment") }
-  let(:missing_link_note)        { find_by_title(site.collections["notes"].docs, "None Fish") }
+  let(:missing_doc)        { find_by_title(site.collections["notes"].docs, "Missing Doc") }
   let(:missing_links_note)       { find_by_title(site.collections["notes"].docs, "None School") }
   let(:missing_right_alias_note) { find_by_title(site.collections["notes"].docs, "None Right Name Fish") }
   let(:missing_left_alias_note)  { find_by_title(site.collections["notes"].docs, "None Left Name Fish") }
@@ -292,31 +292,31 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   context "when target [[wikilink]] note does not exist" do
     
     it "injects a span element with descriptive title" do
-      expect(missing_link_note.output).to include("<span title=\"Content not found.\"")
-      expect(missing_link_note.output).to include("</span>")
+      expect(missing_doc.output).to include("<span title=\"Content not found.\"")
+      expect(missing_doc.output).to include("</span>")
       expect(missing_links_note.output).to include("<span title=\"Content not found.\"").twice
       expect(missing_links_note.output).to include("</span>").twice
     end
 
     it "assigns 'invalid-wiki-link' class to span element" do
-      expect(missing_link_note.output).to include("class=\"invalid-wiki-link\"")
+      expect(missing_doc.output).to include("class=\"invalid-wiki-link\"")
       expect(missing_links_note.output).to include("class=\"invalid-wiki-link\"").twice
     end
 
     it "leaves original angle brackets and text untouched" do
-      expect(missing_link_note.output).to include("[[no.fish]]")
+      expect(missing_doc.output).to include("[[no.doc]]")
       expect(missing_links_note.output).to include("[[no.fish]]")
       expect(missing_links_note.output).to include("[[not.fish]]")
     end
 
     it "full output" do
-      expect(missing_link_note.output).to eq("<p>This <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.fish]]</span> has no target.</p>\n")
+      expect(missing_doc.output).to eq("<p>This <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc]]</span> has no target.</p>\n")
       expect(missing_links_note.output).to eq("<p>This fish has no targets like <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.fish]]</span> and <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[not.fish]]</span>.</p>\n")
     end
 
     # TODO
     # it "handles url fragments; full output" do
-    #   expect(missing_link_note.output).to eq("")
+    #   expect(missing_doc.output).to eq("")
     # end
 
     it "generates graph data" do
@@ -338,11 +338,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "nodes' 'label's equal their doc title" do
-      expect(missing_link_graph_node["label"]).to eq(missing_link_note.data["title"])
+      expect(missing_link_graph_node["label"]).to eq(missing_doc.data["title"])
     end
 
     it "nodes' 'url's equal their doc urls" do
-      expect(missing_link_graph_node["url"]).to eq(missing_link_note.url)
+      expect(missing_link_graph_node["url"]).to eq(missing_doc.url)
     end
 
     it "generated graph data contains links of format: { links: [ { source: '', target: ''}, ... ] }" do
@@ -351,7 +351,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "links' missing 'target' equals the [[wikitext]] in brackets." do
-      expect(missing_target_graph_link["target"]).to eq("no.fish")
+      expect(missing_target_graph_link["target"]).to eq("no.doc")
     end
 
   end
