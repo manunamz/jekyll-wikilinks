@@ -167,12 +167,6 @@ module JekyllWikiLinks
 				regex_wl,
 				"<span title=\"Content not found.\" class=\"invalid-wiki-link\">[[#{cap_gr}]]</span>"
 			)
-			# aliases -- both kinds
-			regex_wl, cap_gr = regex_wiki_link_w_alias()
-			note.content.gsub!(
-				regex_wl,
-				"<span title=\"Content not found.\" class=\"invalid-wiki-link\">[[#{cap_gr}]]</span>"
-			)
 		end
 
 		def get_backlinks(doc)
@@ -311,7 +305,7 @@ module JekyllWikiLinks
 		def regex_wiki_link(wiki_link_text='')
 			# includes fragments
 			if wiki_link_text.empty?
-				regex = /(\[\[)([^\|\]]+)(\]\])/i
+				regex = /(\[\[)([^\]]+)(\]\])/i
 				cap_gr = "\\2" 
 				return regex, cap_gr
 			else 
