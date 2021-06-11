@@ -115,7 +115,7 @@ module JekyllWikiLinks
 					wiki_link_text = m[0]
 					fragment_text = m[1]
 					downcased_fragment_text = fragment_text.downcase
-					if has_header?(fragment_text, note_potentially_linked_to)
+					if header_exists?(fragment_text, note_potentially_linked_to)
 						note.content.gsub!(
 							/\[\[(#{wiki_link_text})#(#{fragment_text})\]\]/i,
 							"<a class='wiki-link' href='#{note_url}\##{downcased_fragment_text}'>#{render_txt} > #{fragment_text}</a>"
@@ -131,7 +131,7 @@ module JekyllWikiLinks
 					fragment_text = m[2]
 					aliased_text = m[4]
 					downcased_fragment_text = fragment_text.downcase
-					if has_header?(fragment_text, note_potentially_linked_to)
+					if header_exists?(fragment_text, note_potentially_linked_to)
 						note.content.gsub!(
 							/(\[\[)(#{title_from_filename})#(#{fragment_text})(\|)([^\]]+)(\]\])/i,
 							"<a class='wiki-link' href='#{note_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
@@ -147,7 +147,7 @@ module JekyllWikiLinks
 					# wiki_link_text = m[3] (which == title_from_filename)
 					fragment_text = m[4]
 					downcased_fragment_text = fragment_text.downcase
-					if has_header?(fragment_text, note_potentially_linked_to)
+					if header_exists?(fragment_text, note_potentially_linked_to)
 						note.content.gsub!(
 							/(\[\[)([^\]\|]+)(\|)(#{title_from_filename})#(#{fragment_text})(\]\])/i,
 							"<a class='wiki-link' href='#{note_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
@@ -179,7 +179,7 @@ module JekyllWikiLinks
 			return backlinks
 		end
 
-		def has_header?(header, note)
+		def header_exists?(header, note)
 			# note: leading + trailing whitespace is ignored when matching headers
 			regex_header, _ = regex_header()
 			regex_setext_header, _ = regex_setext_header()
