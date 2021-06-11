@@ -32,15 +32,15 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:base_case_b)              { find_by_title(site.collections["notes"].docs, "Base Case B") }
   let(:link_to_page_note)        { find_by_title(site.collections["notes"].docs, "Link Page") }
   let(:link_to_post_note)        { find_by_title(site.collections["notes"].docs, "Link Post") }
-  let(:link_to_url_fragment)     { find_by_title(site.collections["notes"].docs, "Link URL Fragment") }
+  let(:link_header)              { find_by_title(site.collections["notes"].docs, "Link Header") }
   let(:right_alias_url_fragment) { find_by_title(site.collections["notes"].docs, "Right Alias Link URL Fragment") }
   let(:left_alias_url_fragment)  { find_by_title(site.collections["notes"].docs, "Left Alias Link URL Fragment") }
   let(:missing_doc)              { find_by_title(site.collections["notes"].docs, "Missing Doc") }
   let(:missing_doc_many)         { find_by_title(site.collections["notes"].docs, "Missing Doc Many") }
   let(:local_right_alias_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Right Missing Doc") }
   let(:local_left_alias_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Left Missing Doc") }
-  let(:missing_right_alias_url_fragment) { find_by_title(site.collections["notes"].docs, "Missing Right Alias Link URL Fragment") }
-  let(:missing_left_alias_url_fragment)  { find_by_title(site.collections["notes"].docs, "Missing Left Alias Link URL Fragment") }
+  let(:local_alias_right_link_header_missing) { find_by_title(site.collections["notes"].docs, "Local Alias Right Link Header Missing") }
+  let(:local_alias_left_link_header_missing)  { find_by_title(site.collections["notes"].docs, "Local Alias Left Link Header Missing") }
   let(:link_whitespace_in_filename)     { find_by_title(site.collections["notes"].docs, "Link Whitespace In Filename") }
   let(:whitespace_in_filename)   { find_by_title(site.collections["notes"].docs, "Whitespace In Filename") }
   let(:local_right_alias)        { find_by_title(site.collections["notes"].docs, "Local Alias Right") }
@@ -135,15 +135,15 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # fragment
 
     it "url fragments contain note name and header text" do
-      expect(link_to_url_fragment.output).to include("long note &gt; Two")
+      expect(link_header.output).to include("long note &gt; Two")
     end
 
     it "url fragment in url" do
-      expect(link_to_url_fragment.output).to include("/notes/long-note/#two")
+      expect(link_header.output).to include("/notes/long-note/#two")
     end
 
     it "processes url fragments; full output" do
-      expect(link_to_url_fragment.output).to eq("<p>This note contains a link fragment to <a class=\"wiki-link\" href=\"/notes/long-note/#two\">long note &gt; Two</a>.</p>\n")
+      expect(link_header.output).to eq("<p>This note contains a link to a header <a class=\"wiki-link\" href=\"/notes/long-note/#two\">long note &gt; Two</a>.</p>\n")
     end
 
     # graph
@@ -420,18 +420,18 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # fragment
 
     it "assigns 'invalid-wiki-link' class to span element" do
-      expect(missing_right_alias_url_fragment.output).to include("class=\"invalid-wiki-link\"")
-      expect(missing_left_alias_url_fragment.output).to include("class=\"invalid-wiki-link\"")
+      expect(local_alias_right_link_header_missing.output).to include("class=\"invalid-wiki-link\"")
+      expect(local_alias_left_link_header_missing.output).to include("class=\"invalid-wiki-link\"")
     end
 
     it "leaves original angle brackets and text untouched" do
-      expect(missing_right_alias_url_fragment.output).to include("[[long-note#Zero|aliased text]]")
-      expect(missing_left_alias_url_fragment.output).to include("[[aliased text|long-note#Zero]]")
+      expect(local_alias_right_link_header_missing.output).to include("[[long-note#Zero|aliased text]]")
+      expect(local_alias_left_link_header_missing.output).to include("[[aliased text|long-note#Zero]]")
     end
 
     it "processes url fragments; full output" do
-      expect(missing_right_alias_url_fragment.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-note#Zero|aliased text]]</span>.</p>\n")
-      expect(missing_left_alias_url_fragment.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[aliased text|long-note#Zero]]</span>.</p>\n")
+      expect(local_alias_right_link_header_missing.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-note#Zero|aliased text]]</span>.</p>\n")
+      expect(local_alias_left_link_header_missing.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[aliased text|long-note#Zero]]</span>.</p>\n")
     end
   end
 
