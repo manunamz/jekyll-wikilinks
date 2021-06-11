@@ -105,7 +105,7 @@ module JekyllWikiLinks
 				)
 
 				# 
-				# fragments/anchors
+				# anchors/fragments/header
 				# 
 
 				# Replace double-bracketed header links using note title and header
