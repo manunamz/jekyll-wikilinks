@@ -1,6 +1,6 @@
 ---
 id: 8ce416c4-efeb-4dac-916a-d8527ec73b2a
-title: None Right Name Fish
+title: Local Alias Right Missing Doc
 permalink: /note/8ce416c4-efeb-4dac-916a-d8527ec73b2a/
 ---
-This [[no.fish|fish]] uses a right alias.
+This doc uses a [[no.doc|local right alias]].

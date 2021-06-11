@@ -37,7 +37,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:left_alias_url_fragment)  { find_by_title(site.collections["notes"].docs, "Left Alias Link URL Fragment") }
   let(:missing_doc)              { find_by_title(site.collections["notes"].docs, "Missing Doc") }
   let(:missing_doc_many)         { find_by_title(site.collections["notes"].docs, "Missing Doc Many") }
-  let(:missing_local_right_alias) { find_by_title(site.collections["notes"].docs, "None Right Name Fish") }
+  let(:local_right_alias_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Right Missing Doc") }
   let(:local_left_alias_missing_doc) { find_by_title(site.collections["notes"].docs, "Local Alias Left Missing Doc") }
   let(:missing_right_alias_url_fragment) { find_by_title(site.collections["notes"].docs, "Missing Right Alias Link URL Fragment") }
   let(:missing_left_alias_url_fragment)  { find_by_title(site.collections["notes"].docs, "Missing Left Alias Link URL Fragment") }
@@ -396,24 +396,24 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # [[left alias|fish]]
 
     it "injects a span element with descriptive title" do
-      expect(missing_local_right_alias.output).to include("<span title=\"Content not found.\"")
-      expect(missing_local_right_alias.output).to include("</span>")
+      expect(local_right_alias_missing_doc.output).to include("<span title=\"Content not found.\"")
+      expect(local_right_alias_missing_doc.output).to include("</span>")
       expect(local_left_alias_missing_doc.output).to include("<span title=\"Content not found.\"")
       expect(local_left_alias_missing_doc.output).to include("</span>")
     end
 
     it "assigns 'invalid-wiki-link' class to span element" do
-      expect(missing_local_right_alias.output).to include("class=\"invalid-wiki-link\"")
+      expect(local_right_alias_missing_doc.output).to include("class=\"invalid-wiki-link\"")
       expect(local_left_alias_missing_doc.output).to include("class=\"invalid-wiki-link\"")
     end
 
     it "leaves original angle brackets and text untouched" do
-      expect(missing_local_right_alias.output).to include("[[no.fish|fish]]")
+      expect(local_right_alias_missing_doc.output).to include("[[no.doc|local right alias]]")
       expect(local_left_alias_missing_doc.output).to include("[[local left alias|no.doc]]")
     end
 
     it "full output" do
-      expect(missing_local_right_alias.output).to eq("<p>This <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.fish|fish]]</span> uses a right alias.</p>\n")
+      expect(local_right_alias_missing_doc.output).to eq("<p>This doc uses a <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc|local right alias]]</span>.</p>\n")
       expect(local_left_alias_missing_doc.output).to eq("<p>This doc uses a <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[local left alias|no.doc]]</span>.</p>\n")
     end
 
