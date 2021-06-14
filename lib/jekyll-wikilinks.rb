@@ -115,7 +115,7 @@ module JekyllWikiLinks
 					wiki_link_text = m[0]
 					fragment_text = m[1]
 					downcased_fragment_text = fragment_text.downcase
-					if header_exists?(fragment_text, doc_potentially_linked_to)
+					if doc_has_header?(fragment_text, doc_potentially_linked_to)
 						doc.content.gsub!(
 							/\[\[(#{wiki_link_text})#(#{fragment_text})\]\]/i,
 							"<a class='wiki-link' href='#{doc_url}\##{downcased_fragment_text}'>#{render_txt} > #{fragment_text}</a>"
@@ -131,7 +131,7 @@ module JekyllWikiLinks
 					fragment_text = m[2]
 					aliased_text = m[4]
 					downcased_fragment_text = fragment_text.downcase
-					if header_exists?(fragment_text, doc_potentially_linked_to)
+					if doc_has_header?(fragment_text, doc_potentially_linked_to)
 						doc.content.gsub!(
 							/(\[\[)(#{title_from_filename})#(#{fragment_text})(\|)([^\]]+)(\]\])/i,
 							"<a class='wiki-link' href='#{doc_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
@@ -147,7 +147,7 @@ module JekyllWikiLinks
 					# wiki_link_text = m[3] (which == title_from_filename)
 					fragment_text = m[4]
 					downcased_fragment_text = fragment_text.downcase
-					if header_exists?(fragment_text, doc_potentially_linked_to)
+					if doc_has_header?(fragment_text, doc_potentially_linked_to)
 						doc.content.gsub!(
 							/(\[\[)([^\]\|]+)(\|)(#{title_from_filename})#(#{fragment_text})(\]\])/i,
 							"<a class='wiki-link' href='#{doc_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
@@ -169,17 +169,9 @@ module JekyllWikiLinks
 			)
 		end
 
-		def get_backlinks(doc)
-			backlinks = []
-			md_docs.each do |backlinked_doc|
-				if backlinked_doc.content.include?(doc.url)
-					backlinks << backlinked_doc
-				end
-			end
-			return backlinks
-		end
+		# doc-link validation
 
-		def header_exists?(header, doc)
+		def doc_has_header?(header, doc)
 			# doc: leading + trailing whitespace is ignored when matching headers
 			regex_header, _ = regex_header()
 			regex_setext_header, _ = regex_setext_header()
@@ -188,10 +180,64 @@ module JekyllWikiLinks
 			return header_results.include?(header.strip) || setext_header_results.include?(header.strip)
 		end
 
+		# helpers
+
+		def get_backlinks(doc)
+			backlinks = []
+			@md_docs.each do |backlinked_doc|
+				if backlinked_doc.content.include?(doc.url)
+					backlinks << backlinked_doc
+				end
+			end
+			return backlinks
+		end
+
 		def invalid_wiki_links(doc)
 			regex, _ = regex_invalid_wiki_link()
 			return doc.content.scan(regex)[0]
 		end
+
+		def context
+			@context ||= JekyllWikiLinks::Context.new(site)
+		end
+
+		# config helpers
+
+		def exclude?(type)
+			return false unless option(EXCLUDE_KEY)
+			return option(EXCLUDE_KEY).include?(type.to_s)
+		end
+
+		def exclude_graph?(type)
+			return false unless option_graph(EXCLUDE_KEY)
+			return option_graph(EXCLUDE_KEY).include?(type.to_s)
+		end
+
+		def markdown_extension?(extension)
+			markdown_converter.matches(extension)
+		end
+
+		def markdown_converter
+			@markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
+		end
+
+		def option(key)
+			config[CONFIG_KEY] && config[CONFIG_KEY][key]
+		end
+
+		def option_graph(key)
+			config[GRAPH_DATA_KEY] && config[GRAPH_DATA_KEY][key]
+		end
+
+		def disabled?
+			option(ENABLED_KEY) == false
+		end
+
+		def disabled_graph_data?
+			option_graph(ENABLED_GRAPH_DATA_KEY) == false
+		end
+
+		# graph
 
 		def generate_graph_data(doc)
 			Jekyll.logger.debug "Processing graph nodes for doc: ", doc.data['title']
@@ -239,58 +285,21 @@ module JekyllWikiLinks
 			}))
 		end
 
-		def context
-			@context ||= JekyllWikiLinks::Context.new(site)
-		end
-
-
-		def exclude?(type)
-			return false unless option(EXCLUDE_KEY)
-			return option(EXCLUDE_KEY).include?(type.to_s)
-		end
-
-		def exclude_graph?(type)
-			return false unless option_graph(EXCLUDE_KEY)
-			return option_graph(EXCLUDE_KEY).include?(type.to_s)
-		end
-
-		def markdown_extension?(extension)
-			markdown_converter.matches(extension)
-		end
-
-		def markdown_converter
-			@markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
-		end
-
-		def option(key)
-			config[CONFIG_KEY] && config[CONFIG_KEY][key]
-		end
-
-		def option_graph(key)
-			config[GRAPH_DATA_KEY] && config[GRAPH_DATA_KEY][key]
-		end
-
-		def disabled?
-			option(ENABLED_KEY) == false
-		end
-
-		def disabled_graph_data?
-			option_graph(ENABLED_GRAPH_DATA_KEY) == false
-		end
-
 		# regex
 		# returns two items: regex and a target capture group (text to be rendered)
 		# using functions instead of constants because of the need to access 'wiki_link_text'
 		#   -- esp. when aliasing.
 
 		def regex_header()
+			# kramdown style atx header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L29
 			regex = /^\#{1,6}[\t ]*([^ \t].*)\n/i
 			cap_gr = "\\1"
 			return regex, cap_gr
 		end
 
 		def regex_setext_header()
-			regex = /^ {0,3}(.*)\n[-=]{2}+[ \t\r\f\v]*/i
+			# kramdown style setext header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L17
+			regex = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
 			cap_gr = "\\1"
 			return regex, cap_gr
 		end
