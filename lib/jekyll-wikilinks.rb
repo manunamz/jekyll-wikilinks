@@ -90,34 +90,29 @@ module JekyllWikiLinks
 		end
 
 		def build_html_link(wikilink)
-			# TODO link_type
 			linked_doc = get_linked_doc(wikilink.filename)
 			if !linked_doc.nil?
+				
+				# TODO link_type
+
 				lnk_doc_rel_url = relative_url(linked_doc.url) if linked_doc&.url
 				# label
 				wikilink_inner_txt = wikilink.clean_label_txt if wikilink.labelled?
 				# TODO not sure about downcase
 				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
 				link_lvl = wikilink.describe['level']
-
-				if (link_lvl == "file" && !linked_doc.nil?)
+				if (link_lvl == "file")
 					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?
-					return "<a class='wiki-link' href='#{lnk_doc_rel_url}'>#{wikilink_inner_txt}</a>"
-				
-				elsif ("header" && !linked_doc.nil? && doc_has_header?(linked_doc, wikilink.header_txt))
+				elsif (link_lvl == "header" && doc_has_header?(linked_doc, wikilink.header_txt))
+					lnk_doc_rel_url += "\#" + wikilink.header_txt.downcase
 					wikilink_inner_txt = "#{fname_inner_txt} > #{wikilink.header_txt}" if wikilink_inner_txt.nil?
-					url_fragment = wikilink.header_txt.downcase
-					return "<a class='wiki-link' href='#{lnk_doc_rel_url}\##{url_fragment}'>#{wikilink_inner_txt}</a>"
-				
-				elsif ("block" && !linked_doc.nil? && doc_has_block_id?(linked_doc, wikilink.block_id))
+				elsif (link_lvl == "block" && doc_has_block_id?(linked_doc, wikilink.block_id))
+					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
 					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
-					url_fragment = wikilink.block_id.downcase
-					return "<a class='wiki-link' href='#{lnk_doc_rel_url}\##{url_fragment}'>#{wikilink_inner_txt}</a>"
-				
 				else
 					return "<span title=\"Content not found.\" class=\"invalid-wiki-link\">#{wikilink.md_link_str}</span>"
 				end
-
+				return "<a class='wiki-link' href='#{lnk_doc_rel_url}'>#{wikilink_inner_txt}</a>"
 			else
 				return "<span title=\"Content not found.\" class=\"invalid-wiki-link\">#{wikilink.md_link_str}</span>"
 			end
