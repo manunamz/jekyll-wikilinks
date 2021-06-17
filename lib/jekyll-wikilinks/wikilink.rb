@@ -44,7 +44,7 @@ module JekyllWikiLinks
 
     def md_link_regex
       regex_embed = embedded? ? REGEX_EMBED : %r{}
-      regex_link_type = typed? ? %r{#{@link_type}#{REGEX_TYPE}} : %r{}
+      regex_link_type = typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
       filename = exists?(FILENAME) ? @filename : ""
       if exists?(HEADER_TXT)
         header = %r{#{REGEX_HEADER}#{@header_txt}}
@@ -59,7 +59,7 @@ module JekyllWikiLinks
       return %r{#{regex_embed}#{regex_link_type}\[\[#{filename}#{header}#{block}#{alias_}\]\]}
     end
 
-    def attrs()
+    def describe
       return {
         'level' => level,
         'aliased' => aliased?,

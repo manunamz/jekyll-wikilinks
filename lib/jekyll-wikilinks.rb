@@ -90,7 +90,7 @@ module JekyllWikiLinks
 		end
 
 		def build_html_link(wikilink)
-			# TODO type
+			# TODO link_type
 			linked_doc = get_linked_doc(wikilink.filename)
 			if !linked_doc.nil?
 				lnk_doc_rel_url = relative_url(linked_doc.url) if linked_doc&.url
@@ -98,7 +98,7 @@ module JekyllWikiLinks
 				wikilink_inner_txt = wikilink.clean_alias_txt if wikilink.aliased?
 				# TODO not sure about downcase
 				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
-				link_lvl = wikilink.attrs()['level']
+				link_lvl = wikilink.describe['level']
 
 				if (link_lvl == "file" && !linked_doc.nil?)
 					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?

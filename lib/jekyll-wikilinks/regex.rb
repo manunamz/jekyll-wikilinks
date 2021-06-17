@@ -8,18 +8,18 @@ module JekyllWikiLinks
     # REGEX_NOT_GREEDY = /(?!\]\]).*/i
     REGEX_NOT_GREEDY = /[^\]]+/i
     REGEX_EMBED = /(?<embed>(\!))/i                                      # 0
-    REGEX_TYPE_TXT = /(?<type-txt>([^\n\s\!\#\^\|\]]+))/i                # 1
+    REGEX_LINK_TYPE_TXT = /(?<type-txt>([^\n\s\!\#\^\|\]]+))/i                # 1
     REGEX_FILENAME = /(?<filename>([^\\\/:\#\^\|\[\]]+))/i               # 2
     REGEX_HEADER_TXT = /(?<header-txt>([^\^\!\#\^\|\[\]]+))/i            # 3
     REGEX_BLOCK_ID_TXT = /(?<block-txt>([^\|\]]+))/i                     # 4
     REGEX_ALIAS_TXT = /(?<alias-txt>(#{REGEX_NOT_GREEDY}))/i             # 5
-    REGEX_TYPE = /::/
+    REGEX_LINK_TYPE = /::/
     REGEX_HEADER = /\#/
     REGEX_BLOCK = /\#\^/
     REGEX_ALIAS = /\|/
     REGEX_WIKI_LINKS = %r{
       (#{REGEX_EMBED})?
-      (#{REGEX_TYPE_TXT}#{REGEX_TYPE})?
+      (#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE})?
       \[\[
         #{REGEX_FILENAME}
         (#{REGEX_HEADER}#{REGEX_HEADER_TXT})?
