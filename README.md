@@ -20,11 +20,12 @@ The `enable` flags may be toggled to turn off the plugin or turn off d3_graph_da
 
 ### Wikilink Syntax
 - [[wikilink]] text is replaced with its `title` attribute, lower-cased, in its frontmatter when rendered.
-- [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note.md]] -> a.note.md, [[a note]] -> a note.md).
+- [[wikilinks]] matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note]] -> a.note.md, [[a note]] -> a note.md).
   - Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
-- aliasing in both directions is supported:
-  - [[some text|filename]]
+- labelling (sometimes called 'aliases') is supported:
   - [[filename|some text]]
+- Header level links supported:
+	- [[filename#header]]
 
 ### MetaData
 Each item will have a `backlinks` metadata field added to its data/frontmatter. You can then access the entire document of each backlink item from that field. 

@@ -1,6 +1,6 @@
 ---
 id: 2849a030-c72d-4a9f-9d1e-9e9a18449e04
-title: Local Alias Right
+title: Labelled
 permalink: /note/2849a030-c72d-4a9f-9d1e-9e9a18449e04/
 ---
-This doc uses a [[base-case.a|local right alias]].
+This doc uses a [[base-case.a|label]].

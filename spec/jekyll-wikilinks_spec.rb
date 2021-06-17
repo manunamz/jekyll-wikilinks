@@ -36,13 +36,13 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   # header link/url fragments
   let(:link_header)                     { find_by_title(site.collections["notes"].docs, "Link Header") }
   let(:link_header_missing_doc)         { find_by_title(site.collections["notes"].docs, "Link Header Missing") }
-  let(:link_header_local_alias_right)   { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Right") }
+  let(:link_header_label)   { find_by_title(site.collections["notes"].docs, "Link Header Labelled") }
   # TODO: block link
-  # local aliases
-  let(:local_alias_right)               { find_by_title(site.collections["notes"].docs, "Local Alias Right") }
-  let(:local_alias_right_sq_br)         { find_by_title(site.collections["notes"].docs, "Local Alias Right With Square Brackets") }
-  let(:local_alias_right_missing_doc)   { find_by_title(site.collections["notes"].docs, "Local Alias Right Missing Doc") }
-  let(:local_alias_right_link_header_missing) { find_by_title(site.collections["notes"].docs, "Local Alias Right Link Header Missing") }  
+  # labels
+  let(:label)                           { find_by_title(site.collections["notes"].docs, "Labelled") }
+  let(:label_sq_br)                     { find_by_title(site.collections["notes"].docs, "Labelled With Square Brackets") }
+  let(:label_missing_doc)               { find_by_title(site.collections["notes"].docs, "Labelled Missing Doc") }
+  let(:labelled_link_header_missing)    { find_by_title(site.collections["notes"].docs, "Labelled Link Header Missing") }  
   # graph
   let(:graph_generated_file)            { find_generated_file("/assets/graph-net-web.json") }
   let(:graph_static_file)               { find_static_file("/assets/graph-net-web.json") }
@@ -361,76 +361,76 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   end
 
-  context "when target [[wikilink]] using piped aliasing exists" do
+  context "when target [[wikilink]] using piped labels exists" do
 
-    it "renders the alias text, not the note's filename" do
-      expect(local_alias_right.output).to include("local right alias")
-      expect(local_alias_right.output).to_not include("base-case.a")
+    it "renders the label text, not the note's filename" do
+      expect(label.output).to include("label")
+      expect(label.output).to_not include("base-case.a")
     end
 
     it "full output" do
-      expect(local_alias_right.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">local right alias</a>.</p>\n")
+      expect(label.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">label</a>.</p>\n")
     end
 
-    # aliased text preserves [square brackets]
-    it "renders the alias text with [square brackets], not the note's filename" do
-      pending("flexible alias text")
-      expect(local_alias_right_sq_br.output).to include("local right alias with [square brackets]")
-      expect(local_alias_right_sq_br.output).to_not include("base-case.a")
+    # labelled text preserves [square brackets]
+    it "renders the label text with [square brackets], not the note's filename" do
+      pending("flexible label text")
+      expect(label_sq_br.output).to include("label with [square brackets]")
+      expect(label_sq_br.output).to_not include("base-case.a")
     end
 
     it "full output" do
-      pending("flexible alias text")
-      expect(local_alias_right_sq_br.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">local right alias with [square brackets]</a>.</p>\n")
+      pending("flexible label text")
+      expect(label_sq_br.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">label with [square brackets]</a>.</p>\n")
     end
 
     # fragment
 
     it "url fragments contain note name and header text" do
-      expect(link_header_local_alias_right.output).to include("aliased text")
+      expect(link_header_label.output).to include("labelled text")
     end
 
     it "url fragment in url" do
-      expect(link_header_local_alias_right.output).to include("/notes/long-note/#two")
+      expect(link_header_label.output).to include("/notes/long-note/#two")
     end
 
     it "processes url fragments; full output" do
-      expect(link_header_local_alias_right.output).to eq("<p>This note contains a link to a header with <a class=\"wiki-link\" href=\"/notes/long-note/#two\">aliased text</a>.</p>\n")
+      expect(link_header_label.output).to eq("<p>This note contains a link to a header with <a class=\"wiki-link\" href=\"/notes/long-note/#two\">labelled text</a>.</p>\n")
     end
   
   end
 
-  context "when target [[wikilink]] using piped aliasing does not exist" do
+  context "when target [[wikilink]] using piped labels does not exist" do
 
     it "injects a span element with descriptive title" do
-      expect(local_alias_right_missing_doc.output).to include("<span title=\"Content not found.\"")
-      expect(local_alias_right_missing_doc.output).to include("</span>")
+      expect(label_missing_doc.output).to include("<span title=\"Content not found.\"")
+      expect(label_missing_doc.output).to include("</span>")
     end
 
     it "assigns 'invalid-wiki-link' class to span element" do
-      expect(local_alias_right_missing_doc.output).to include("class=\"invalid-wiki-link\"")
+      expect(label_missing_doc.output).to include("class=\"invalid-wiki-link\"")
     end
 
     it "leaves original angle brackets and text untouched" do
-      expect(local_alias_right_missing_doc.output).to include("[[no.doc|local right alias]]")
+      expect(label_missing_doc.output).to include("[[no.doc|label]]")
     end
 
     it "full output" do
-      expect(local_alias_right_missing_doc.output).to eq("<p>This doc uses a <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc|local right alias]]</span>.</p>\n")
+      expect(label_missing_doc.output).to eq("<p>This doc uses a <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc|label]]</span>.</p>\n")
     end
 
     # fragment
 
     it "assigns 'invalid-wiki-link' class to span element" do
-      expect(local_alias_right_link_header_missing.output).to include("class=\"invalid-wiki-link\"")
+      expect(labelled_link_header_missing.output).to include("class=\"invalid-wiki-link\"")
     end
 
     it "leaves original angle brackets and text untouched" do
-      expect(local_alias_right_link_header_missing.output).to include("[[long-note#Zero|aliased text]]")
+      expect(labelled_link_header_missing.output).to include("[[long-note#Zero|labelled text]]")
     end
 
     it "processes url fragments; full output" do
-      expect(local_alias_right_link_header_missing.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-note#Zero|aliased text]]</span>.</p>\n")
+      expect(labelled_link_header_missing.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-note#Zero|labelled text]]</span>.</p>\n")
     end
   end
 

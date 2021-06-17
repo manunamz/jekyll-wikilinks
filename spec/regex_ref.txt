@@ -20,22 +20,22 @@ type::[[wikilink#^block_id]]
 
 what if the type::[[wikilink]] is inline?
 
-# aliased
-[[wikilink|alias txt]]
+# labelled
+[[wikilink|label txt]]
 
-[[wikilink#header|alias txt]]
+[[wikilink#header|label txt]]
 
-[[wikilink#^block_id|alias txt]]
+[[wikilink#^block_id|label txt]]
 
-# aliased w bracket
+# labelled w bracket
 
-[[wikilink|[bracketted] alias txt]]
+[[wikilink|[bracketted] label txt]]
 
-[[wikilink|bracketted alias [txt]]]
+[[wikilink|bracketted label [txt]]]
 
-[[wikilink#header|[bracketted] alias txt]]
+[[wikilink#header|[bracketted] label txt]]
 
-[[wikilink#^block_id|[bracketted] alias txt]]
+[[wikilink#^block_id|[bracketted] label txt]]
 
 # embedded
 
@@ -55,15 +55,15 @@ what if the type::[[wikilink]] is inline?
 
 what if the !type::[[wikilink]] is inline?
 
-# typed aliased
+# typed labelled
 
-type::[[wikilink|alias txt]]
+type::[[wikilink|label txt]]
 
-type::[[wikilink#header|alias txt]]
+type::[[wikilink#header|label txt]]
 
-type::[[wikilink#^block_id|alias txt]]
+type::[[wikilink#^block_id|label txt]]
 
-what if the type::[[wikilink|alias txt]] is inline?
+what if the type::[[wikilink|label txt]] is inline?
 
 # stacked header-block
 

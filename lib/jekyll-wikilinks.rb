@@ -94,8 +94,8 @@ module JekyllWikiLinks
 			linked_doc = get_linked_doc(wikilink.filename)
 			if !linked_doc.nil?
 				lnk_doc_rel_url = relative_url(linked_doc.url) if linked_doc&.url
-				# alias
-				wikilink_inner_txt = wikilink.clean_alias_txt if wikilink.aliased?
+				# label
+				wikilink_inner_txt = wikilink.clean_label_txt if wikilink.labelled?
 				# TODO not sure about downcase
 				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
 				link_lvl = wikilink.describe['level']

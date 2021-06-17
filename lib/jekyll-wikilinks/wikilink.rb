@@ -3,26 +3,26 @@ require_relative "regex"
 module JekyllWikiLinks
   # the wikilink class knows everything about the original markdown syntax and its semantic meaning
   class WikiLink
-    attr_accessor :embed, :link_type, :filename, :header_txt, :block_id, :alias_txt
+    attr_accessor :embed, :link_type, :filename, :header_txt, :block_id, :label_txt
 
     FILENAME = "filename"
     HEADER_TXT = "header_txt"
     BLOCK_ID = "block_id"
 
     # parameters ordered by appearance in regex
-    def initialize(embed, link_type, filename, header_txt, block_id, alias_txt)
-      # super(embed, link_type, filename, header_txt, block_id, alias_txt)
+    def initialize(embed, link_type, filename, header_txt, block_id, label_txt)
+      # super(embed, link_type, filename, header_txt, block_id, label_txt)
       @embed ||= embed
       @link_type ||= link_type
       @filename ||= filename
       @header_txt ||= header_txt
       @block_id ||= block_id
-      @alias_txt ||= alias_txt
+      @label_txt ||= label_txt
     end
 
-    # aliases are really flexible, so we need to handle them with a bit more care
-    def clean_alias_txt
-      return @alias_txt.sub("[", "\\[").sub("]", "\\]")
+    # labeles are really flexible, so we need to handle them with a bit more care
+    def clean_label_txt
+      return @label_txt.sub("[", "\\[").sub("]", "\\]")
     end
 
     def md_link_str
@@ -38,8 +38,8 @@ module JekyllWikiLinks
       elsif !exists?(FILENAME)
         Jekyll.logger.error "Invalid link level in 'md_link_str'. See WikiLink's 'md_link_str' for details"
       end
-      alias_ = aliased? ? "\|#{@alias_txt}" : ""
-      return "#{embed}#{link_type}\[\[#{filename}#{header}#{block}#{alias_}\]\]"
+      label_ = labelled? ? "\|#{@label_txt}" : ""
+      return "#{embed}#{link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]"
     end
 
     def md_link_regex
@@ -55,21 +55,21 @@ module JekyllWikiLinks
       elsif !exists?(FILENAME)
         Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_link_regex' for details"
       end
-      alias_ =  aliased? ? %r{#{REGEX_ALIAS}#{clean_alias_txt}} : %r{}
-      return %r{#{regex_embed}#{regex_link_type}\[\[#{filename}#{header}#{block}#{alias_}\]\]}
+      label_ =  labelled? ? %r{#{REGEX_LABEL}#{clean_label_txt}} : %r{}
+      return %r{#{regex_embed}#{regex_link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]}
     end
 
     def describe
       return {
         'level' => level,
-        'aliased' => aliased?,
+        'labelled' => labelled?,
         'embedded' => embedded?,
         'typed_link' => typed?,
       }
     end
 
-    def aliased?
-      return !@alias_txt.nil? && !@alias_txt.empty?
+    def labelled?
+      return !@label_txt.nil? && !@label_txt.empty?
     end
 
     def typed?
