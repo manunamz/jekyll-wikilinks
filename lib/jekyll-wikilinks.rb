@@ -52,7 +52,7 @@ module JekyllWikiLinks
 			@graph_nodes, @graph_links = [], []
 			md_docs.each do |document|
 				document.data['backlinks'] = get_backlinks(document)
-				if !disabled_graph_data? && !exclude_graph?(document.type)
+				if !disabled_graph_data? && !excluded_in_graph?(document.type)
 					generate_graph_data(document) 
 				end
 			end
@@ -166,7 +166,7 @@ module JekyllWikiLinks
 			return option(EXCLUDE_KEY).include?(type.to_s)
 		end
 
-		def exclude_graph?(type)
+		def excluded_in_graph?(type)
 			return false unless option_graph(EXCLUDE_KEY)
 			return option_graph(EXCLUDE_KEY).include?(type.to_s)
 		end
@@ -226,7 +226,7 @@ module JekyllWikiLinks
 				label: doc.data['title'],
 			}
 			get_backlinks(doc).each do |b|
-				if !exclude_graph?(b.type)
+				if !excluded_in_graph?(b.type)
 					graph_links << {
 						source: relative_url(b.url),
 						target: relative_url(doc.url),
