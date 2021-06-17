@@ -3,6 +3,7 @@ require "jekyll"
 require_relative "context"
 require_relative "filter"
 require_relative "regex"
+require_relative "validator"
 require_relative "wikilink"
 
 module JekyllWikiLinks
@@ -83,7 +84,7 @@ module JekyllWikiLinks
 		end
 
 		def build_html_link(wikilink)
-			linked_doc = get_linked_doc(wikilink.filename)
+			linked_doc = Validator.get_linked_doc(@md_docs, wikilink.filename)
 			if !linked_doc.nil?
 				
 				# TODO link_type
@@ -96,10 +97,10 @@ module JekyllWikiLinks
 				link_lvl = wikilink.describe['level']
 				if (link_lvl == "file")
 					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?
-				elsif (link_lvl == "header" && doc_has_header?(linked_doc, wikilink.header_txt))
+				elsif (link_lvl == "header" && Validator.doc_has_header?(linked_doc, wikilink.header_txt))
 					lnk_doc_rel_url += "\#" + wikilink.header_txt.downcase
 					wikilink_inner_txt = "#{fname_inner_txt} > #{wikilink.header_txt}" if wikilink_inner_txt.nil?
-				elsif (link_lvl == "block" && doc_has_block_id?(linked_doc, wikilink.block_id))
+				elsif (link_lvl == "block" && Validator.doc_has_block_id?(linked_doc, wikilink.block_id))
 					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
 					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
 				else
@@ -109,28 +110,6 @@ module JekyllWikiLinks
 			else
 				return "<span title=\"Content not found.\" class=\"invalid-wiki-link\">#{wikilink.md_link_str}</span>"
 			end
-		end
-
-		# doc-link validation
-
-		def get_linked_doc(filename)
-			docs = @md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
-			return nil if docs.nil? || docs.size > 1
-			return docs[0]
-		end
-
-		def doc_has_header?(doc, header)
-			return if header.nil?
-			# leading + trailing whitespace is ignored when matching headers
-			header_results = doc.content.scan(REGEX_ATX_HEADER).flatten.map { |htxt| htxt.strip } 
-			setext_header_results = doc.content.scan(REGEX_SETEXT_HEADER).flatten.map { |htxt| htxt.strip } 
-			return header_results.include?(header.strip) || setext_header_results.include?(header.strip)
-		end
-
-		def doc_has_block_id?(doc, block_id)
-			# leading + trailing whitespace is ignored when matching blocks
-			block_id_results = doc.content.scan(REGEX_BLOCK).flatten.map { |bid| bid.strip } 
-			return block_id_results.include?(block_id)
 		end
 
 		# helpers
