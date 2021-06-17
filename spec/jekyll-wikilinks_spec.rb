@@ -18,7 +18,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       )
     )
   end
-  let(:site)                     { Jekyll::Site.new(config) }
+  let(:site)                            { Jekyll::Site.new(config) }
   
   # TODO: block file link with attribute
   # TODO: inline file link with attribute
@@ -36,8 +36,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   # header link/url fragments
   let(:link_header)                     { find_by_title(site.collections["notes"].docs, "Link Header") }
   let(:link_header_missing_doc)         { find_by_title(site.collections["notes"].docs, "Link Header Missing") }
-  let(:link_header_label)   { find_by_title(site.collections["notes"].docs, "Link Header Labelled") }
-  # TODO: block link
+  let(:link_header_label)               { find_by_title(site.collections["notes"].docs, "Link Header Labelled") }
+  # block link
+  let(:link_block)                      { find_by_title(site.collections["notes"].docs, "Link Block") }
   # labels
   let(:label)                           { find_by_title(site.collections["notes"].docs, "Labelled") }
   let(:label_sq_br)                     { find_by_title(site.collections["notes"].docs, "Labelled With Square Brackets") }
@@ -138,18 +139,32 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(base_case_b.output).to eq("<p>This <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a> has a little star.</p>\n")
     end
 
-    # fragment
+    # header fragment
 
-    it "url fragments contain note name and header text" do
+    it "header url fragments contain note name and header text" do
       expect(link_header.output).to include("long note &gt; Two")
     end
 
-    it "url fragment in url" do
+    it "header url fragment in url" do
       expect(link_header.output).to include("/notes/long-note/#two")
     end
 
-    it "processes url fragments; full output" do
+    it "processes header url fragments; full output" do
       expect(link_header.output).to eq("<p>This note contains a link to a header <a class=\"wiki-link\" href=\"/notes/long-note/#two\">long note &gt; Two</a>.</p>\n")
+    end
+
+    # block fragment
+
+    it "block url fragments contain note name and block id" do
+      expect(link_block.output).to include("long note &gt; ^block_id")
+    end
+
+    it "block url fragment in url" do
+      expect(link_block.output).to include("/notes/long-note/#block_id")
+    end
+
+    it "processes block url fragments; full output" do
+      expect(link_block.output).to eq("<p>This note contains a link to a block <a class=\"wiki-link\" href=\"/notes/long-note/#block_id\">long note &gt; ^block_id</a>.</p>\n")
     end
 
     # graph
@@ -320,7 +335,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(missing_doc_many.output).to eq("<p>This fish has no targets like <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc.1]]</span> and <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc.2]]</span>.</p>\n")
     end
 
-    it "handles url fragments; full output" do
+    it "handles header url fragments; full output" do
       expect(link_header_missing_doc.output).to eq("<p>This note contains an invalid link with an invalid header <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-note#Zero]]</span>.</p>\n")
     end
 
@@ -384,17 +399,17 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(label_sq_br.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">label with [square brackets]</a>.</p>\n")
     end
 
-    # fragment
+    # header fragment
 
-    it "url fragments contain note name and header text" do
+    it "header url fragments contain note name and header text" do
       expect(link_header_label.output).to include("labelled text")
     end
 
-    it "url fragment in url" do
+    it "header url fragment in url" do
       expect(link_header_label.output).to include("/notes/long-note/#two")
     end
 
-    it "processes url fragments; full output" do
+    it "processes header url fragments; full output" do
       expect(link_header_label.output).to eq("<p>This note contains a link to a header with <a class=\"wiki-link\" href=\"/notes/long-note/#two\">labelled text</a>.</p>\n")
     end
   
@@ -419,7 +434,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(label_missing_doc.output).to eq("<p>This doc uses a <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc|label]]</span>.</p>\n")
     end
 
-    # fragment
+    # header fragment
 
     it "assigns 'invalid-wiki-link' class to span element" do
       expect(labelled_link_header_missing.output).to include("class=\"invalid-wiki-link\"")
@@ -429,7 +444,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(labelled_link_header_missing.output).to include("[[long-note#Zero|labelled text]]")
     end
 
-    it "processes url fragments; full output" do
+    it "processes header url fragments; full output" do
       expect(labelled_link_header_missing.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-note#Zero|labelled text]]</span>.</p>\n")
     end
   end

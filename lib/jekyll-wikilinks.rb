@@ -64,7 +64,7 @@ module JekyllWikiLinks
 
 		def old_config_warn()
 			if config.include?("wikilinks_collection")
-				Jekyll.logger.warn "Deprecated: As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details: https://manunamz.github.io/jekyll-wikilinks/"
+				Jekyll.logger.warn "As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details."
 			end
 		end
 		
@@ -109,10 +109,10 @@ module JekyllWikiLinks
 					url_fragment = wikilink.header_txt.downcase
 					return "<a class='wiki-link' href='#{lnk_doc_rel_url}\##{url_fragment}'>#{wikilink_inner_txt}</a>"
 				
-				elsif ("block" && !linked_doc.nil? && doc_has_block?(linked_doc, wikilink.block_id))
+				elsif ("block" && !linked_doc.nil? && doc_has_block_id?(linked_doc, wikilink.block_id))
 					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
 					url_fragment = wikilink.block_id.downcase
-					return "<a class='wiki-link' href='#{lnk_doc_rel_url}\##{url_fragment}}'>#{wikilink_inner_txt}</a>"
+					return "<a class='wiki-link' href='#{lnk_doc_rel_url}\##{url_fragment}'>#{wikilink_inner_txt}</a>"
 				
 				else
 					return "<span title=\"Content not found.\" class=\"invalid-wiki-link\">#{wikilink.md_link_str}</span>"
@@ -133,14 +133,16 @@ module JekyllWikiLinks
 
 		def doc_has_header?(doc, header)
 			return if header.nil?
-			# doc: leading + trailing whitespace is ignored when matching headers
-			header_results = doc.content.scan(REGEX_ATX_HEADER).flatten.map { |r| r.strip } 
-			setext_header_results = doc.content.scan(REGEX_SETEXT_HEADER).flatten.map { |r| r.strip } 
+			# leading + trailing whitespace is ignored when matching headers
+			header_results = doc.content.scan(REGEX_ATX_HEADER).flatten.map { |htxt| htxt.strip } 
+			setext_header_results = doc.content.scan(REGEX_SETEXT_HEADER).flatten.map { |htxt| htxt.strip } 
 			return header_results.include?(header.strip) || setext_header_results.include?(header.strip)
 		end
 
-		def doc_has_block?(doc, block_id)
-			#TODO
+		def doc_has_block_id?(doc, block_id)
+			# leading + trailing whitespace is ignored when matching blocks
+			block_id_results = doc.content.scan(REGEX_BLOCK).flatten.map { |bid| bid.strip } 
+			return block_id_results.include?(block_id)
 		end
 
 		# helpers

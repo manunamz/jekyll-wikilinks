@@ -43,19 +43,19 @@ module JekyllWikiLinks
     end
 
     def md_link_regex
-      regex_embed = embedded? ? REGEX_EMBED : %r{}
+      regex_embed = embedded? ? REGEX_LINK_EMBED : %r{}
       regex_link_type = typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
       filename = exists?(FILENAME) ? @filename : ""
       if exists?(HEADER_TXT)
-        header = %r{#{REGEX_HEADER}#{@header_txt}}
+        header = %r{#{REGEX_LINK_HEADER}#{@header_txt}}
         block = %r{}
       elsif exists?(BLOCK_ID)
         header = %r{}
-        block = %r{#{REGEX_BLOCK}#{@block_id}}
+        block = %r{#{REGEX_LINK_BLOCK}#{@block_id}}
       elsif !exists?(FILENAME)
         Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_link_regex' for details"
       end
-      label_ =  labelled? ? %r{#{REGEX_LABEL}#{clean_label_txt}} : %r{}
+      label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{clean_label_txt}} : %r{}
       return %r{#{regex_embed}#{regex_link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]}
     end
 
