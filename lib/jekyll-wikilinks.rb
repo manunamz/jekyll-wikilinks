@@ -35,25 +35,25 @@ module JekyllWikiLinks
 			@site = site    
 			@context = context
 
-			documents = []
-			documents += site.pages if !exclude?(:pages)
+			docs = []
+			docs += site.pages if !exclude?(:pages)
 			included_docs = site.docs_to_write.filter { |d| !exclude?(d.type) }
-			documents += included_docs
-			@md_docs = documents.select {|doc| markdown_extension?(doc.extname) }
+			docs += included_docs
+			@md_docs = docs.select {|doc| markdown_extension?(doc.extname) }
 
 			old_config_warn()
 
 			# build links
-			md_docs.each do |document|
-				parse_wiki_links(document)
+			md_docs.each do |doc|
+				parse_wiki_links(doc)
 			end
 
 			# backlinks data handling
 			@graph_nodes, @graph_links = [], []
-			md_docs.each do |document|
-				document.data['backlinks'] = get_backlinks(document)
-				if !disabled_graph_data? && !excluded_in_graph?(document.type)
-					generate_graph_data(document) 
+			md_docs.each do |doc|
+				doc.data['backlinks'] = get_backlinks(doc)
+				if !disabled_graph_data? && !excluded_in_graph?(doc.type)
+					generate_graph_data(doc) 
 				end
 			end
 
