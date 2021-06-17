@@ -10,8 +10,8 @@ module JekyllWikiLinks
     REGEX_LINK_EMBED = /(?<embed>(\!))/i                           # 0
     REGEX_LINK_TYPE_TXT = /(?<type-txt>([^\n\s\!\#\^\|\]]+))/i     # 1
     REGEX_FILENAME = /(?<filename>([^\\\/:\#\^\|\[\]]+))/i         # 2
-    REGEX_HEADER_TXT = /(?<header-txt>([^\^\!\#\^\|\[\]]+))/i      # 3
-    REGEX_BLOCK_ID_TXT = /(?<block-id>([^\|\]]+))/i                # 4
+    REGEX_HEADER_TXT = /(?<header-txt>([^\!\#\^\|\[\]]+))/i        # 3
+    REGEX_BLOCK_ID_TXT = /(?<block-id>([^\\\/:\!\#\^\|\[\]]+))/i   # 4
     REGEX_LABEL_TXT = /(?<label-txt>(#{REGEX_NOT_GREEDY}))/i       # 5
     REGEX_LINK_TYPE = /::/
     REGEX_LINK_HEADER = /\#/
@@ -34,7 +34,7 @@ module JekyllWikiLinks
     # setext header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L17
     REGEX_SETEXT_HEADER = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
     # obsidian-style
-    REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}^[^\n]/i
+    REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}^\n/i
 
     # identify missing links in doc via .invalid-wiki-link class and nested doc-name.
     REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
