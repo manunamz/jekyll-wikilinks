@@ -104,12 +104,12 @@ module JekyllWikiLinks
 					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?
 					return "<a class='wiki-link' href='#{lnk_doc_rel_url}'>#{wikilink_inner_txt}</a>"
 				
-				elsif ("header" && !linked_doc.nil? && doc_has_header?(wikilink.header_txt, linked_doc))
+				elsif ("header" && !linked_doc.nil? && doc_has_header?(linked_doc, wikilink.header_txt))
 					wikilink_inner_txt = "#{fname_inner_txt} > #{wikilink.header_txt}" if wikilink_inner_txt.nil?
 					url_fragment = wikilink.header_txt.downcase
 					return "<a class='wiki-link' href='#{lnk_doc_rel_url}\##{url_fragment}'>#{wikilink_inner_txt}</a>"
 				
-				elsif ("block" && !linked_doc.nil? && doc_has_block?(wikilink.block_id, linked_doc))
+				elsif ("block" && !linked_doc.nil? && doc_has_block?(linked_doc, wikilink.block_id))
 					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
 					url_fragment = wikilink.block_id.downcase
 					return "<a class='wiki-link' href='#{lnk_doc_rel_url}\##{url_fragment}}'>#{wikilink_inner_txt}</a>"
@@ -131,7 +131,7 @@ module JekyllWikiLinks
 			return docs[0]
 		end
 
-		def doc_has_header?(header, doc)
+		def doc_has_header?(doc, header)
 			return if header.nil?
 			# doc: leading + trailing whitespace is ignored when matching headers
 			header_results = doc.content.scan(REGEX_ATX_HEADER).flatten.map { |r| r.strip } 
@@ -139,7 +139,7 @@ module JekyllWikiLinks
 			return header_results.include?(header.strip) || setext_header_results.include?(header.strip)
 		end
 
-		def doc_has_block?(block_id, doc)
+		def doc_has_block?(doc, block_id)
 			#TODO
 		end
 
