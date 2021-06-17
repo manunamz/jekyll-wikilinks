@@ -27,9 +27,6 @@ module JekyllWikiLinks
         (#{REGEX_LINK_LABEL}#{REGEX_LABEL_TXT})?
       \]\]
     }x
-    
-    # identify missing links in doc via .invalid-wiki-link class and nested doc-name.
-    REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
 
     # kramdown header regexes
     # atx header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L29
@@ -38,4 +35,7 @@ module JekyllWikiLinks
     REGEX_SETEXT_HEADER = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
     # obsidian-style
     REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}^[^\n]/i
+
+    # identify missing links in doc via .invalid-wiki-link class and nested doc-name.
+    REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
 end
