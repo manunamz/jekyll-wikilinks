@@ -2,7 +2,9 @@
 require "jekyll"
 require_relative "jekyll-wikilinks/context"
 require_relative "jekyll-wikilinks/filter"
+require_relative "jekyll-wikilinks/regex"
 require_relative "jekyll-wikilinks/version"
+require_relative "jekyll-wikilinks/wikilink"
 
 module JekyllWikiLinks
 	class Generator < Jekyll::Generator
@@ -11,13 +13,15 @@ module JekyllWikiLinks
 		# Use Jekyll's native relative_url filter
 		include Jekyll::Filters::URLFilters
 
-		CONFIG_KEY = "wikilinks"
 		CONVERTER_CLASS = Jekyll::Converters::Markdown
+		# config
+		CONFIG_KEY = "wikilinks"
 		ENABLED_KEY = "enabled"
-		ENABLED_GRAPH_DATA_KEY = "enabled"
 		EXCLUDE_KEY = "exclude"
-		EXCLUDE_GRAPH_KEY = "exclude"
+		# graph config
 		GRAPH_DATA_KEY = "d3_graph_data"
+		ENABLED_GRAPH_DATA_KEY = "enabled"
+		EXCLUDE_GRAPH_KEY = "exclude"
 
 		def initialize(config)
 			@config = config
@@ -63,121 +67,80 @@ module JekyllWikiLinks
 				Jekyll.logger.warn "Deprecated: As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details: https://manunamz.github.io/jekyll-wikilinks/"
 			end
 		end
-
+		
 		def parse_wiki_links(doc)
-			# Convert all Wiki/Roam-style double-bracket link syntax to plain HTML
-			# anchor tag elements (<a>) with "wiki-link" CSS class
-			md_docs.each do |doc_potentially_linked_to|
-				title_from_filename = File.basename(
-					doc_potentially_linked_to.basename,
-					File.extname(doc_potentially_linked_to.basename)
+			wikilink_matches = doc.content.scan(REGEX_WIKI_LINKS)
+			return unless !wikilink_matches.nil? && wikilink_matches.size != 0
+			# recursive embed with max level; insert markdown
+			# scan match again
+			wikilink_matches.each do |wl_match|
+				wikilink = WikiLink.new(
+					wl_match[0],
+					wl_match[1],
+				  wl_match[2],
+					wl_match[3],
+					wl_match[4],
+					wl_match[5],
 				)
-				
-				render_txt = doc_potentially_linked_to.data['title'].downcase
-				doc_url = relative_url(doc_potentially_linked_to.url) if doc_potentially_linked_to&.url
-
-				# 
-				# links
-				# 
-
-				# Replace double-bracketed links using doc title
-				# [[feline.cats]]
-				regex_wl, cap_gr = regex_wiki_link(title_from_filename)
-				doc.content.gsub!(
-					regex_wl,
-					"<a class='wiki-link' href='#{doc_url}'>#{render_txt}</a>"
+				doc.content.sub!(
+					wikilink.md_link_regex,
+					build_html_link(wikilink)
 				)
-
-				# Replace double-bracketed links with alias (right)
-				# [[feline.cats|this is a link to the doc about cats]]
-				regex_wl, cap_gr = regex_wiki_link_w_alias_right(title_from_filename)
-				doc.content.gsub!(
-					regex_wl,
-					"<a class='wiki-link' href='#{doc_url}'>#{cap_gr}</a>"
-				)
-
-				# Replace double-bracketed links with alias (left)
-				# [[this is a link to the doc about cats|feline.cats]]
-				regex_wl, cap_gr = regex_wiki_link_w_alias_left(title_from_filename)
-				doc.content.gsub!(
-					regex_wl,
-					"<a class='wiki-link' href='#{doc_url}'>#{cap_gr}</a>"
-				)
-
-				# 
-				# anchors/fragments/header
-				# 
-
-				# Replace double-bracketed header links using doc title and header
-				# [[feline.cats#meow]] -> "cats > meow"
-				matches = doc.content.scan(/\[\[(#{title_from_filename})#(.+?)\]\]/i)
-				matches.each do |m|
-					wiki_link_text = m[0]
-					fragment_text = m[1]
-					downcased_fragment_text = fragment_text.downcase
-					if doc_has_header?(fragment_text, doc_potentially_linked_to)
-						doc.content.gsub!(
-							/\[\[(#{wiki_link_text})#(#{fragment_text})\]\]/i,
-							"<a class='wiki-link' href='#{doc_url}\##{downcased_fragment_text}'>#{render_txt} > #{fragment_text}</a>"
-						)
-					end
-				end
-
-				# Replace double-bracketed header links with alias (right)
-				# [[feline.cats#meow|this is a link to the doc about cats]]
-				matches = doc.content.scan(/(\[\[)(#{title_from_filename})#(.+?)(\|)([^\]]+)(\]\])/i)
-				matches.each do |m|
-					# wiki_link_text = m[1] (which == title_from_filename)
-					fragment_text = m[2]
-					aliased_text = m[4]
-					downcased_fragment_text = fragment_text.downcase
-					if doc_has_header?(fragment_text, doc_potentially_linked_to)
-						doc.content.gsub!(
-							/(\[\[)(#{title_from_filename})#(#{fragment_text})(\|)([^\]]+)(\]\])/i,
-							"<a class='wiki-link' href='#{doc_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
-						)
-					end
-				end
-
-				# Replace double-bracketed header links with alias (left)
-				# [[this is a link to the doc about cats|feline.cats#meow]]
-				matches = doc.content.scan(/(\[\[)([^\]\|]+)(\|)(#{title_from_filename})#(.+?)(\]\])/i)
-				matches.each do |m|
-					aliased_text = m[1]
-					# wiki_link_text = m[3] (which == title_from_filename)
-					fragment_text = m[4]
-					downcased_fragment_text = fragment_text.downcase
-					if doc_has_header?(fragment_text, doc_potentially_linked_to)
-						doc.content.gsub!(
-							/(\[\[)([^\]\|]+)(\|)(#{title_from_filename})#(#{fragment_text})(\]\])/i,
-							"<a class='wiki-link' href='#{doc_url}\##{downcased_fragment_text}'>#{aliased_text}</a>"
-						)
-					end
-				end
-
-				# Replace double-bracketed block links using doc title and block id
-				# [[feline.cats#^id]] -> "cats > ^id"
-
 			end
+		end
 
-			# At this point, all remaining double-bracket-wrapped words are
-			# pointing to non-existing pages, so let's disable them
-			regex_wl, cap_gr = regex_wiki_link()
-			doc.content.gsub!(
-				regex_wl,
-				"<span title=\"Content not found.\" class=\"invalid-wiki-link\">[[#{cap_gr}]]</span>"
-			)
+		def build_html_link(wikilink)
+			# TODO type
+			linked_doc = get_linked_doc(wikilink.filename)
+			if !linked_doc.nil?
+				lnk_doc_rel_url = relative_url(linked_doc.url) if linked_doc&.url
+				# alias
+				wikilink_inner_txt = wikilink.clean_alias_txt if wikilink.aliased?
+				# TODO not sure about downcase
+				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
+				link_lvl = wikilink.attrs()['level']
+
+				if (link_lvl == "file" && !linked_doc.nil?)
+					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?
+					return "<a class='wiki-link' href='#{lnk_doc_rel_url}'>#{wikilink_inner_txt}</a>"
+				
+				elsif ("header" && !linked_doc.nil? && doc_has_header?(wikilink.header_txt, linked_doc))
+					wikilink_inner_txt = "#{fname_inner_txt} > #{wikilink.header_txt}" if wikilink_inner_txt.nil?
+					url_fragment = wikilink.header_txt.downcase
+					return "<a class='wiki-link' href='#{lnk_doc_rel_url}\##{url_fragment}'>#{wikilink_inner_txt}</a>"
+				
+				elsif ("block" && !linked_doc.nil? && doc_has_block?(wikilink.block_id, linked_doc))
+					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
+					url_fragment = wikilink.block_id.downcase
+					return "<a class='wiki-link' href='#{lnk_doc_rel_url}\##{url_fragment}}'>#{wikilink_inner_txt}</a>"
+				
+				else
+					return "<span title=\"Content not found.\" class=\"invalid-wiki-link\">#{wikilink.md_link_str}</span>"
+				end
+
+			else
+				return "<span title=\"Content not found.\" class=\"invalid-wiki-link\">#{wikilink.md_link_str}</span>"
+			end
 		end
 
 		# doc-link validation
 
+		def get_linked_doc(filename)
+			docs = @md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
+			return nil if docs.nil? || docs.size > 1
+			return docs[0]
+		end
+
 		def doc_has_header?(header, doc)
+			return if header.nil?
 			# doc: leading + trailing whitespace is ignored when matching headers
-			regex_header, _ = regex_header()
-			regex_setext_header, _ = regex_setext_header()
-			header_results = doc.content.scan(regex_header).flatten.map { |r| r.strip } 
-			setext_header_results = doc.content.scan(regex_setext_header).flatten.map { |r| r.strip } 
+			header_results = doc.content.scan(REGEX_ATX_HEADER).flatten.map { |r| r.strip } 
+			setext_header_results = doc.content.scan(REGEX_SETEXT_HEADER).flatten.map { |r| r.strip } 
 			return header_results.include?(header.strip) || setext_header_results.include?(header.strip)
+		end
+
+		def doc_has_block?(block_id, doc)
+			#TODO
 		end
 
 		# helpers
@@ -190,11 +153,6 @@ module JekyllWikiLinks
 				end
 			end
 			return backlinks
-		end
-
-		def invalid_wiki_links(doc)
-			regex, _ = regex_invalid_wiki_link()
-			return doc.content.scan(regex)[0]
 		end
 
 		def context
@@ -242,9 +200,10 @@ module JekyllWikiLinks
 		def generate_graph_data(doc)
 			Jekyll.logger.debug "Processing graph nodes for doc: ", doc.data['title']
 			# missing nodes
-			missing_node_names = invalid_wiki_links(doc)
+			missing_node_names = doc.content.scan(REGEX_INVALID_WIKI_LINK)
 			if !missing_node_names.nil?
-				missing_node_names.each do |missing_node_name| 
+				missing_node_names.each do |missing_node_name_captures| 
+					missing_node_name = missing_node_name_captures[0]
 					if graph_nodes.none? { |node| node[:id] == missing_node_name }
 						Jekyll.logger.warn "Net-Web node missing: ", missing_node_name
 						Jekyll.logger.warn " in: ", doc.data['slug']  
@@ -283,69 +242,6 @@ module JekyllWikiLinks
 				links: graph_links,
 				nodes: graph_nodes,
 			}))
-		end
-
-		# regex
-		# returns two items: regex and a target capture group (text to be rendered)
-		# using functions instead of constants because of the need to access 'wiki_link_text'
-		#   -- esp. when aliasing.
-
-		def regex_header()
-			# kramdown style atx header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L29
-			regex = /^\#{1,6}[\t ]*([^ \t].*)\n/i
-			cap_gr = "\\1"
-			return regex, cap_gr
-		end
-
-		def regex_setext_header()
-			# kramdown style setext header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L17
-			regex = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
-			cap_gr = "\\1"
-			return regex, cap_gr
-		end
-
-		def regex_invalid_wiki_link()
-			# identify missing links in doc via .invalid-wiki-link class and nested doc-name.
-			regex = /invalid-wiki-link[^\]]+\[\[([^\]]+)\]\]/i
-			cap_gr = "\\1" # this is mostly just to remain consistent with other regex functions
-			return regex, cap_gr
-		end
-
-		def regex_wiki_link(wiki_link_text='')
-			# includes fragments
-			if wiki_link_text.empty?
-				regex = /(\[\[)([^\]]+)(\]\])/i
-				cap_gr = "\\2" 
-				return regex, cap_gr
-			else 
-				regex = /(\[\[)(#{wiki_link_text})(\]\])/i
-				return regex, wiki_link_text
-			end
-		end
-
-		def regex_wiki_link_w_alias()
-			# includes fragments
-			regex = /(\[\[)([^\]\|]+)(\|)([^\]]+)(\]\])/i
-			cap_gr = "\\2|\\4"
-			return regex, cap_gr 
-		end
-
-		def regex_wiki_link_w_alias_left(wiki_link_text)
-			raise ArgumentError.new(
-				"Expected a value for 'wiki_link_text'"
-			) if wiki_link_text.nil?
-			regex = /(\[\[)([^\]\|]+)(\|)(#{wiki_link_text})(\]\])/i
-			cap_gr = "\\2"
-			return regex, cap_gr
-		end
-
-		def regex_wiki_link_w_alias_right(wiki_link_text)
-			raise ArgumentError.new(
-				"Expected a value for 'wiki_link_text'"
-			) if wiki_link_text.nil?
-			regex = /(\[\[)(#{wiki_link_text})(\|)([^\]]+)(\]\])/i
-			cap_gr = "\\4"
-			return regex, cap_gr
 		end
 
 	end

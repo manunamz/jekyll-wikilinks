@@ -20,7 +20,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   end
   let(:site)                     { Jekyll::Site.new(config) }
   
-  # base link
+  # TODO: block file link with attribute
+  # TODO: inline file link with attribute
+  # file link
   let(:base_case_a)                     { find_by_title(site.collections["notes"].docs, "Base Case A") }
   let(:base_case_b)                     { find_by_title(site.collections["notes"].docs, "Base Case B") }
   let(:one_page)                        { find_by_title(site.pages, "One Page") }
@@ -34,13 +36,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   # header link/url fragments
   let(:link_header)                     { find_by_title(site.collections["notes"].docs, "Link Header") }
   let(:link_header_missing_doc)         { find_by_title(site.collections["notes"].docs, "Link Header Missing") }
-  let(:link_header_local_alias_left)    { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Left") }
   let(:link_header_local_alias_right)   { find_by_title(site.collections["notes"].docs, "Link Header Local Alias Right") }
+  # TODO: block link
   # local aliases
-  let(:local_alias_left)                { find_by_title(site.collections["notes"].docs, "Local Alias Left") }
-  let(:local_alias_left_missing_doc)    { find_by_title(site.collections["notes"].docs, "Local Alias Left Missing Doc") }
-  let(:local_alias_left_link_header_missing)  { find_by_title(site.collections["notes"].docs, "Local Alias Left Link Header Missing") }
   let(:local_alias_right)               { find_by_title(site.collections["notes"].docs, "Local Alias Right") }
+  let(:local_alias_right_sq_br)         { find_by_title(site.collections["notes"].docs, "Local Alias Right With Square Brackets") }
   let(:local_alias_right_missing_doc)   { find_by_title(site.collections["notes"].docs, "Local Alias Right Missing Doc") }
   let(:local_alias_right_link_header_missing) { find_by_title(site.collections["notes"].docs, "Local Alias Right Link Header Missing") }  
   # graph
@@ -362,81 +362,75 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   end
 
   context "when target [[wikilink]] using piped aliasing exists" do
-    # [[fish|right alias]]
-    # [[left alias|fish]]
 
     it "renders the alias text, not the note's filename" do
       expect(local_alias_right.output).to include("local right alias")
       expect(local_alias_right.output).to_not include("base-case.a")
-      expect(local_alias_left.output).to include("local left alias")
-      expect(local_alias_left.output).to_not include("base-case.a")
     end
 
     it "full output" do
       expect(local_alias_right.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">local right alias</a>.</p>\n")
-      expect(local_alias_left.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">local left alias</a>.</p>\n")
+    end
+
+    # aliased text preserves [square brackets]
+    it "renders the alias text with [square brackets], not the note's filename" do
+      pending("flexible alias text")
+      expect(local_alias_right_sq_br.output).to include("local right alias with [square brackets]")
+      expect(local_alias_right_sq_br.output).to_not include("base-case.a")
+    end
+
+    it "full output" do
+      pending("flexible alias text")
+      expect(local_alias_right_sq_br.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">local right alias with [square brackets]</a>.</p>\n")
     end
 
     # fragment
 
     it "url fragments contain note name and header text" do
       expect(link_header_local_alias_right.output).to include("aliased text")
-      expect(link_header_local_alias_left.output).to include("aliased text")
     end
 
     it "url fragment in url" do
       expect(link_header_local_alias_right.output).to include("/notes/long-note/#two")
-      expect(link_header_local_alias_left.output).to include("/notes/long-note/#two")
     end
 
     it "processes url fragments; full output" do
       expect(link_header_local_alias_right.output).to eq("<p>This note contains a link to a header with <a class=\"wiki-link\" href=\"/notes/long-note/#two\">aliased text</a>.</p>\n")
-      expect(link_header_local_alias_left.output).to eq("<p>This note contains a link to a header with <a class=\"wiki-link\" href=\"/notes/long-note/#two\">aliased text</a>.</p>\n")
     end
   
   end
 
   context "when target [[wikilink]] using piped aliasing does not exist" do
-    # [[fish|right alias]]
-    # [[left alias|fish]]
 
     it "injects a span element with descriptive title" do
       expect(local_alias_right_missing_doc.output).to include("<span title=\"Content not found.\"")
       expect(local_alias_right_missing_doc.output).to include("</span>")
-      expect(local_alias_left_missing_doc.output).to include("<span title=\"Content not found.\"")
-      expect(local_alias_left_missing_doc.output).to include("</span>")
     end
 
     it "assigns 'invalid-wiki-link' class to span element" do
       expect(local_alias_right_missing_doc.output).to include("class=\"invalid-wiki-link\"")
-      expect(local_alias_left_missing_doc.output).to include("class=\"invalid-wiki-link\"")
     end
 
     it "leaves original angle brackets and text untouched" do
       expect(local_alias_right_missing_doc.output).to include("[[no.doc|local right alias]]")
-      expect(local_alias_left_missing_doc.output).to include("[[local left alias|no.doc]]")
     end
 
     it "full output" do
       expect(local_alias_right_missing_doc.output).to eq("<p>This doc uses a <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[no.doc|local right alias]]</span>.</p>\n")
-      expect(local_alias_left_missing_doc.output).to eq("<p>This doc uses a <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[local left alias|no.doc]]</span>.</p>\n")
     end
 
     # fragment
 
     it "assigns 'invalid-wiki-link' class to span element" do
       expect(local_alias_right_link_header_missing.output).to include("class=\"invalid-wiki-link\"")
-      expect(local_alias_left_link_header_missing.output).to include("class=\"invalid-wiki-link\"")
     end
 
     it "leaves original angle brackets and text untouched" do
       expect(local_alias_right_link_header_missing.output).to include("[[long-note#Zero|aliased text]]")
-      expect(local_alias_left_link_header_missing.output).to include("[[aliased text|long-note#Zero]]")
     end
 
     it "processes url fragments; full output" do
       expect(local_alias_right_link_header_missing.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-note#Zero|aliased text]]</span>.</p>\n")
-      expect(local_alias_left_link_header_missing.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[aliased text|long-note#Zero]]</span>.</p>\n")
     end
   end
 

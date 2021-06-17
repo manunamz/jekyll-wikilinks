@@ -1,0 +1,80 @@
+If parsing has bugs, test on https://rubular.com/ with the one-liner from wikilinks.rb and the below info:
+
+test text:
+----------
+
+# vanilla
+
+[[wikilink]]
+
+[[wikilink#header]]
+
+[[wikilink#^block_id]]
+
+# typed
+type::[[wikilink]]
+
+type::[[wikilink#header]]
+
+type::[[wikilink#^block_id]]
+
+what if the type::[[wikilink]] is inline?
+
+# aliased
+[[wikilink|alias txt]]
+
+[[wikilink#header|alias txt]]
+
+[[wikilink#^block_id|alias txt]]
+
+# aliased w bracket
+
+[[wikilink|[bracketted] alias txt]]
+
+[[wikilink|bracketted alias [txt]]]
+
+[[wikilink#header|[bracketted] alias txt]]
+
+[[wikilink#^block_id|[bracketted] alias txt]]
+
+# embedded
+
+![[wikilink]]
+
+![[wikilink#header]]
+
+![[wikilink#^block_id]]
+
+# typed embedded
+
+!type::[[wikilink]]
+
+!type::[[wikilink#header]]
+
+!type::[[wikilink#^block_id]]
+
+what if the !type::[[wikilink]] is inline?
+
+# typed aliased
+
+type::[[wikilink|alias txt]]
+
+type::[[wikilink#header|alias txt]]
+
+type::[[wikilink#^block_id|alias txt]]
+
+what if the type::[[wikilink|alias txt]] is inline?
+
+# stacked header-block
+
+[[wikilink#header#^block]]
+
+# known invalids
+
+# stacked headers
+
+[[wikilink#header#another-header]]
+
+# header range
+
+[[wikilink#header#another:#header]]
