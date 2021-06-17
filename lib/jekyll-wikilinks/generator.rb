@@ -60,12 +60,6 @@ module JekyllWikiLinks
 				write_graph_data()
 			end
 		end
-
-		def old_config_warn()
-			if config.include?("wikilinks_collection")
-				Jekyll.logger.warn "As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details."
-			end
-		end
 		
 		def parse_wiki_links(doc)
 			wikilink_matches = doc.content.scan(REGEX_WIKI_LINKS)
@@ -239,6 +233,13 @@ module JekyllWikiLinks
 				nodes: graph_nodes,
 			}))
 		end
+
+    # deprecations
+    def old_config_warn()
+      if config.include?("wikilinks_collection")
+        Jekyll.logger.warn "As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details."
+      end
+    end
 
 	end
 end
