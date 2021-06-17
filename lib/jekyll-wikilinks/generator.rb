@@ -2,9 +2,8 @@
 require "jekyll"
 require_relative "context"
 require_relative "filter"
-require_relative "regex"
+require_relative "parser"
 require_relative "validator"
-require_relative "wikilink"
 
 module JekyllWikiLinks
 	class Generator < Jekyll::Generator
@@ -22,6 +21,10 @@ module JekyllWikiLinks
 		GRAPH_DATA_KEY = "d3_graph_data"
 		ENABLED_GRAPH_DATA_KEY = "enabled"
 		EXCLUDE_GRAPH_KEY = "exclude"
+
+    # REGEX_NOT_GREEDY dependent on parser
+    # identify missing links in doc via .invalid-wiki-link class and nested doc-text.
+    REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
 
 		def initialize(config)
 			@config = config
@@ -42,11 +45,7 @@ module JekyllWikiLinks
 			@md_docs = docs.select {|doc| markdown_extension?(doc.extname) }
 
 			old_config_warn()
-
-			# build links
-			md_docs.each do |doc|
-				parse_wiki_links(doc)
-			end
+      parse_wiki_links()
 
 			# backlinks data handling
 			@graph_nodes, @graph_links = [], []
@@ -56,31 +55,22 @@ module JekyllWikiLinks
 					generate_graph_data(doc) 
 				end
 			end
-
 			if !disabled_graph_data?
 				write_graph_data()
 			end
 		end
 		
-		def parse_wiki_links(doc)
-			wikilink_matches = doc.content.scan(REGEX_WIKI_LINKS)
-			return unless !wikilink_matches.nil? && wikilink_matches.size != 0
-			# recursive embed with max level; insert markdown
-			# scan match again
-			wikilink_matches.each do |wl_match|
-				wikilink = WikiLink.new(
-					wl_match[0],
-					wl_match[1],
-				  wl_match[2],
-					wl_match[3],
-					wl_match[4],
-					wl_match[5],
-				)
-				doc.content.sub!(
-					wikilink.md_link_regex,
-					build_html_link(wikilink)
-				)
-			end
+		def parse_wiki_links()
+      md_docs.each do |doc|
+        wikilink_objs = Parser.new(doc).wikilinks
+        next if wikilink_objs.nil? 
+        wikilink_objs.each do |wikilink|
+          doc.content.sub!(
+            wikilink.md_link_regex,
+            build_html_link(wikilink)
+          )
+        end
+      end
 		end
 
 		def build_html_link(wikilink)

@@ -1,8 +1,14 @@
-require_relative "regex"
-
 module JekyllWikiLinks
-  # this is essentially an abstract class for now
+	# this is essentially an abstract class for now
   class Validator
+		# kramdown header regexes
+		# atx header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L29
+		REGEX_ATX_HEADER = /^\#{1,6}[\t ]*([^ \t].*)\n/i
+		# setext header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L17
+		REGEX_SETEXT_HEADER = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
+		# obsidian-style
+		REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}^\n/i
+
 		def self.get_linked_doc(md_docs, filename)
       return nil if filename.nil?
 			docs = md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
