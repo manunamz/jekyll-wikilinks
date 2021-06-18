@@ -76,14 +76,14 @@ module JekyllWikiLinks
     def md_link_str
       embed = embedded? ? "!" : ""
       link_type = typed? ? "#{@link_type}::" : ""
-      filename = exists?(FILENAME) ? @filename : ""
-      if exists?(HEADER_TXT)
+      filename = described?(FILENAME) ? @filename : ""
+      if described?(HEADER_TXT)
         header = "\##{@header_txt}"
         block = ""
-      elsif exists?(BLOCK_ID)
+      elsif described?(BLOCK_ID)
         header = ""
         block = "\#\^#{@block_id}"
-      elsif !exists?(FILENAME)
+      elsif !described?(FILENAME)
         Jekyll.logger.error "Invalid link level in 'md_link_str'. See WikiLink's 'md_link_str' for details"
       end
       label_ = labelled? ? "\|#{@label_txt}" : ""
@@ -93,14 +93,14 @@ module JekyllWikiLinks
     def md_link_regex
       regex_embed = embedded? ? REGEX_LINK_EMBED : %r{}
       regex_link_type = typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
-      filename = exists?(FILENAME) ? @filename : ""
-      if exists?(HEADER_TXT)
+      filename = described?(FILENAME) ? @filename : ""
+      if described?(HEADER_TXT)
         header = %r{#{REGEX_LINK_HEADER}#{@header_txt}}
         block = %r{}
-      elsif exists?(BLOCK_ID)
+      elsif described?(BLOCK_ID)
         header = %r{}
         block = %r{#{REGEX_LINK_BLOCK}#{@block_id}}
-      elsif !exists?(FILENAME)
+      elsif !described?(FILENAME)
         Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_link_regex' for details"
       end
       label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{clean_label_txt}} : %r{}
@@ -128,7 +128,7 @@ module JekyllWikiLinks
       return !@embed.nil? && @embed == "!"
     end
 
-    def exists?(chunk)
+    def described?(chunk)
       return (!@filename.nil? && !@filename.empty?) if chunk == FILENAME
       return (!@header_txt.nil? && !@header_txt.empty?) if chunk == HEADER_TXT
       return (!@block_id.nil? && !@block_id.empty?) if chunk == BLOCK_ID
@@ -136,9 +136,9 @@ module JekyllWikiLinks
     end
 
     def level
-      return "file" if exists?(FILENAME) && !exists?(HEADER_TXT) && !exists?(BLOCK_ID)
-      return "header" if exists?(FILENAME) && exists?(HEADER_TXT) && !exists?(BLOCK_ID)    
-      return "block" if exists?(FILENAME) && !exists?(HEADER_TXT) && exists?(BLOCK_ID)
+      return "file" if described?(FILENAME) && !described?(HEADER_TXT) && !described?(BLOCK_ID)
+      return "header" if described?(FILENAME) && described?(HEADER_TXT) && !described?(BLOCK_ID)    
+      return "block" if described?(FILENAME) && !described?(HEADER_TXT) && described?(BLOCK_ID)
       return "invalid"
     end
   end
