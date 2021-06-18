@@ -27,15 +27,15 @@ module JekyllWikiLinks
     \]\]
   }x
 
+  # it's not a parser, but a "parser"...for now...
   class Parser
     attr_accessor :wikilinks
 
     def initialize(doc)
+      # handle block-lvl typed links
       wikilink_matches = doc.content.scan(REGEX_WIKI_LINKS)
       @wikilinks = [] 
       return if wikilink_matches.nil? || wikilink_matches.size == 0
-      # recursive embed with max level; insert markdown
-      # scan match again
       wikilink_matches.each do |wl_match|
         @wikilinks << WikiLink.new(
           wl_match[0],

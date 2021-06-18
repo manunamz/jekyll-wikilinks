@@ -73,20 +73,44 @@ module JekyllWikiLinks
       end
 		end
 
+    def build_html_embed(title, content, url)
+      # multi-line for readability
+      return [
+        "<div class=\"wiki-link-embed\">",
+          "<div class=\"wiki-link-embed-title\">",
+            "#{title}",
+          "</div>",
+          "<div class=\"wiki-link-embed-content\">",
+            "#{@markdown_converter.convert(content)}",
+          "</div>",
+          "<div class=\"wiki-link-embed-link\">",
+            "<a href=\"#{url}\"></a>",
+          "</div>",
+        "</div>",
+      ].join("\n").gsub!("\n", "")
+    end
+
 		def build_html_link(wikilink)
 			linked_doc = Validator.get_linked_doc(@md_docs, wikilink.filename)
 			if !linked_doc.nil?
 				
 				# TODO link_type
 
-				lnk_doc_rel_url = relative_url(linked_doc.url) if linked_doc&.url
 				# label
 				wikilink_inner_txt = wikilink.clean_label_txt if wikilink.labelled?
-				# TODO not sure about downcase
+
+				lnk_doc_rel_url = relative_url(linked_doc.url) if linked_doc&.url
+        # TODO not sure about downcase
 				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
-				link_lvl = wikilink.describe['level']
+				
+        link_lvl = wikilink.describe['level']
 				if (link_lvl == "file")
 					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?
+          return build_html_embed(
+            linked_doc['title'],
+            get_doc_content(wikilink.filename),
+            lnk_doc_rel_url
+          ) if wikilink.embedded?
 				elsif (link_lvl == "header" && Validator.doc_has_header?(linked_doc, wikilink.header_txt))
 					lnk_doc_rel_url += "\#" + wikilink.header_txt.downcase
 					wikilink_inner_txt = "#{fname_inner_txt} > #{wikilink.header_txt}" if wikilink_inner_txt.nil?
@@ -113,6 +137,12 @@ module JekyllWikiLinks
 			end
 			return backlinks
 		end
+
+    def get_doc_content(filename)
+      docs = md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
+      return docs[0].content if docs.size == 1
+      return nil
+    end
 
 		def context
 			@context ||= JekyllWikiLinks::Context.new(site)

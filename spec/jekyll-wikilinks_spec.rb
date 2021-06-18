@@ -44,6 +44,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:label_sq_br)                     { find_by_title(site.collections["notes"].docs, "Labelled With Square Brackets") }
   let(:label_missing_doc)               { find_by_title(site.collections["notes"].docs, "Labelled Missing Doc") }
   let(:labelled_link_header_missing)    { find_by_title(site.collections["notes"].docs, "Labelled Link Header Missing") }  
+  # embed
+  let(:embed)                           { find_by_title(site.collections["notes"].docs, "Embed") }
+  let(:embed_long)                      { find_by_title(site.collections["notes"].docs, "Embed Long") }
   # graph
   let(:graph_generated_file)            { find_generated_file("/assets/graph-net-web.json") }
   let(:graph_static_file)               { find_static_file("/assets/graph-net-web.json") }
@@ -447,6 +450,50 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     it "processes header url fragments; full output" do
       expect(labelled_link_header_missing.output).to eq("<p>This note contains an invalid link fragment to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-note#Zero|labelled text]]</span>.</p>\n")
     end
+  end
+
+  context "when target embedded ![[wikilink]] exists" do
+
+    it "adds embed div wrapper with 'wiki-link-embed' class" do
+      expect(embed.output).to include("<div class=\"wiki-link-embed\">")
+    end
+
+    it "adds embed title div with 'wiki-link-embed-title' class" do
+      expect(embed.output).to include("<div class=\"wiki-link-embed-title\">")
+    end
+
+    it "adds embed link div with 'wiki-link-embed' class" do
+      expect(embed.output).to include("<div class=\"wiki-link-embed-link\">")
+    end
+
+    it "full output; short" do
+      expect(embed.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Base Case A</div><div class=\"wiki-link-embed-content\"><p>This <a class=\"wiki-link\" href=\"/note/e0c824b6-0b8c-4595-8032-b6889edd815f/\">base case b</a> has a littlecar.</p></div><div class=\"wiki-link-embed-link\"><a href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"></a></div></div>\n")
+    end
+
+    it "converts/'markdownifies' nested content'" do
+      expect(embed_long.output).to include("<div class=\"wiki-link-embed-content\"><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div>")
+    end
+
+    it "full output; long" do
+      expect(embed_long.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Long Note</div><div class=\"wiki-link-embed-content\"><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div><div class=\"wiki-link-embed-link\"><a href=\"/notes/long-note/\"></a></div></div>\n")
+    end
+    
+    # header fragment
+
+    it "processes header url fragments; full output" do
+      pending("proper parse tree; embedded header fragment")
+      expect(1).to eq(2)
+      # expect(embed_header_long.output).to eq("")
+    end
+  
+    # block fragment
+
+    it "processes header url fragments; full output" do
+      pending("proper parse tree; embedded block fragment")
+      expect(1).to eq(2)
+      # expect(embed_block_long.output).to eq("")
+    end
+
   end
 
 end
