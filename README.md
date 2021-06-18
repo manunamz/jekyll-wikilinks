@@ -51,12 +51,12 @@ Graph data is generated and output to a `.json` file in your `/assets` directory
 
 ```
 {
-  "nodes": ["id": "<some-id>", "url": "<relative-url>", "label": "<note's-title>"],
-  "links": ["source": "<a-node-id>", "target": "<another-node-id>"]
+  "nodes": [{"id": "<some-id>", "url": "<relative-url>", "label": "<note's-title>", ...}],
+  "links": [{"source": "<a-node-id>", "target": "<another-node-id>", ...}]
 }
 ```
 
-D3 can be tricky, so I've created a gist [here](https://gist.github.com/shorty25h0r7/3222e73c6b7eaef3a677a26e8f177466) of a network graph using d3 version 6. You can see in action [here](https://shorty25h0r7.github.io/jekyll-bonsai/) (just click the 🕸 in the top-left to toggle it on).
+D3 can be tricky, so I've created a gist [here](https://gist.github.com/manunamz/3222e73c6b7eaef3a677a26e8f177466) of a network graph using d3 version 6. You can see in action [here](https://manunamz.github.io/jekyll-bonsai/) (just click the 🕸 in the top-left to toggle it on).
 
 ---
 
@@ -78,13 +78,13 @@ A note on testing -- all tests pass if they are run in certain orders. As far as
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/shorty25h0r7/jekyll-wikilinks.
+Bug reports and pull requests are welcome on GitHub at https://github.com/manunamz/jekyll-wikilinks.
 
 ## I am Not Reduplicating Work Due-Diligence
-- Wikilinks are part of the [commonmark spec](https://github.com/mity/md4c#markdown-extensions) (see `MD_FLAG_WIKILINKS`).
+- They are supported by [md4c](https://github.com/mity/md4c#markdown-extensions) (see `MD_FLAG_WIKILINKS`).
 - They are not supported by [kramdown](https://github.com/gettalong/kramdown) (searched 'wikilinks' in repo).
 - They are [not supported](https://github.com/gjtorikian/commonmarker#options) by [`jekyll-commonmark`](https://github.com/jekyll/jekyll-commonmark) that I can see (don't see any reference to `MD_FLAG_WIKILINKS`).
-- There are scattered implementations around the internet: [here](https://github.com/maximevaillancourt/digital-garden-jekyll-template/blob/master/_plugins/bidirectional_links_generator.rb), [here](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb), are some examples.
+- There are scattered ruby/jekyll implementations around the internet: [here](https://github.com/maximevaillancourt/digital-garden-jekyll-template/blob/master/_plugins/bidirectional_links_generator.rb), [here](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb), are some examples.
 - Stackoverflow [sees lots of interest in this functionality](https://stackoverflow.com/questions/4629675/jekyll-markdown-internal-links), specifically for jekyll, but no other answers lead to a plugin like this one. (But who knows...SO deleted my answer pointing to this plugin 👻)
 
 [^type]: I refer to pages, posts, and collections as "jekyll types". [Here](https://ben.balter.com/2015/02/20/jekyll-collections/) is a great blog post about them.
