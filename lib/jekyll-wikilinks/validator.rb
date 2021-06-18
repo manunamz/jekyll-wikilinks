@@ -1,3 +1,5 @@
+require_relative "img_format_const"
+
 module JekyllWikiLinks
 	# this is essentially an abstract class for now
   class Validator
@@ -10,8 +12,16 @@ module JekyllWikiLinks
 		REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}^\n/i
 
 		def self.get_linked_doc(md_docs, filename)
-      return nil if filename.nil?
+      return nil if filename.nil? || md_docs.size == 0
 			docs = md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
+			return nil if docs.nil? || docs.size > 1
+			return docs[0]
+		end
+
+		def self.get_linked_image(static_files, filename)
+			return nil if filename.nil? || static_files.size == 0
+			return if !SUPPORTED_IMG_FORMATS.any?{ |ext| ext == File.extname(filename).downcase }
+			docs = static_files.select{ |d| d.basename == filename[...-4] }
 			return nil if docs.nil? || docs.size > 1
 			return docs[0]
 		end

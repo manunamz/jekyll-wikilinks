@@ -47,6 +47,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   # embed
   let(:embed)                           { find_by_title(site.collections["notes"].docs, "Embed") }
   let(:embed_long)                      { find_by_title(site.collections["notes"].docs, "Embed Long") }
+  let(:embed_img)                       { find_by_title(site.collections["notes"].docs, "Embed Image") }
   # graph
   let(:graph_generated_file)            { find_generated_file("/assets/graph-net-web.json") }
   let(:graph_static_file)               { find_static_file("/assets/graph-net-web.json") }
@@ -494,6 +495,10 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       # expect(embed_block_long.output).to eq("")
     end
 
-  end
+    # images
 
+    it "processes images" do
+      expect(embed_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"/assets/image.png\" /></span></p>\n")
+    end
+  end
 end

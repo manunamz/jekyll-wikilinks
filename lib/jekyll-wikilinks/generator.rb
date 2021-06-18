@@ -60,6 +60,8 @@ module JekyllWikiLinks
 			end
 		end
 		
+    # TODO: proper parse tree; move parsing and html building to parser.rb
+
 		def parse_wiki_links()
       md_docs.each do |doc|
         wikilink_objs = Parser.new(doc).wikilinks
@@ -72,6 +74,8 @@ module JekyllWikiLinks
         end
       end
 		end
+
+    # build html
 
     def build_html_embed(title, content, url)
       # multi-line for readability
@@ -90,10 +94,19 @@ module JekyllWikiLinks
       ].join("\n").gsub!("\n", "")
     end
 
+    def build_html_img_embed(img_file)
+      "<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"#{relative_url(img_file.relative_path)}\"/></span></p>"
+    end
+
 		def build_html_link(wikilink)
-			linked_doc = Validator.get_linked_doc(@md_docs, wikilink.filename)
+      if wikilink.is_img?
+			  linked_doc = Validator.get_linked_image(@site.static_files, wikilink.filename)
+        if wikilink.embedded? && wikilink.is_img?
+          return build_html_img_embed(linked_doc)
+        end
+      end
+      linked_doc = Validator.get_linked_doc(@md_docs, wikilink.filename)
 			if !linked_doc.nil?
-				
 				# TODO link_type
 
 				# label

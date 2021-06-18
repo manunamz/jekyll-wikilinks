@@ -1,3 +1,5 @@
+require_relative "img_format_const"
+
 module JekyllWikiLinks
   # <variables> only work with 'match' function, not with 'scan' function. :/ 
   # oh well...they are there for easier debugging...
@@ -126,6 +128,11 @@ module JekyllWikiLinks
 
     def embedded?
       return !@embed.nil? && @embed == "!"
+    end
+
+    def is_img?
+      # github supported image formats: https://docs.github.com/en/github/managing-files-in-a-repository/working-with-non-code-files/rendering-and-diffing-images
+      return SUPPORTED_IMG_FORMATS.any?{ |ext| ext == File.extname(@filename).downcase }
     end
 
     def described?(chunk)
