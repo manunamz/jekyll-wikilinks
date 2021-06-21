@@ -12,15 +12,17 @@ test text:
 [[wikilink#^block_id]]
 
 # typed
-type::[[wikilink]]
 
-type::[[wikilink#header]]
+link_type::[[wikilink]]
 
-type::[[wikilink#^block_id]]
+link_type::[[wikilink#header]]
 
-what if the type::[[wikilink]] is inline?
+link_type::[[wikilink#^block_id]]
+
+what if the link_type::[[wikilink]] is inline?
 
 # labelled
+
 [[wikilink|label txt]]
 
 [[wikilink#header|label txt]]
@@ -47,23 +49,23 @@ what if the type::[[wikilink]] is inline?
 
 # typed embedded
 
-!type::[[wikilink]]
+!link_type::[[wikilink]]
 
-!type::[[wikilink#header]]
+!link_type::[[wikilink#header]]
 
-!type::[[wikilink#^block_id]]
+!link_type::[[wikilink#^block_id]]
 
 what if the !type::[[wikilink]] is inline?
 
 # typed labelled
 
-type::[[wikilink|label txt]]
+link_type::[[wikilink|label txt]]
 
-type::[[wikilink#header|label txt]]
+link_type::[[wikilink#header|label txt]]
 
-type::[[wikilink#^block_id|label txt]]
+link_type::[[wikilink#^block_id|label txt]]
 
-what if the type::[[wikilink|label txt]] is inline?
+what if the link_type::[[wikilink|label txt]] is inline?
 
 # stacked header-block
 
