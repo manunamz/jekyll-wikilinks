@@ -25,6 +25,7 @@ module JekyllWikiLinks
     # REGEX_NOT_GREEDY dependent on parser
     # identify missing links in doc via .invalid-wiki-link class and nested doc-text.
     REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
+    REGEX_LINK_TYPE = /<a\sclass="wiki-link(\slink-type\s(?<link-type>([^"]+)))?"\shref="(?<link-url>([^"]+))">/i
 
 		def initialize(config)
 			@config = config
@@ -44,28 +45,28 @@ module JekyllWikiLinks
 			docs += included_docs
 			@md_docs = docs.select {|doc| markdown_extension?(doc.extname) }
 
-			old_config_warn()
-      parse_wiki_links()
+			self.old_config_warn()
+      self.parse_wiki_links()
 
-			# backlinks data handling
 			@graph_nodes, @graph_links = [], []
-			md_docs.each do |doc|
-				doc.data['backlinks'] = get_backlinks(doc)
-				if !disabled_graph_data? && !excluded_in_graph?(doc.type)
-					generate_graph_data(doc) 
+			@md_docs.each do |doc|
+				if !disabled_graph_data? && !self.excluded_in_graph?(doc.type)
+					self.generate_graph_data(doc) 
 				end
 			end
 			if !disabled_graph_data?
-				write_graph_data()
+				self.write_graph_data()
 			end
 		end
 		
     # TODO: proper parse tree; move parsing and html building to parser.rb
 
 		def parse_wiki_links()
-      md_docs.each do |doc|
-        wikilink_objs = Parser.new(doc).wikilinks
-        next if wikilink_objs.nil? 
+      @md_docs.each do |doc|
+        parser = Parser.new(doc)
+        self.populate_attributes(doc, parser.typed_link_blocks)
+        wikilink_objs = parser.wikilinks
+        next if wikilink_objs.nil?
         wikilink_objs.each do |wikilink|
           doc.content.sub!(
             wikilink.md_link_regex,
@@ -73,6 +74,7 @@ module JekyllWikiLinks
           )
         end
       end
+      self.populate_backlinks()
 		end
 
     # build html
@@ -107,7 +109,7 @@ module JekyllWikiLinks
       end
       linked_doc = Validator.get_linked_doc(@md_docs, wikilink.filename)
 			if !linked_doc.nil?
-				# TODO link_type
+        link_type = wikilink.typed? ? " link-type #{wikilink.link_type}" : ""
 
 				# label
 				wikilink_inner_txt = wikilink.clean_label_txt if wikilink.labelled?
@@ -131,25 +133,43 @@ module JekyllWikiLinks
 					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
 					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
 				else
-					return "<span title=\"Content not found.\" class=\"invalid-wiki-link\">#{wikilink.md_link_str}</span>"
+					return '<span title="Content not found." class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
 				end
-				return "<a class='wiki-link' href='#{lnk_doc_rel_url}'>#{wikilink_inner_txt}</a>"
+				return '<a class="wiki-link' + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
 			else
-				return "<span title=\"Content not found.\" class=\"invalid-wiki-link\">#{wikilink.md_link_str}</span>"
+				return '<span title="Content not found." class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
 			end
 		end
 
 		# helpers
 
-		def get_backlinks(doc)
-			backlinks = []
-			@md_docs.each do |backlinked_doc|
-				if backlinked_doc.content.include?(doc.url)
-					backlinks << backlinked_doc
-				end
-			end
-			return backlinks
-		end
+    def populate_attributes(doc, typed_link_blocks)
+      attributes = {}
+      typed_link_blocks.each do |tl|
+        attributes[tl.link_type] = Validator.get_linked_doc(@md_docs, tl.filename)
+      end
+      doc.data['attributes'] = attributes
+    end
+
+    def populate_backlinks()
+      # for each document...
+      @md_docs.each do |doc|
+        backlinks = []
+        link_types = []
+        # ...process its backlinks and link_types
+        @md_docs.each do |doc_to_backlink|
+          match_results = doc_to_backlink.content.scan(REGEX_LINK_TYPE)
+          match_results.each do |m|
+            if m[1] == doc.url
+              backlinks << doc_to_backlink
+              link_types << m[0]
+            end
+          end
+        end
+        doc.data['backlinks'] = backlinks
+        doc.data['link_types'] = link_types
+      end
+    end
 
     def get_doc_content(filename)
       docs = md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
@@ -227,7 +247,7 @@ module JekyllWikiLinks
 				url: relative_url(doc.url),
 				label: doc.data['title'],
 			}
-			get_backlinks(doc).each do |b|
+			doc.data['backlinks'].each do |b|
 				if !excluded_in_graph?(b.type)
 					graph_links << {
 						source: relative_url(b.url),

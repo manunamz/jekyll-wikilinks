@@ -28,25 +28,43 @@ module JekyllWikiLinks
       (#{REGEX_LINK_LABEL}#{REGEX_LABEL_TXT})?
     \]\]
   }x
+  REGEX_TYPED_LINK_BLOCK = /\n#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\[\[#{REGEX_FILENAME}\]\]\n/i
 
   # it's not a parser, but a "parser"...for now...
   class Parser
-    attr_accessor :wikilinks
+    attr_accessor :wikilinks, :typed_link_blocks
 
     def initialize(doc)
-      # handle block-lvl typed links
+      @wikilinks, @typed_link_blocks = [], []
+
+      typed_link_block_matches = doc.content.scan(REGEX_TYPED_LINK_BLOCK)
       wikilink_matches = doc.content.scan(REGEX_WIKI_LINKS)
-      @wikilinks = [] 
-      return if wikilink_matches.nil? || wikilink_matches.size == 0
-      wikilink_matches.each do |wl_match|
-        @wikilinks << WikiLink.new(
-          wl_match[0],
-          wl_match[1],
-          wl_match[2],
-          wl_match[3],
-          wl_match[4],
-          wl_match[5],
-        )
+      
+      if !typed_link_block_matches.nil? && typed_link_block_matches.size != 0 
+        typed_link_block_matches.each do |wl_match|
+          typed_link_block_wikilink = WikiLink.new(
+            nil,
+            wl_match[0],
+            wl_match[1],
+            nil,
+            nil,
+            nil,
+          )
+          doc.content.gsub!(typed_link_block_wikilink.md_link_str, "")
+          @typed_link_blocks << typed_link_block_wikilink
+        end
+      end
+      if !wikilink_matches.nil? && wikilink_matches.size != 0
+        wikilink_matches.each do |wl_match|
+          @wikilinks << WikiLink.new(
+            wl_match[0],
+            wl_match[1],
+            wl_match[2],
+            wl_match[3],
+            wl_match[4],
+            wl_match[5],
+          )
+        end
       end
     end
   end

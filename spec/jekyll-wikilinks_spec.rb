@@ -20,8 +20,6 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   end
   let(:site)                            { Jekyll::Site.new(config) }
   
-  # TODO: block file link with attribute
-  # TODO: inline file link with attribute
   # file link
   let(:base_case_a)                     { find_by_title(site.collections["notes"].docs, "Base Case A") }
   let(:base_case_b)                     { find_by_title(site.collections["notes"].docs, "Base Case B") }
@@ -33,6 +31,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:missing_doc_many)                { find_by_title(site.collections["notes"].docs, "Missing Doc Many") }
   let(:link_whitespace_in_filename)     { find_by_title(site.collections["notes"].docs, "Link Whitespace In Filename") }
   let(:whitespace_in_filename)          { find_by_title(site.collections["notes"].docs, "Whitespace In Filename") }
+  # typed links
+  let(:typed_inline)                    { find_by_title(site.collections["notes"].docs, "Typed Link Inline") }
+  let(:typed_block)                     { find_by_title(site.collections["notes"].docs, "Typed Link Block") }
   # header link/url fragments
   let(:link_header)                     { find_by_title(site.collections["notes"].docs, "Link Header") }
   let(:link_header_missing_doc)         { find_by_title(site.collections["notes"].docs, "Link Header Missing") }
@@ -128,6 +129,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     it "adds 'backlinks' metadata" do
       expect(base_case_a.data).to include("backlinks")
       expect(base_case_b.data).to include("backlinks")
+    end
+
+    it "adds 'link_types' metadata" do
+      expect(base_case_a.data).to include("link_types")
+      expect(base_case_b.data).to include("link_types")
     end
 
     it "'backlinks' metadata includes all jekyll types -- pages, docs (posts and collections)" do
@@ -309,7 +315,31 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
     # todo: collection-type-1 <-> collection-type-2
     # todo: page <-> post
+  end
 
+  context "when typed::[[wikilink]] exists" do
+    
+    it "inline; full output" do
+      expect(typed_inline.output).to eq("<p>This link is typed inline: <a class=\"wiki-link link-type inline-typed\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.</p>\n")
+      # corresponding 'link_type' added to linked file
+      expect(base_case_a.data).to include("link_types")
+      expect(base_case_a.data['link_types']).to eq([nil, nil, nil, nil, nil, "inline-typed"])
+      expect(base_case_a.data).to include("backlinks")
+      expect(base_case_a.data['backlinks'][0].is_a?(Jekyll::Page)).to be true
+      expect(base_case_a.data['backlinks'][1].is_a?(Jekyll::Document)).to be true
+      expect(base_case_a.data['backlinks'][2].is_a?(Jekyll::Document)).to be true
+      expect(base_case_a.data['backlinks'][3].is_a?(Jekyll::Document)).to be true
+      expect(base_case_a.data['backlinks'][4].is_a?(Jekyll::Document)).to be true
+      expect(base_case_a.data['backlinks'][5].is_a?(Jekyll::Document)).to be true # this is the corresponding typed link
+    end
+
+    it "block; full output" do
+      expect(typed_block.output).to eq("<p>This link is block typed.</p>\n\n")
+      expect(typed_block.data).to include("attributes")
+      expect(typed_block.data['attributes'].keys).to eq(["block-typed"])
+      expect(typed_block.data['attributes'].values[0].is_a?(Jekyll::Document)).to be true
+    end
+  
   end
 
   # /happy-path
