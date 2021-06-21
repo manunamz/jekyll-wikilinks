@@ -37,7 +37,7 @@ module JekyllWikiLinks
 			Jekyll.logger.debug "Excluded jekyll types in graph: ", option_graph(EXCLUDE_GRAPH_KEY)
 
 			@site = site    
-			@context = context
+			@context ||= JekyllWikiLinks::Context.new(site)
 
 			docs = []
 			docs += site.pages if !exclude?(:pages)
@@ -176,10 +176,6 @@ module JekyllWikiLinks
       return docs[0].content if docs.size == 1
       return nil
     end
-
-		def context
-			@context ||= JekyllWikiLinks::Context.new(site)
-		end
 
 		# config helpers
 
