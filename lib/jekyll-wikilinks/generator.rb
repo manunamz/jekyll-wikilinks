@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 require "jekyll"
 require_relative "context"
+require_relative "doc_manager"
 require_relative "filter"
 require_relative "parser"
-require_relative "validator"
 
 module JekyllWikiLinks
 	class Generator < Jekyll::Generator
-		attr_accessor :site, :config, :md_docs, :graph_nodes, :graph_links
+		attr_accessor :site, :config, :md_docs, :doc_manager, :graph_nodes, :graph_links
 
 		# Use Jekyll's native relative_url filter
 		include Jekyll::Filters::URLFilters
@@ -33,6 +33,8 @@ module JekyllWikiLinks
 
 		def generate(site)
 			return if disabled?
+      self.old_config_warn()
+      
 			Jekyll.logger.debug "Excluded jekyll types: ", option(EXCLUDE_KEY)
 			Jekyll.logger.debug "Excluded jekyll types in graph: ", option_graph(EXCLUDE_GRAPH_KEY)
 
@@ -45,8 +47,15 @@ module JekyllWikiLinks
 			docs += included_docs
 			@md_docs = docs.select {|doc| markdown_extension?(doc.extname) }
 
-			self.old_config_warn()
-      self.parse_wiki_links()
+      @doc_manager = DocManager.new(@md_docs, @site.static_files)
+      @parser = Parser.new(@context, @markdown_converter, doc_manager)
+
+      # self.parse_wiki_links()
+      @md_docs.each do |doc|
+        @parser.parse(doc.content)
+        self.populate_attributes(doc, @parser.typed_link_blocks)
+      end
+      self.populate_backlinks()
 
 			@graph_nodes, @graph_links = [], []
 			@md_docs.each do |doc|
@@ -58,95 +67,13 @@ module JekyllWikiLinks
 				self.write_graph_data()
 			end
 		end
-		
-    # TODO: proper parse tree; move parsing and html building to parser.rb
-
-		def parse_wiki_links()
-      @md_docs.each do |doc|
-        parser = Parser.new(doc)
-        self.populate_attributes(doc, parser.typed_link_blocks)
-        wikilink_objs = parser.wikilinks
-        next if wikilink_objs.nil?
-        wikilink_objs.each do |wikilink|
-          doc.content.sub!(
-            wikilink.md_link_regex,
-            build_html_link(wikilink)
-          )
-        end
-      end
-      self.populate_backlinks()
-		end
-
-    # build html
-
-    def build_html_embed(title, content, url)
-      # multi-line for readability
-      return [
-        "<div class=\"wiki-link-embed\">",
-          "<div class=\"wiki-link-embed-title\">",
-            "#{title}",
-          "</div>",
-          "<div class=\"wiki-link-embed-content\">",
-            "#{@markdown_converter.convert(content)}",
-          "</div>",
-          "<div class=\"wiki-link-embed-link\">",
-            "<a href=\"#{url}\"></a>",
-          "</div>",
-        "</div>",
-      ].join("\n").gsub!("\n", "")
-    end
-
-    def build_html_img_embed(img_file)
-      "<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"#{relative_url(img_file.relative_path)}\"/></span></p>"
-    end
-
-		def build_html_link(wikilink)
-      if wikilink.is_img?
-			  linked_doc = Validator.get_linked_image(@site.static_files, wikilink.filename)
-        if wikilink.embedded? && wikilink.is_img?
-          return build_html_img_embed(linked_doc)
-        end
-      end
-      linked_doc = Validator.get_linked_doc(@md_docs, wikilink.filename)
-			if !linked_doc.nil?
-        link_type = wikilink.typed? ? " link-type #{wikilink.link_type}" : ""
-
-				# label
-				wikilink_inner_txt = wikilink.clean_label_txt if wikilink.labelled?
-
-				lnk_doc_rel_url = relative_url(linked_doc.url) if linked_doc&.url
-        # TODO not sure about downcase
-				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
-				
-        link_lvl = wikilink.describe['level']
-				if (link_lvl == "file")
-					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?
-          return build_html_embed(
-            linked_doc['title'],
-            get_doc_content(wikilink.filename),
-            lnk_doc_rel_url
-          ) if wikilink.embedded?
-				elsif (link_lvl == "header" && Validator.doc_has_header?(linked_doc, wikilink.header_txt))
-					lnk_doc_rel_url += "\#" + wikilink.header_txt.downcase
-					wikilink_inner_txt = "#{fname_inner_txt} > #{wikilink.header_txt}" if wikilink_inner_txt.nil?
-				elsif (link_lvl == "block" && Validator.doc_has_block_id?(linked_doc, wikilink.block_id))
-					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
-					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
-				else
-					return '<span title="Content not found." class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
-				end
-				return '<a class="wiki-link' + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
-			else
-				return '<span title="Content not found." class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
-			end
-		end
 
 		# helpers
 
     def populate_attributes(doc, typed_link_blocks)
       attributes = {}
       typed_link_blocks.each do |tl|
-        attributes[tl.link_type] = Validator.get_linked_doc(@md_docs, tl.filename)
+        attributes[tl.link_type] = @doc_manager.get_doc(tl.filename)
       end
       doc.data['attributes'] = attributes
     end
@@ -169,12 +96,6 @@ module JekyllWikiLinks
         doc.data['backlinks'] = backlinks
         doc.data['link_types'] = link_types
       end
-    end
-
-    def get_doc_content(filename)
-      docs = md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
-      return docs[0].content if docs.size == 1
-      return nil
     end
 
 		# config helpers

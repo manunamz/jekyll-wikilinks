@@ -1,19 +1,7 @@
-require_relative "img_format_const"
+require_relative "naming_const"
 
 module JekyllWikiLinks
-  # <variables> only work with 'match' function, not with 'scan' function. :/ 
-  # oh well...they are there for easier debugging...
-                                                                  # capture indeces
-  # TODO: Fix REGEX_NOT_GREEDY
-  # REGEX_NOT_GREEDY = /[^(?!\]\])]+/i
-  # REGEX_NOT_GREEDY = /(?!\]\]).*/i
-  REGEX_NOT_GREEDY = /[^\]]+/i
-  REGEX_LINK_EMBED = /(?<embed>(\!))/i                           # 0
-  REGEX_LINK_TYPE_TXT = /(?<type-txt>([^\n\s\!\#\^\|\]]+))/i     # 1
-  REGEX_FILENAME = /(?<filename>([^\\\/:\#\^\|\[\]]+))/i         # 2
-  REGEX_HEADER_TXT = /(?<header-txt>([^\!\#\^\|\[\]]+))/i        # 3
-  REGEX_BLOCK_ID_TXT = /(?<block-id>([^\\\/:\!\#\^\|\[\]]+))/i   # 4
-  REGEX_LABEL_TXT = /(?<label-txt>(#{REGEX_NOT_GREEDY}))/i       # 5
+  REGEX_LINK_EMBED = /(?<embed>(\!))/i                           # 0 (capture index for WikiLinks class)
   REGEX_LINK_TYPE = /::/
   REGEX_LINK_HEADER = /\#/
   REGEX_LINK_BLOCK = /\#\^/
@@ -32,14 +20,22 @@ module JekyllWikiLinks
 
   # it's not a parser, but a "parser"...for now...
   class Parser
-    attr_accessor :wikilinks, :typed_link_blocks
+    attr_accessor :doc_manager, :markdown_converter, :wikilinks, :typed_link_blocks
 
-    def initialize(doc)
+    # Use Jekyll's native relative_url filter
+    include Jekyll::Filters::URLFilters
+
+    def initialize(context, markdown_converter, doc_manager)
+      @context ||= context
+      @doc_manager ||= doc_manager
+      @markdown_converter ||= markdown_converter
       @wikilinks, @typed_link_blocks = [], []
+    end
 
-      typed_link_block_matches = doc.content.scan(REGEX_TYPED_LINK_BLOCK)
-      wikilink_matches = doc.content.scan(REGEX_WIKI_LINKS)
-      
+    def parse(doc_content)
+      @typed_link_blocks, @wikilinks = [], []
+      # process blocks
+      typed_link_block_matches = doc_content.scan(REGEX_TYPED_LINK_BLOCK)
       if !typed_link_block_matches.nil? && typed_link_block_matches.size != 0 
         typed_link_block_matches.each do |wl_match|
           typed_link_block_wikilink = WikiLink.new(
@@ -50,10 +46,12 @@ module JekyllWikiLinks
             nil,
             nil,
           )
-          doc.content.gsub!(typed_link_block_wikilink.md_link_str, "")
+          doc_content.gsub!(typed_link_block_wikilink.md_link_str, "")
           @typed_link_blocks << typed_link_block_wikilink
         end
       end
+      # process inlines
+      wikilink_matches = doc_content.scan(REGEX_WIKI_LINKS)
       if !wikilink_matches.nil? && wikilink_matches.size != 0
         wikilink_matches.each do |wl_match|
           @wikilinks << WikiLink.new(
@@ -66,7 +64,77 @@ module JekyllWikiLinks
           )
         end
       end
+      # replace text
+      return if @wikilinks.nil?
+      @wikilinks.each do |wikilink|
+        doc_content.sub!(
+          wikilink.md_link_regex,
+          self.build_html(wikilink)
+        )
+      end
     end
+
+    def build_html_embed(title, content, url)
+      # multi-line for readability
+      return [
+        "<div class=\"wiki-link-embed\">",
+          "<div class=\"wiki-link-embed-title\">",
+            "#{title}",
+          "</div>",
+          "<div class=\"wiki-link-embed-content\">",
+            "#{@markdown_converter.convert(content)}",
+          "</div>",
+          "<div class=\"wiki-link-embed-link\">",
+            "<a href=\"#{url}\"></a>",
+          "</div>",
+        "</div>",
+      ].join("\n").gsub!("\n", "")
+    end
+
+    def build_html_img_embed(img_file)
+      "<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"#{relative_url(img_file.relative_path)}\"/></span></p>"
+    end
+
+		def build_html(wikilink)
+      if wikilink.is_img?
+			  linked_doc = @doc_manager.get_image(wikilink.filename)
+        if wikilink.embedded? && wikilink.is_img?
+          return build_html_img_embed(linked_doc)
+        end
+      end
+      linked_doc = @doc_manager.get_doc(wikilink.filename)
+			if !linked_doc.nil?
+        link_type = wikilink.typed? ? " link-type #{wikilink.link_type}" : ""
+
+				# label
+				wikilink_inner_txt = wikilink.clean_label_txt if wikilink.labelled?
+
+				lnk_doc_rel_url = relative_url(linked_doc.url) if linked_doc&.url
+        # TODO not sure about downcase
+				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
+				
+        link_lvl = wikilink.describe['level']
+				if (link_lvl == "file")
+					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?
+          return build_html_embed(
+            linked_doc['title'],
+            @doc_manager.get_doc_content(wikilink.filename),
+            lnk_doc_rel_url
+          ) if wikilink.embedded?
+				elsif (link_lvl == "header" && DocManager.doc_has_header?(linked_doc, wikilink.header_txt))
+					lnk_doc_rel_url += "\#" + wikilink.header_txt.downcase
+					wikilink_inner_txt = "#{fname_inner_txt} > #{wikilink.header_txt}" if wikilink_inner_txt.nil?
+				elsif (link_lvl == "block" && DocManager.doc_has_block_id?(linked_doc, wikilink.block_id))
+					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
+					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
+				else
+					return '<span title="Content not found." class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
+				end
+				return '<a class="wiki-link' + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
+			else
+				return '<span title="Content not found." class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
+			end
+		end
   end
   
   # the wikilink class knows everything about the original markdown syntax and its semantic meaning

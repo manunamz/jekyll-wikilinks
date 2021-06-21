@@ -1,27 +1,40 @@
-require_relative "img_format_const"
+require_relative "naming_const"
 
 module JekyllWikiLinks
-	# this is essentially an abstract class for now
-  class Validator
+  class DocManager
+		attr_accessor :md_docs, :static_files
+
 		# kramdown header regexes
 		# atx header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L29
 		REGEX_ATX_HEADER = /^\#{1,6}[\t ]*([^ \t].*)\n/i
 		# setext header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L17
 		REGEX_SETEXT_HEADER = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
 		# obsidian-style
+		# REGEX_BLOCK_ID_TXT = /(?<block-id>([^\\\/:\!\#\^\|\[\]]+))/i
 		REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}^\n/i
 
-		def self.get_linked_doc(md_docs, filename)
-      return nil if filename.nil? || md_docs.size == 0
-			docs = md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
+		def initialize(md_docs, static_files)
+			@md_docs ||= md_docs
+			@static_files ||= static_files
+		end
+
+		def get_doc(filename)
+      return nil if filename.nil? || @md_docs.size == 0
+			docs = @md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
 			return nil if docs.nil? || docs.size > 1
 			return docs[0]
 		end
 
-		def self.get_linked_image(static_files, filename)
-			return nil if filename.nil? || static_files.size == 0
-			return if !SUPPORTED_IMG_FORMATS.any?{ |ext| ext == File.extname(filename).downcase }
-			docs = static_files.select{ |d| d.basename == filename[...-4] }
+    def get_doc_content(filename)
+      return nil if filename.nil? || @md_docs.size == 0
+      docs = @md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
+      return docs[0].content if docs.size == 1
+      return nil
+    end
+
+		def get_image(filename)
+			return nil if filename.nil? || @static_files.size == 0 || !SUPPORTED_IMG_FORMATS.any?{ |ext| ext == File.extname(filename).downcase }
+			docs = @static_files.select{ |d| d.basename == filename[...-4] }
 			return nil if docs.nil? || docs.size > 1
 			return docs[0]
 		end
