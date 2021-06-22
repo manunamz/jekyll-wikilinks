@@ -19,7 +19,6 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     )
   end
   let(:site)                            { Jekyll::Site.new(config) }
-  
   # file link
   let(:base_case_a)                     { find_by_title(site.collections["notes"].docs, "Base Case A") }
   let(:base_case_b)                     { find_by_title(site.collections["notes"].docs, "Base Case B") }
@@ -126,22 +125,41 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(base_case_b.output).to_not include(".html")
     end
 
-    it "adds 'backlinks' metadata" do
-      expect(base_case_a.data).to include("backlinks")
-      expect(base_case_b.data).to include("backlinks")
+    it "adds 'backattrs' to document" do
+      expect(base_case_a.instance_variable_get(:@backattrs)).to_not be_nil
+      expect(base_case_a.instance_variable_get(:@backattrs)[0]['type']).to_not be_nil
+      expect(base_case_a.instance_variable_get(:@backattrs)[0]['doc']).to_not be_nil
+      expect(base_case_b.instance_variable_get(:@backattrs)).to_not be_nil
     end
 
-    it "adds 'link_types' metadata" do
-      expect(base_case_a.data).to include("link_types")
-      expect(base_case_b.data).to include("link_types")
+    it "adds 'backlinks' to document" do
+      expect(base_case_a.instance_variable_get(:@backlinks)).to_not be_nil
+      expect(base_case_b.instance_variable_get(:@backlinks)).to_not be_nil
     end
 
-    it "'backlinks' metadata includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(base_case_a.data["backlinks"]).to include(Jekyll::Page)
-      expect(base_case_a.data["backlinks"]).to include(Jekyll::Document)
+    it "'backlinks' includes all jekyll types -- pages, docs (posts and collections)" do
+      expect(base_case_a.backlinks[0]['doc']).to be_a(Jekyll::Page)
+      expect(base_case_a.backlinks[1]['doc']).to be_a(Jekyll::Document)
       # 'base_case_b' does not include any pages in its backlinks
-      # expect(base_case_b.data["backlinks"]).to include(Jekyll::Page)
-      expect(base_case_b.data["backlinks"]).to include(Jekyll::Document)
+      # expect(base_case_b.instance_variable_get(:@backlinks)).to include(Jekyll::Page)
+      # expect(base_case_b.instance_variable_get(:@backlinks)[2]['doc']).to be_kind_of(Jekyll::Document)
+    end
+    
+    it "adds 'foreattrs' to document" do
+      expect(base_case_a.instance_variable_get(:@foreattrs)).to_not be_nil
+      expect(base_case_b.instance_variable_get(:@foreattrs)).to_not be_nil
+    end
+
+    it "adds 'forelinks' to document" do
+      expect(base_case_a.instance_variable_get(:@forelinks)).to_not be_nil
+      expect(base_case_b.instance_variable_get(:@forelinks)).to_not be_nil
+    end
+
+    it "'forelinks' includes all jekyll types -- pages, docs (posts and collections)" do
+      expect(base_case_a.forelinks[0]['doc']).to be_a(Jekyll::Document)
+      # 'base_case_b' does not include any pages in its backlinks
+      # expect(base_case_b.instance_variable_get(:@forelinks)).to include(Jekyll::Page)
+      # expect(base_case_b.instance_variable_get(:@forelinks)[0]['doc']).to include(Jekyll::Document)
     end
 
     it "full output" do
@@ -317,29 +335,60 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # todo: page <-> post
   end
 
-  context "when typed::[[wikilink]] exists" do
+  context "when inline style typed::[[wikilink]] exists" do
     
-    it "inline; full output" do
-      expect(typed_inline.output).to eq("<p>This link is typed inline: <a class=\"wiki-link link-type inline-typed\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.</p>\n")
-      # corresponding 'link_type' added to linked file
-      expect(base_case_a.data).to include("link_types")
-      expect(base_case_a.data['link_types']).to eq([nil, nil, nil, nil, nil, "inline-typed"])
-      expect(base_case_a.data).to include("backlinks")
-      expect(base_case_a.data['backlinks'][0].is_a?(Jekyll::Page)).to be true
-      expect(base_case_a.data['backlinks'][1].is_a?(Jekyll::Document)).to be true
-      expect(base_case_a.data['backlinks'][2].is_a?(Jekyll::Document)).to be true
-      expect(base_case_a.data['backlinks'][3].is_a?(Jekyll::Document)).to be true
-      expect(base_case_a.data['backlinks'][4].is_a?(Jekyll::Document)).to be true
-      expect(base_case_a.data['backlinks'][5].is_a?(Jekyll::Document)).to be true # this is the corresponding typed link
+    it "adds 'backlinks' to document" do
+      expect(base_case_a.instance_variable_get(:@backlinks)).to_not be_nil
     end
 
-    it "block; full output" do
-      expect(typed_block.output).to eq("<p>This link is block typed.</p>\n\n")
-      expect(typed_block.data).to include("attributes")
-      expect(typed_block.data['attributes'].keys).to eq(["block-typed"])
-      expect(typed_block.data['attributes'].values[0].is_a?(Jekyll::Document)).to be true
+    it "'backlinks' includes all jekyll types -- pages, docs (posts and collections)" do
+      expect(base_case_a.backlinks[5]['type']).to_not be_nil
+      expect(base_case_a.backlinks[5]['type']).to be_a(String)
+      expect(base_case_a.backlinks[5]['doc']).to eq(typed_inline)
     end
-  
+
+    it "adds 'forelinks' to document" do
+      expect(typed_inline.instance_variable_get(:@forelinks)).to_not be_nil
+    end
+
+    it "'forelinks' includes all jekyll types -- pages, docs (posts and collections)" do
+      expect(typed_inline.forelinks[0]['type']).to_not be_nil
+      expect(typed_inline.forelinks[0]['type']).to be_a(String)
+      expect(typed_inline.forelinks[0]['doc']).to eq(base_case_a)
+    end
+
+    it "full html" do
+      expect(typed_inline.output).to eq("<p>This link is typed inline: <a class=\"wiki-link link-type inline-typed\" href=\"/note/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.</p>\n")
+    end
+
+  end
+
+  context "when block style typed::[[wikilink]] exists" do
+
+    it "adds 'backattrs' to document" do
+      expect(base_case_a.instance_variable_get(:@backattrs)).to_not be_nil
+    end
+
+    it "'backattrs' includes all jekyll types -- pages, docs (posts and collections)" do
+      expect(base_case_a.backattrs[0]['type']).to_not be_nil
+      expect(base_case_a.backattrs[0]['type']).to be_a(String)
+      expect(base_case_a.backattrs[0]['doc']).to eq(typed_block)
+    end
+
+    it "adds 'foreattrs' to document" do
+      expect(typed_block.instance_variable_get(:@foreattrs)).to_not be_nil
+    end
+
+    it "'foreattrs' includes all jekyll types -- pages, docs (posts and collections)" do
+      expect(typed_block.instance_variable_get(:@foreattrs)[0]['type']).to_not be_nil
+      expect(typed_block.instance_variable_get(:@foreattrs)[0]['type']).to be_a(String)
+      expect(typed_block.instance_variable_get(:@foreattrs)[0]['doc']).to eq(base_case_a)
+    end
+
+    it "full html" do
+      expect(typed_block.output).to eq("<p>This link is block typed.</p>\n\n")
+    end
+
   end
 
   # /happy-path
@@ -531,4 +580,6 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(embed_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"/assets/image.png\" /></span></p>\n")
     end
   end
+
+  # TODO: context "when target embedded ![[wikilink]] does not exist" do
 end

@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 require "jekyll"
+require_relative "jekyll_adds"
 require_relative "context"
 require_relative "doc_manager"
-require_relative "filter"
+require_relative "link_index"
 require_relative "parser"
 
 module JekyllWikiLinks
 	class Generator < Jekyll::Generator
-		attr_accessor :site, :config, :md_docs, :doc_manager, :graph_nodes, :graph_links
+		attr_accessor :site, :config, :md_docs, :doc_manager, :link_index, :parser, :graph_nodes, :graph_links
 
 		# Use Jekyll's native relative_url filter
 		include Jekyll::Filters::URLFilters
@@ -22,7 +23,6 @@ module JekyllWikiLinks
 		ENABLED_GRAPH_DATA_KEY = "enabled"
 		EXCLUDE_GRAPH_KEY = "exclude"
 
-    # REGEX_NOT_GREEDY dependent on parser
     # identify missing links in doc via .invalid-wiki-link class and nested doc-text.
     REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
     REGEX_LINK_TYPE = /<a\sclass="wiki-link(\slink-type\s(?<link-type>([^"]+)))?"\shref="(?<link-url>([^"]+))">/i
@@ -34,29 +34,33 @@ module JekyllWikiLinks
 		def generate(site)
 			return if disabled?
       self.old_config_warn()
-      
 			Jekyll.logger.debug "Excluded jekyll types: ", option(EXCLUDE_KEY)
 			Jekyll.logger.debug "Excluded jekyll types in graph: ", option_graph(EXCLUDE_GRAPH_KEY)
-
+      
+      # setup site
 			@site = site    
 			@context ||= JekyllWikiLinks::Context.new(site)
-
+      
+      # setup markdown docs
 			docs = []
 			docs += site.pages if !exclude?(:pages)
 			included_docs = site.docs_to_write.filter { |d| !exclude?(d.type) }
 			docs += included_docs
 			@md_docs = docs.select {|doc| markdown_extension?(doc.extname) }
-
+      
+      # setup helper classes
       @doc_manager = DocManager.new(@md_docs, @site.static_files)
-      @parser = Parser.new(@context, @markdown_converter, doc_manager)
-
-      # self.parse_wiki_links()
+      @parser = Parser.new(@context, @markdown_converter, @doc_manager)
+      @link_index = LinkIndex.new(@doc_manager)
+      
+      # parse + populate index
       @md_docs.each do |doc|
         @parser.parse(doc.content)
-        self.populate_attributes(doc, @parser.typed_link_blocks)
+        @link_index.populate_attributes(doc, @parser.typed_link_blocks)
       end
-      self.populate_backlinks()
-
+      @link_index.process
+      
+      # handle graph data
 			@graph_nodes, @graph_links = [], []
 			@md_docs.each do |doc|
 				if !disabled_graph_data? && !self.excluded_in_graph?(doc.type)
@@ -67,36 +71,6 @@ module JekyllWikiLinks
 				self.write_graph_data()
 			end
 		end
-
-		# helpers
-
-    def populate_attributes(doc, typed_link_blocks)
-      attributes = {}
-      typed_link_blocks.each do |tl|
-        attributes[tl.link_type] = @doc_manager.get_doc(tl.filename)
-      end
-      doc.data['attributes'] = attributes
-    end
-
-    def populate_backlinks()
-      # for each document...
-      @md_docs.each do |doc|
-        backlinks = []
-        link_types = []
-        # ...process its backlinks and link_types
-        @md_docs.each do |doc_to_backlink|
-          match_results = doc_to_backlink.content.scan(REGEX_LINK_TYPE)
-          match_results.each do |m|
-            if m[1] == doc.url
-              backlinks << doc_to_backlink
-              link_types << m[0]
-            end
-          end
-        end
-        doc.data['backlinks'] = backlinks
-        doc.data['link_types'] = link_types
-      end
-    end
 
 		# config helpers
 
@@ -164,10 +138,11 @@ module JekyllWikiLinks
 				url: relative_url(doc.url),
 				label: doc.data['title'],
 			}
-			doc.data['backlinks'].each do |b|
-				if !excluded_in_graph?(b.type)
+			doc.backlinks.each do |bl|
+        linked_doc = bl['doc']
+				if !excluded_in_graph?(linked_doc.type)
 					graph_links << {
-						source: relative_url(b.url),
+						source: relative_url(linked_doc.url),
 						target: relative_url(doc.url),
 					}
 				end
@@ -183,12 +158,12 @@ module JekyllWikiLinks
 			}))
 		end
 
-    # deprecations
+    # !! deprecated !!
+
     def old_config_warn()
       if config.include?("wikilinks_collection")
         Jekyll.logger.warn "As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details."
       end
     end
-
 	end
 end

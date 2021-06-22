@@ -102,7 +102,7 @@ module JekyllWikiLinks
           return build_html_img_embed(linked_doc)
         end
       end
-      linked_doc = @doc_manager.get_doc(wikilink.filename)
+      linked_doc = @doc_manager.get_doc_by_fname(wikilink.filename)
 			if !linked_doc.nil?
         link_type = wikilink.typed? ? " link-type #{wikilink.link_type}" : ""
 
