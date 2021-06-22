@@ -1,5 +1,5 @@
 ---
-title: Long Note
+title: Long Doc
 ---
 # One
 - a
