@@ -97,7 +97,7 @@ module JekyllWikiLinks
 
 		def build_html(wikilink)
       if wikilink.is_img?
-			  linked_doc = @doc_manager.get_image(wikilink.filename)
+			  linked_doc = @doc_manager.get_image_by_bname(wikilink.filename)
         if wikilink.embedded? && wikilink.is_img?
           return build_html_img_embed(linked_doc)
         end

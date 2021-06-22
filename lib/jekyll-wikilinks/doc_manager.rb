@@ -42,7 +42,8 @@ module JekyllWikiLinks
       return nil
     end
 
-		def get_image(filename)
+		# 'bname' -> 'basename' (filename with extension)
+		def get_image_by_bname(filename)
 			return nil if filename.nil? || @static_files.size == 0 || !SUPPORTED_IMG_FORMATS.any?{ |ext| ext == File.extname(filename).downcase }
 			docs = @static_files.select{ |d| d.basename == filename[...-4] }
 			return nil if docs.nil? || docs.size > 1
