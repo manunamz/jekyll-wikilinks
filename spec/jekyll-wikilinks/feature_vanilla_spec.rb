@@ -87,11 +87,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
     # metadata attached to doc patch
 
-    it "adds 'backattrs' to document" do
-      expect(base_case_a.data['backattrs']).to_not be_nil
-      expect(base_case_a.data['backattrs'][0]['type']).to_not be_nil
-      expect(base_case_a.data['backattrs'][0]['doc']).to_not be_nil
-      expect(base_case_b.data['backattrs']).to_not be_nil
+    it "adds 'attributed' to document" do
+      expect(base_case_a.data['attributed']).to_not be_nil
+      expect(base_case_a.data['attributed'][0]['type']).to_not be_nil
+      expect(base_case_a.data['attributed'][0]['doc']).to_not be_nil
+      expect(base_case_b.data['attributed']).to_not be_nil
     end
 
     it "adds 'backlinks' to document" do
@@ -107,9 +107,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       # expect(base_case_b.instance_variable_get(:@backlinks)[2]['doc']).to be_kind_of(Jekyll::Document)
     end
     
-    it "adds 'foreattrs' to document" do
-      expect(base_case_a.data['foreattrs']).to_not be_nil
-      expect(base_case_b.data['foreattrs']).to_not be_nil
+    it "adds 'attributes' to document" do
+      expect(base_case_a.data['attributes']).to_not be_nil
+      expect(base_case_b.data['attributes']).to_not be_nil
     end
 
     it "adds 'forelinks' to document" do

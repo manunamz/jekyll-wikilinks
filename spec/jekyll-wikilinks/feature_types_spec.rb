@@ -76,24 +76,24 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   context "when block style typed::[[wikilink]] exists" do
 
-    it "adds 'backattrs' to document" do
-      expect(base_case_a.data.keys).to include('backattrs')
+    it "adds 'attributed' to document" do
+      expect(base_case_a.data.keys).to include('attributed')
     end
 
-    it "'backattrs' includes all jekyll types -- pages, docs (posts and collections)" do
-      backattr_doc = base_case_a.data['backattrs'].select{ |bl| bl['doc']['title'] == "Typed Link Block" }.first
+    it "'attributed' includes all jekyll types -- pages, docs (posts and collections)" do
+      backattr_doc = base_case_a.data['attributed'].select{ |bl| bl['doc']['title'] == "Typed Link Block" }.first
       expect(backattr_doc['type']).to_not be_nil
       expect(backattr_doc['type']).to be_a(String)
       expect(backattr_doc['type']).to eq("block-typed")
       expect(backattr_doc['doc']).to eq(typed_block)
     end
 
-    it "adds 'foreattrs' to document" do
-      expect(typed_block.data.keys).to include("foreattrs")
+    it "adds 'attributes' to document" do
+      expect(typed_block.data.keys).to include("attributes")
     end
 
-    it "'foreattrs' includes all jekyll types -- pages, docs (posts and collections)" do
-      foreattr_doc = typed_block.data['foreattrs'].select{ |bl| bl['doc']['title'] == "Base Case A" }.first
+    it "'attributes' includes all jekyll types -- pages, docs (posts and collections)" do
+      foreattr_doc = typed_block.data['attributes'].select{ |bl| bl['doc']['title'] == "Base Case A" }.first
       expect(foreattr_doc['type']).to_not be_nil
       expect(foreattr_doc['type']).to be_a(String)
       expect(foreattr_doc['type']).to eq("block-typed")

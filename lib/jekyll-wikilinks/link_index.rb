@@ -20,9 +20,9 @@ module JekyllWikiLinks
       self.populate_links()
       # apply index info to each document
       @doc_manager.all.each do |doc|
-        doc.data['backattrs'] = @index[doc.url].backattrs
+        doc.data['attributed'] = @index[doc.url].attributed
         doc.data['backlinks'] = @index[doc.url].backlinks
-        doc.data['foreattrs'] = @index[doc.url].foreattrs
+        doc.data['attributes'] = @index[doc.url].attributes
         doc.data['forelinks'] = @index[doc.url].forelinks
       end
     end
@@ -30,11 +30,11 @@ module JekyllWikiLinks
     def populate_attributes(doc, typed_link_blocks)
       typed_link_blocks.each do |tl|
         attr_doc = @doc_manager.get_doc_by_fname(tl.filename)
-        @index[doc.url].foreattrs << {
+        @index[doc.url].attributes << {
           'type' => tl.link_type, 
           'doc' => attr_doc,
         }
-        @index[attr_doc.url].backattrs << {
+        @index[attr_doc.url].attributed << {
           'type' => tl.link_type,
           'doc' => doc,
         }
@@ -68,12 +68,12 @@ module JekyllWikiLinks
     end
 
     class LinksInfo
-      attr_accessor :backattrs, :backlinks, :foreattrs, :forelinks
+      attr_accessor :attributed, :attributes, :backlinks, :forelinks
 
       def initialize
-        @backattrs = []
+        @attributed = [] # (block-level typed forelinks)
+        @attributes = [] # (block-level typed backlinks)
         @backlinks = []
-        @foreattrs = []
         @forelinks = []
       end
     end
