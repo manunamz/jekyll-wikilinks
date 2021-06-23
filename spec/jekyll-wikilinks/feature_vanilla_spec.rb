@@ -31,6 +31,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   let(:missing_doc_many)                { find_by_title(site.collections["docs"].docs, "Missing Doc Many") }
   let(:link_whitespace_in_filename)     { find_by_title(site.collections["docs"].docs, "Link Whitespace In Filename") }
   let(:whitespace_in_filename)          { find_by_title(site.collections["docs"].docs, "Whitespace In Filename") }
+  let(:with_html)                       { find_by_title(site.collections["docs"].docs, "With HTML") }
   # header link/url fragments
   let(:link_header)                     { find_by_title(site.collections["docs"].docs, "Link Header") }
   let(:link_header_missing_doc)         { find_by_title(site.collections["docs"].docs, "Link Header Missing") }
@@ -82,6 +83,8 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(base_case_b.output).to include("base case a")
       expect(base_case_a.data['title'].downcase).to eq("base case a")
     end
+
+    # metadata attached to doc patch
 
     it "adds 'backattrs' to document" do
       expect(base_case_a.instance_variable_get(:@backattrs)).to_not be_nil
@@ -182,6 +185,24 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(link_whitespace_in_filename.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/doc/fb6bf728-948f-489e-9c9f-bb2b92677192/\">whitespace in filename</a>.</p>\n")
     end
 
+  end
+
+  context "markdown file contains html" do
+    
+    it "preserves html" do
+      expect(with_html.output).to include("<div class=\"box\">")
+      expect(with_html.output).to include("</div>")
+    end
+
+    it "handles wikilinks in html's innertext" do
+      expect(with_html.output).to_not include("[[base-case.a]]")
+      expect(with_html.output).to include("<a class=\"wiki-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>")
+    end
+    
+    it "full output" do
+      expect(with_html.output).to eq("<p>This doc has some HTML:</p>\n\n<div class=\"box\">\n  And inside is a link: <a class=\"wiki-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.\n</div>\n")
+    end
+  
   end
 
   context "when target [[wikilink]] doc does not exist" do
