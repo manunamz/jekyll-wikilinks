@@ -48,9 +48,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "'backlinks' includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(base_case_a.data['backlinks'][5]['type']).to_not be_nil
-      expect(base_case_a.data['backlinks'][5]['type']).to be_a(String)
-      expect(base_case_a.data['backlinks'][5]['doc']).to eq(typed_inline)
+      backlink_doc = base_case_a.data['backlinks'].select{ |bl| bl['doc']['title'] == "Typed Link Inline" }.first
+      expect(backlink_doc['type']).to_not be_nil
+      expect(backlink_doc['type']).to be_a(String)
+      expect(backlink_doc['type']).to eq("inline-typed")
+      expect(backlink_doc['doc']).to eq(typed_inline)
     end
 
     it "adds 'forelinks' to document" do
@@ -58,9 +60,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "'forelinks' includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(typed_inline.data['forelinks'][0]['type']).to_not be_nil
-      expect(typed_inline.data['forelinks'][0]['type']).to be_a(String)
-      expect(typed_inline.data['forelinks'][0]['doc']).to eq(base_case_a)
+      forelink_doc = typed_inline.data['forelinks'].select{ |bl| bl['doc']['title'] == "Base Case A" }.first
+      expect(forelink_doc['type']).to_not be_nil
+      expect(forelink_doc['type']).to be_a(String)
+      expect(forelink_doc['type']).to eq("inline-typed")
+      expect(forelink_doc['doc']).to eq(base_case_a)
     end
 
     it "full html" do
@@ -76,9 +80,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "'backattrs' includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(base_case_a.data['backattrs'][0]['type']).to_not be_nil
-      expect(base_case_a.data['backattrs'][0]['type']).to be_a(String)
-      expect(base_case_a.data['backattrs'][0]['doc']).to eq(typed_block)
+      backattr_doc = base_case_a.data['backattrs'].select{ |bl| bl['doc']['title'] == "Typed Link Block" }.first
+      expect(backattr_doc['type']).to_not be_nil
+      expect(backattr_doc['type']).to be_a(String)
+      expect(backattr_doc['type']).to eq("block-typed")
+      expect(backattr_doc['doc']).to eq(typed_block)
     end
 
     it "adds 'foreattrs' to document" do
@@ -86,9 +92,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "'foreattrs' includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(typed_block.data['foreattrs'][0]['type']).to_not be_nil
-      expect(typed_block.data['foreattrs'][0]['type']).to be_a(String)
-      expect(typed_block.data['foreattrs'][0]['doc']).to eq(base_case_a)
+      foreattr_doc = typed_block.data['foreattrs'].select{ |bl| bl['doc']['title'] == "Base Case A" }.first
+      expect(foreattr_doc['type']).to_not be_nil
+      expect(foreattr_doc['type']).to be_a(String)
+      expect(foreattr_doc['type']).to eq("block-typed")
+      expect(foreattr_doc['doc']).to eq(base_case_a)
     end
 
     it "full html" do
