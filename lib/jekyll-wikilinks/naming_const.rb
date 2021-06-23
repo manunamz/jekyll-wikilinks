@@ -1,5 +1,5 @@
 # naming_const.rb
-# regex constants defining valid file types and names for files, variables, or text
+# regex constants defining supported file types and valid names for files, variables, or text
 # 
 
 module JekyllWikiLinks
