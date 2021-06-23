@@ -25,7 +25,6 @@ module JekyllWikiLinks
 
     # identify missing links in doc via .invalid-wiki-link class and nested doc-text.
     REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
-    REGEX_LINK_TYPE = /<a\sclass="wiki-link(\slink-type\s(?<link-type>([^"]+)))?"\shref="(?<link-url>([^"]+))">/i
 
 		def initialize(config)
 			@config = config
