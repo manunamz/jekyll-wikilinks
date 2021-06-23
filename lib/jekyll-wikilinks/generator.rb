@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require "jekyll"
-require_relative "jekyll_adds"
+require_relative "jekyll_patch"
 require_relative "context"
 require_relative "doc_manager"
 require_relative "link_index"
