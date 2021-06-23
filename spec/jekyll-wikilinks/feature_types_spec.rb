@@ -44,23 +44,23 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   context "when inline style typed::[[wikilink]] exists" do
     
     it "adds 'backlinks' to document" do
-      expect(base_case_a.instance_variable_get(:@backlinks)).to_not be_nil
+      expect(base_case_a.data.keys).to include("backlinks")
     end
 
     it "'backlinks' includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(base_case_a.backlinks[5]['type']).to_not be_nil
-      expect(base_case_a.backlinks[5]['type']).to be_a(String)
-      expect(base_case_a.backlinks[5]['doc']).to eq(typed_inline)
+      expect(base_case_a.data['backlinks'][5]['type']).to_not be_nil
+      expect(base_case_a.data['backlinks'][5]['type']).to be_a(String)
+      expect(base_case_a.data['backlinks'][5]['doc']).to eq(typed_inline)
     end
 
     it "adds 'forelinks' to document" do
-      expect(typed_inline.instance_variable_get(:@forelinks)).to_not be_nil
+      expect(base_case_a.data.keys).to include("forelinks")
     end
 
     it "'forelinks' includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(typed_inline.forelinks[0]['type']).to_not be_nil
-      expect(typed_inline.forelinks[0]['type']).to be_a(String)
-      expect(typed_inline.forelinks[0]['doc']).to eq(base_case_a)
+      expect(typed_inline.data['forelinks'][0]['type']).to_not be_nil
+      expect(typed_inline.data['forelinks'][0]['type']).to be_a(String)
+      expect(typed_inline.data['forelinks'][0]['doc']).to eq(base_case_a)
     end
 
     it "full html" do
@@ -72,23 +72,23 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   context "when block style typed::[[wikilink]] exists" do
 
     it "adds 'backattrs' to document" do
-      expect(base_case_a.instance_variable_get(:@backattrs)).to_not be_nil
+      expect(base_case_a.data.keys).to include('backattrs')
     end
 
     it "'backattrs' includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(base_case_a.backattrs[0]['type']).to_not be_nil
-      expect(base_case_a.backattrs[0]['type']).to be_a(String)
-      expect(base_case_a.backattrs[0]['doc']).to eq(typed_block)
+      expect(base_case_a.data['backattrs'][0]['type']).to_not be_nil
+      expect(base_case_a.data['backattrs'][0]['type']).to be_a(String)
+      expect(base_case_a.data['backattrs'][0]['doc']).to eq(typed_block)
     end
 
     it "adds 'foreattrs' to document" do
-      expect(typed_block.instance_variable_get(:@foreattrs)).to_not be_nil
+      expect(typed_block.data.keys).to include("foreattrs")
     end
 
     it "'foreattrs' includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(typed_block.instance_variable_get(:@foreattrs)[0]['type']).to_not be_nil
-      expect(typed_block.instance_variable_get(:@foreattrs)[0]['type']).to be_a(String)
-      expect(typed_block.instance_variable_get(:@foreattrs)[0]['doc']).to eq(base_case_a)
+      expect(typed_block.data['foreattrs'][0]['type']).to_not be_nil
+      expect(typed_block.data['foreattrs'][0]['type']).to be_a(String)
+      expect(typed_block.data['foreattrs'][0]['doc']).to eq(base_case_a)
     end
 
     it "full html" do

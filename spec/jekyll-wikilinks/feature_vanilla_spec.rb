@@ -87,15 +87,15 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # metadata attached to doc patch
 
     it "adds 'backattrs' to document" do
-      expect(base_case_a.instance_variable_get(:@backattrs)).to_not be_nil
-      expect(base_case_a.instance_variable_get(:@backattrs)[0]['type']).to_not be_nil
-      expect(base_case_a.instance_variable_get(:@backattrs)[0]['doc']).to_not be_nil
-      expect(base_case_b.instance_variable_get(:@backattrs)).to_not be_nil
+      expect(base_case_a.data['backattrs']).to_not be_nil
+      expect(base_case_a.data['backattrs'][0]['type']).to_not be_nil
+      expect(base_case_a.data['backattrs'][0]['doc']).to_not be_nil
+      expect(base_case_b.data['backattrs']).to_not be_nil
     end
 
     it "adds 'backlinks' to document" do
-      expect(base_case_a.instance_variable_get(:@backlinks)).to_not be_nil
-      expect(base_case_b.instance_variable_get(:@backlinks)).to_not be_nil
+      expect(base_case_a.data['backlinks']).to_not be_nil
+      expect(base_case_b.data['backlinks']).to_not be_nil
     end
 
     it "'backlinks' includes all jekyll types -- pages, docs (posts and collections)" do
@@ -107,13 +107,13 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
     
     it "adds 'foreattrs' to document" do
-      expect(base_case_a.instance_variable_get(:@foreattrs)).to_not be_nil
-      expect(base_case_b.instance_variable_get(:@foreattrs)).to_not be_nil
+      expect(base_case_a.data['foreattrs']).to_not be_nil
+      expect(base_case_b.data['foreattrs']).to_not be_nil
     end
 
     it "adds 'forelinks' to document" do
-      expect(base_case_a.instance_variable_get(:@forelinks)).to_not be_nil
-      expect(base_case_b.instance_variable_get(:@forelinks)).to_not be_nil
+      expect(base_case_a.data['forelinks']).to_not be_nil
+      expect(base_case_b.data['forelinks']).to_not be_nil
     end
 
     it "'forelinks' includes all jekyll types -- pages, docs (posts and collections)" do

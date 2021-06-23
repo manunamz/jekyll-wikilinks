@@ -20,10 +20,10 @@ module JekyllWikiLinks
       self.populate_links()
       # apply index info to each document
       @doc_manager.all.each do |doc|
-        doc.backattrs = @index[doc.url].backattrs
-        doc.backlinks = @index[doc.url].backlinks
-        doc.foreattrs = @index[doc.url].foreattrs
-        doc.forelinks = @index[doc.url].forelinks
+        doc.data['backattrs'] = @index[doc.url].backattrs
+        doc.data['backlinks'] = @index[doc.url].backlinks
+        doc.data['foreattrs'] = @index[doc.url].foreattrs
+        doc.data['forelinks'] = @index[doc.url].forelinks
       end
     end
 

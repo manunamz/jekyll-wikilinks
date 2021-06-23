@@ -138,7 +138,7 @@ module JekyllWikiLinks
 				url: relative_url(doc.url),
 				label: doc.data['title'],
 			}
-			doc.backlinks.each do |bl|
+			doc.data['backlinks'].each do |bl|
         linked_doc = bl['doc']
 				if !excluded_in_graph?(linked_doc.type)
 					graph_links << {
