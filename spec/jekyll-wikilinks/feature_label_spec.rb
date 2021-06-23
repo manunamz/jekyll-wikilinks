@@ -34,8 +34,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     site.process
   end
 
-  # todo: change to :each
-  after(:all) do
+  after(:each) do
     # cleanup generated assets
     FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
     # cleanup _site/ dir
