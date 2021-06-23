@@ -2,9 +2,13 @@ module JekyllWikiLinks
   class LinkIndex
     attr_accessor :index
 
+    # Use Jekyll's native relative_url filter
+    include Jekyll::Filters::URLFilters
+
     REGEX_LINK_TYPE = /<a\sclass="wiki-link(\slink-type\s(?<link-type>([^"]+)))?"\shref="(?<link-url>([^"]+))">/i
 
-    def initialize(doc_manager)
+    def initialize(site, doc_manager)
+      @context ||= JekyllWikiLinks::Context.new(site)
       @doc_manager ||= doc_manager
       @index = {}
       @doc_manager.all.each do |doc|
@@ -52,7 +56,7 @@ module JekyllWikiLinks
         @doc_manager.all.each do |doc_to_backlink|
           doc_to_backlink.content.scan(REGEX_LINK_TYPE).each do |m|
             ltype, lurl = m[0], m[1]
-            if lurl == doc.url
+            if lurl == relative_url(doc.url)
               @index[doc.url].backlinks << {
                 'type' => ltype, 
                 'doc' => doc_to_backlink,

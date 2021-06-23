@@ -51,7 +51,7 @@ module JekyllWikiLinks
       # setup helper classes
       @doc_manager = DocManager.new(@md_docs, @site.static_files)
       @parser = Parser.new(@context, @markdown_converter, @doc_manager)
-      @link_index = LinkIndex.new(@doc_manager)
+      @link_index = LinkIndex.new(@site, @doc_manager)
       
       # parse + populate index
       @md_docs.each do |doc|
