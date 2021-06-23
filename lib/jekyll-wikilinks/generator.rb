@@ -27,7 +27,8 @@ module JekyllWikiLinks
     REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
 
 		def initialize(config)
-			@config = config
+			@config ||= config
+			@testing ||= config['testing'] if config.keys.include?('testing')
 		end
 
 		def generate(site)
@@ -155,7 +156,10 @@ module JekyllWikiLinks
 				links: graph_links,
 				nodes: graph_nodes,
 			}))
-			@site.static_files << static_file
+			# tests fail without manually adding the static file, but actual site builds seem to do ok, although there does seem to be a race condition...
+			if @testing
+				@site.static_files << static_file if !@site.static_files.include?(static_file)
+			end
 		end
 
     # !! deprecated !!

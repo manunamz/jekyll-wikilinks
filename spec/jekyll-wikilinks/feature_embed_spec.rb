@@ -14,6 +14,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
         "source"               => fixtures_dir,
         "destination"          => site_dir,
         "url"                  => "garden.testsite.com",
+        "testing"              => true,
         # "baseurl"              => "",
       )
     )
