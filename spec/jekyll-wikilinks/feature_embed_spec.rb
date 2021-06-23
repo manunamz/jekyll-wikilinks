@@ -53,8 +53,13 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(embed.output).to include("<div class=\"wiki-link-embed-link\">")
     end
 
+    it "adds a element with 'wiki-link' class" do
+      expect(embed.output).to include("<a class=\"wiki-link\" href=")
+      expect(embed.output).to include("</a>")
+    end
+
     it "full output; short" do
-      expect(embed.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Base Case A</div><div class=\"wiki-link-embed-content\"><p>This <a class=\"wiki-link\" href=\"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/\">base case b</a> has a littlecar.</p></div><div class=\"wiki-link-embed-link\"><a href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"></a></div></div>\n")
+      expect(embed.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Base Case A</div><div class=\"wiki-link-embed-content\"><p>This <a class=\"wiki-link\" href=\"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/\">base case b</a> has a littlecar.</p></div><div class=\"wiki-link-embed-link\"><a class=\"wiki-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"></a></div></div>\n")
     end
 
     it "converts/'markdownifies' nested content'" do
@@ -62,7 +67,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "full output; long" do
-      expect(embed_long.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Long Doc</div><div class=\"wiki-link-embed-content\"><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div><div class=\"wiki-link-embed-link\"><a href=\"/docs/long-doc/\"></a></div></div>\n")
+      expect(embed_long.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Long Doc</div><div class=\"wiki-link-embed-content\"><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div><div class=\"wiki-link-embed-link\"><a class=\"wiki-link\" href=\"/docs/long-doc/\"></a></div></div>\n")
     end
     
     # header fragment
