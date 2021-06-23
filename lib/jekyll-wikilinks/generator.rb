@@ -156,6 +156,7 @@ module JekyllWikiLinks
 				links: graph_links,
 				nodes: graph_nodes,
 			}))
+			@site.static_files << static_file
 		end
 
     # !! deprecated !!

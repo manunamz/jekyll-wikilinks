@@ -1,1 +1,0 @@
-This file exists is so the 'assets' dir can be saved to git.
