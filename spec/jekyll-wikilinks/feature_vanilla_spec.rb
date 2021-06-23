@@ -78,6 +78,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(base_case_b.output).to_not include(".html")
     end
 
+    it "downcases title in wikilink's rendered text" do
+      expect(base_case_b.output).to include("base case a")
+      expect(base_case_a.data['title'].downcase).to eq("base case a")
+    end
+
     it "adds 'backattrs' to document" do
       expect(base_case_a.instance_variable_get(:@backattrs)).to_not be_nil
       expect(base_case_a.instance_variable_get(:@backattrs)[0]['type']).to_not be_nil
@@ -171,9 +176,9 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # todo: page <-> post
   end
 
-  context "when target [[wikilink]] doc exists and contains whitespace" do
+  context "[[wikilink]] filename attributes" do
     
-    it "[[wikilinks]] work as expected; full output" do
+    it "may contain whitespace; full output" do
       expect(link_whitespace_in_filename.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/doc/fb6bf728-948f-489e-9c9f-bb2b92677192/\">whitespace in filename</a>.</p>\n")
     end
 
