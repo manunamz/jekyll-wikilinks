@@ -26,6 +26,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   let(:typed_inline)                    { find_by_title(site.collections["docs"].docs, "Typed Link Inline") }
   let(:typed_block)                     { find_by_title(site.collections["docs"].docs, "Typed Link Block") }
+  let(:typed_block_many)                { find_by_title(site.collections["docs"].docs, "Typed Link Block Many") }
   
   # makes markdown tests work
   subject { described_class.new(site.config) }
@@ -44,11 +45,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   context "when inline style typed::[[wikilink]] exists" do
     
-    it "adds 'backlinks' to document" do
+    it "adds 'backlinks' to linked document" do
       expect(base_case_a.data.keys).to include("backlinks")
     end
 
-    it "'backlinks' includes all jekyll types -- pages, docs (posts and collections)" do
+    it "'backlinks' has keys 'type' and 'doc', whose values are strings and jekyll docs respectively" do
       backlink_doc = base_case_a.data['backlinks'].select{ |bl| bl['doc']['title'] == "Typed Link Inline" }.first
       expect(backlink_doc['type']).to_not be_nil
       expect(backlink_doc['type']).to be_a(String)
@@ -56,11 +57,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
       expect(backlink_doc['doc']).to eq(typed_inline)
     end
 
-    it "adds 'forelinks' to document" do
+    it "adds 'forelinks' to original document" do
       expect(base_case_a.data.keys).to include("forelinks")
     end
 
-    it "'forelinks' includes all jekyll types -- pages, docs (posts and collections)" do
+    it "'forelinks' has keys 'type' and 'doc', whose values are strings and jekyll docs respectively" do
       forelink_doc = typed_inline.data['forelinks'].select{ |bl| bl['doc']['title'] == "Base Case A" }.first
       expect(forelink_doc['type']).to_not be_nil
       expect(forelink_doc['type']).to be_a(String)
@@ -76,33 +77,85 @@ RSpec.describe(JekyllWikiLinks::Generator) do
 
   context "when block style typed::[[wikilink]] exists" do
 
-    it "adds 'attributed' to document" do
+    it "adds 'attributed' to linked document" do
       expect(base_case_a.data.keys).to include('attributed')
     end
 
-    it "'attributed' includes all jekyll types -- pages, docs (posts and collections)" do
-      backattr_doc = base_case_a.data['attributed'].select{ |bl| bl['doc']['title'] == "Typed Link Block" }.first
-      expect(backattr_doc['type']).to_not be_nil
-      expect(backattr_doc['type']).to be_a(String)
-      expect(backattr_doc['type']).to eq("block-typed")
-      expect(backattr_doc['doc']).to eq(typed_block)
+    it "'attributed' has keys 'type' and 'doc', whose values are strings and jekyll docs respectively" do
+      attributed_doc = base_case_a.data['attributed'].select{ |bl| bl['doc']['title'] == "Typed Link Block" }.first
+      expect(attributed_doc['type']).to_not be_nil
+      expect(attributed_doc['type']).to be_a(String)
+      expect(attributed_doc['type']).to eq("block-typed")
+      expect(attributed_doc['doc']).to eq(typed_block)
     end
 
-    it "adds 'attributes' to document" do
+    it "adds 'attributes' to original document" do
       expect(typed_block.data.keys).to include("attributes")
     end
 
-    it "'attributes' includes all jekyll types -- pages, docs (posts and collections)" do
-      foreattr_doc = typed_block.data['attributes'].select{ |bl| bl['doc']['title'] == "Base Case A" }.first
-      expect(foreattr_doc['type']).to_not be_nil
-      expect(foreattr_doc['type']).to be_a(String)
-      expect(foreattr_doc['type']).to eq("block-typed")
-      expect(foreattr_doc['doc']).to eq(base_case_a)
+    it "'attributes' has keys 'type' and 'doc', whose values are strings and jekyll docs respectively" do
+      attributes_doc = typed_block.data['attributes'].select{ |bl| bl['doc']['title'] == "Base Case A" }.first
+      expect(attributes_doc['type']).to_not be_nil
+      expect(attributes_doc['type']).to be_a(String)
+      expect(attributes_doc['type']).to eq("block-typed")
+      expect(attributes_doc['doc']).to eq(base_case_a)
     end
 
     it "full html" do
       expect(typed_block.output).to eq("<p>This link is block typed.</p>\n\n")
     end
 
+  end
+
+  context "when there are multiple block style typed::[[wikilink]]s" do
+
+    it "adds 'attributed' to linked documents" do
+      expect(base_case_a.data.keys).to include('attributed')
+      expect(base_case_b.data.keys).to include('attributed')
+    end
+
+    it "adds 'attributes' to original document" do
+      expect(typed_block_many.data.keys).to include("attributes")
+    end
+
+    it "full html" do
+      expect(typed_block_many.output).to eq("\n<p>Add multiple block level typed wikilinks to create wikipedia-style infoboxes!</p>\n")
+    end
+
+    # first attribute
+
+    it "'attributed' has keys 'type' and 'doc', whose values are strings and jekyll docs respectively" do
+      attributed_doc = base_case_a.data['attributed'].select{ |bl| bl['doc']['title'] == "Typed Link Block Many" }.first
+      expect(attributed_doc['type']).to_not be_nil
+      expect(attributed_doc['type']).to be_a(String)
+      expect(attributed_doc['type']).to eq("block-typed")
+      expect(attributed_doc['doc']).to eq(typed_block_many)
+    end
+
+    it "'attributes' has keys 'type' and 'doc', whose values are strings and jekyll docs respectively" do
+      attributes_doc = typed_block_many.data['attributes'].select{ |bl| bl['doc']['title'] == "Base Case A" }.first
+      expect(attributes_doc['type']).to_not be_nil
+      expect(attributes_doc['type']).to be_a(String)
+      expect(attributes_doc['type']).to eq("block-typed")
+      expect(attributes_doc['doc']).to eq(base_case_a)
+    end
+
+    # second attribute
+
+    it "'attributed' has keys 'type' and 'doc', whose values are strings and jekyll docs respectively" do
+      attributed_doc = base_case_b.data['attributed'].select{ |bl| bl['doc']['title'] == "Typed Link Block Many" }.first
+      expect(attributed_doc['type']).to_not be_nil
+      expect(attributed_doc['type']).to be_a(String)
+      expect(attributed_doc['type']).to eq("another-block-typed")
+      expect(attributed_doc['doc']).to eq(typed_block_many)
+    end
+
+    it "'attributes' has keys 'type' and 'doc', whose values are strings and jekyll docs respectively" do
+      attributes_doc = typed_block_many.data['attributes'].select{ |bl| bl['doc']['title'] == "Base Case B" }.first
+      expect(attributes_doc['type']).to_not be_nil
+      expect(attributes_doc['type']).to be_a(String)
+      expect(attributes_doc['type']).to eq("another-block-typed")
+      expect(attributes_doc['doc']).to eq(base_case_b)
+    end
   end
 end

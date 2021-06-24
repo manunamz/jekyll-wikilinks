@@ -16,9 +16,9 @@ module JekyllWikiLinks
       (#{REGEX_LINK_LABEL}#{REGEX_LABEL_TXT})?
     \]\]
   }x
-  REGEX_TYPED_LINK_BLOCK = /\n#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\[\[#{REGEX_FILENAME}\]\]\n/i
+  REGEX_TYPED_LINK_BLOCK = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\[\[#{REGEX_FILENAME}\]\]\n/i
 
-  # it's not a parser, but a "parser"...for now...
+  # more of a "parser" than a parser
   class Parser
     attr_accessor :doc_manager, :markdown_converter, :wikilinks, :typed_link_blocks
 
@@ -36,7 +36,7 @@ module JekyllWikiLinks
       @typed_link_blocks, @wikilinks = [], []
       # process blocks
       typed_link_block_matches = doc_content.scan(REGEX_TYPED_LINK_BLOCK)
-      if !typed_link_block_matches.nil? && typed_link_block_matches.size != 0 
+      if !typed_link_block_matches.nil? && typed_link_block_matches.size != 0
         typed_link_block_matches.each do |wl_match|
           typed_link_block_wikilink = WikiLink.new(
             nil,
