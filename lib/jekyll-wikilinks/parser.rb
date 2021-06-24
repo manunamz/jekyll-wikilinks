@@ -84,9 +84,7 @@ module JekyllWikiLinks
           "<div class=\"wiki-link-embed-content\">",
             "#{@markdown_converter.convert(content)}",
           "</div>",
-          "<div class=\"wiki-link-embed-link\">",
-            "<a class=\"wiki-link\" href=\"#{url}\"></a>",
-          "</div>",
+          "<a class=\"wiki-link-embed-link\" href=\"#{url}\"></a>",
         "</div>",
       ].join("\n").gsub!("\n", "")
     end
