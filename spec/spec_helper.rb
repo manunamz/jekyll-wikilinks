@@ -42,6 +42,8 @@ RSpec.configure do |config|
     JSON.parse(graph_file)
   end
 
+  # TODO: write better graph data getters
+
   def get_graph_node()
     graph_file = File.read(site_dir("/assets/graph-net-web.json"))
     JSON.parse(graph_file)["nodes"].find { |n| n["id"] == "/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/" } # "Base Case A"
@@ -50,7 +52,7 @@ RSpec.configure do |config|
   def get_graph_link_match_source()
     graph_file = File.read(site_dir("/assets/graph-net-web.json"))
     all_links = JSON.parse(graph_file)["links"]
-    target_link = all_links.find_all { |l| l["source"] == "/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/" } # "Base Case A" as source
+    target_link = all_links.find_all { |l| l["source"] == "/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/" && l["target"] == "/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/" } # link "Base Case A" -> "Base Case B"
     if target_link.size > 1
       raise "Expected only one link with 'source' as \"One Fish\" note to exist."
     else

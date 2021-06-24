@@ -138,8 +138,10 @@ module JekyllWikiLinks
 				url: relative_url(doc.url),
 				label: doc.data['title'],
 			}
-			doc.data['backlinks'].each do |bl|
-        linked_doc = bl['doc']
+			# TODO: this link calculation ends up with duplicates -- re-visit this later.
+			all_links = doc.data['attributes'] + doc.data['backlinks']
+			all_links.each do |link|
+        linked_doc = link['doc']
 				if !excluded_in_graph?(linked_doc.type)
 					graph_links << {
 						source: relative_url(linked_doc.url),
