@@ -18,6 +18,7 @@ wikilinks:
 d3_graph_data:
   enabled: true
   exclude: []
+  assets_rel_path: "/assets"
 ```
 
 The `enable` flags may be toggled to turn off the plugin or turn off `d3_graph_data` generation. Any jekyll type ("pages", "posts", or collection names such as "docs" or "notes") may be added to a list of `exclude`s for either wikilinks or graph generation.
@@ -149,6 +150,8 @@ Graph data is generated and output to a `.json` file in your `/assets` directory
   ]
 }
 ```
+
+`links` are built from `backlinks` and `attributes` (❗️Should be `attributed`, this has been fixed and will be released in the next version❗️).
 
 I've created a gist [here](https://gist.github.com/manunamz/3222e73c6b7eaef3a677a26e8f177466) of a working network graph using d3 version 6. You can see in action [here](https://manunamz.github.io/jekyll-bonsai/) (just click the 🕸 in the top-left to toggle it on).
 
