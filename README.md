@@ -118,7 +118,7 @@ Say you want to display 'post' backlinks and 'note' backlinks separately. Just f
 {% endfor %}
 ```
 
-The same should work for link types:
+The same setup works for link types:
 
 ```
 <!-- show note backlink titles -->
