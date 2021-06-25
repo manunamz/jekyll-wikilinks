@@ -22,6 +22,7 @@ module JekyllWikiLinks
 		GRAPH_DATA_KEY = "d3_graph_data"
 		ENABLED_GRAPH_DATA_KEY = "enabled"
 		EXCLUDE_GRAPH_KEY = "exclude"
+		GRAPH_ASSETS_LOCATION_KEY = "assets_rel_path"
 
     # identify missing links in doc via .invalid-wiki-link class and nested doc-text.
     REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
@@ -82,6 +83,10 @@ module JekyllWikiLinks
 		def excluded_in_graph?(type)
 			return false unless option_graph(EXCLUDE_KEY)
 			return option_graph(EXCLUDE_KEY).include?(type.to_s)
+		end
+
+		def has_custom_assets_path?
+			return !!option_graph(GRAPH_ASSETS_LOCATION_KEY)
 		end
 
 		def markdown_extension?(extension)
@@ -152,13 +157,19 @@ module JekyllWikiLinks
 		end
 
 		def write_graph_data()
+			assets_path = has_custom_assets_path? ? option_graph(GRAPH_ASSETS_LOCATION_KEY) : "/assets"
+			if !File.directory?(File.join(site.source, assets_path))
+				Jekyll.logger.error "Assets location does not exist, please create required directories for path: ", assets_path
+			end
 			# from: https://github.com/jekyll/jekyll/issues/7195#issuecomment-415696200
-			static_file = Jekyll::StaticFile.new(site, site.source, "/assets", "graph-net-web.json")
+			static_file = Jekyll::StaticFile.new(site, site.source, assets_path, "graph-net-web.json")
+			# TODO: make write file location more flexible -- requiring a write location configuration feels messy...
 			File.write(@site.source + static_file.relative_path, JSON.dump({
 				links: graph_links,
 				nodes: graph_nodes,
 			}))
-			# tests fail without manually adding the static file, but actual site builds seem to do ok, although there does seem to be a race condition...
+			# tests fail without manually adding the static file, but actual site builds seem to do ok
+			# ...although there does seem to be a race condition which causes a rebuild to be necessary in order to detect the graph data file
 			if @testing
 				@site.static_files << static_file if !@site.static_files.include?(static_file)
 			end

@@ -30,7 +30,7 @@ RSpec.configure do |config|
   end
 
   def find_generated_file(relative_path)
-    fixtures_dir("assets/graph-net-web.json")
+    fixtures_dir(relative_path)
   end
 
   def find_static_file(relative_path)
