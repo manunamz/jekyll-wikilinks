@@ -70,7 +70,7 @@ The `enable` flags may be toggled to turn off the plugin or turn off `d3_graph_d
     - `[[filename|label text]]`
     - `[[filename#header|label text]]`
     - `[[filename#^block_id|label text]]`
-  - 🐛 KNOWN-BUG: Square brackets currently do not work in label text (e.g. `[[filename|this [won't] work]]`).
+  - [🐛 KNOWN-BUG](https://github.com/manunamz/jekyll-wikilinks/issues/17): Square brackets currently do not work in label text (e.g. `[[filename|this [won't] work]]`).
   - HTML: `<a class="wiki-link" href="doc_url">label text</a>`
 - Typed wikilinks: `link_type::[[filename]]`
   - Types should not contain whitespace. (kabob-case is recommended, but snake_case and camelCase will work too)
