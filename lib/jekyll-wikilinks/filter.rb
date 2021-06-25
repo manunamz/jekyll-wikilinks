@@ -37,5 +37,3 @@ module JekyllWikiLinks
     end
   end
 end
-
-Liquid::Template.register_filter(JekyllWikiLinks::TypeFilters)
