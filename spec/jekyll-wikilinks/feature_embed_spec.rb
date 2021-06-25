@@ -4,21 +4,8 @@ require "jekyll-wikilinks"
 require "spec_helper"
 
 RSpec.describe(JekyllWikiLinks::Generator) do
+  include_context "shared jekyll configs"
   let(:config_overrides) { {} }
-  let(:config) do
-    Jekyll.configuration(
-      config_overrides.merge(
-        "collections"          => { "docs" => { "output" => true } },
-        "permalink"            => "pretty",
-        "skip_config_files"    => false,
-        "source"               => fixtures_dir,
-        "destination"          => site_dir,
-        "url"                  => "garden.testsite.com",
-        "testing"              => true,
-        # "baseurl"              => "",
-      )
-    )
-  end
   let(:site)                            { Jekyll::Site.new(config) }
   
   let(:embed)                           { find_by_title(site.collections["docs"].docs, "Embed") }
