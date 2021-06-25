@@ -45,9 +45,8 @@ module JekyllWikiLinks
       # setup markdown docs
 			docs = []
 			docs += site.pages if !exclude?(:pages)
-			included_docs = site.docs_to_write.filter { |d| !exclude?(d.type) }
-			docs += included_docs
-			@md_docs = docs.select {|doc| markdown_extension?(doc.extname) }
+			docs += site.docs_to_write.filter { |d| !exclude?(d.type) }
+			@md_docs = docs.filter {|doc| markdown_extension?(doc.extname) }
       
       # setup helper classes
       @doc_manager = DocManager.new(@md_docs, @site.static_files)
@@ -75,14 +74,13 @@ module JekyllWikiLinks
 
 		# config helpers
 
+		def disabled?
+			option(ENABLED_KEY) == false
+		end
+
 		def exclude?(type)
 			return false unless option(EXCLUDE_KEY)
 			return option(EXCLUDE_KEY).include?(type.to_s)
-		end
-
-		def excluded_in_graph?(type)
-			return false unless option_graph(EXCLUDE_KEY)
-			return option_graph(EXCLUDE_KEY).include?(type.to_s)
 		end
 
 		def has_custom_assets_path?
@@ -101,19 +99,22 @@ module JekyllWikiLinks
 			config[CONFIG_KEY] && config[CONFIG_KEY][key]
 		end
 
-		def option_graph(key)
-			config[GRAPH_DATA_KEY] && config[GRAPH_DATA_KEY][key]
-		end
-
-		def disabled?
-			option(ENABLED_KEY) == false
-		end
+		# graph config helpers
 
 		def disabled_graph_data?
 			option_graph(ENABLED_GRAPH_DATA_KEY) == false
 		end
 
-		# graph
+		def excluded_in_graph?(type)
+			return false unless option_graph(EXCLUDE_KEY)
+			return option_graph(EXCLUDE_KEY).include?(type.to_s)
+		end
+
+		def option_graph(key)
+			config[GRAPH_DATA_KEY] && config[GRAPH_DATA_KEY][key]
+		end
+
+		# graph helpers
 
 		def generate_graph_data(doc)
 			Jekyll.logger.debug "Processing graph nodes for doc: ", doc.data['title']
