@@ -151,7 +151,7 @@ Graph data is generated and output to a `.json` file in your `/assets` directory
 }
 ```
 
-`links` are built from `backlinks` and `attributes` (❗️Should be `attributed`, this has been fixed and will be released in the next version❗️).
+`links` are built from `backlinks` and `attributed`.
 
 I've created a gist [here](https://gist.github.com/manunamz/3222e73c6b7eaef3a677a26e8f177466) of a working network graph using d3 version 6. You can see in action [here](https://manunamz.github.io/jekyll-bonsai/) (just click the 🕸 in the top-left to toggle it on).
 
