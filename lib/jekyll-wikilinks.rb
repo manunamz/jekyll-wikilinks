@@ -150,7 +150,7 @@ module JekyllWikiLinks
 				label: doc.data['title'],
 			}
 			# TODO: this link calculation ends up with duplicates -- re-visit this later.
-			all_links = doc.data['attributes'] + doc.data['backlinks']
+			all_links = doc.data['attributed'] + doc.data['backlinks']
 			all_links.each do |link|
         linked_doc = link['doc']
 				if !excluded_in_graph?(linked_doc.type)
