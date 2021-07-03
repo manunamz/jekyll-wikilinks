@@ -46,11 +46,11 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     end
 
     it "converts/'markdownifies' nested content'" do
-      expect(embed_long.output).to include("<div class=\"wiki-link-embed-content\"><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div>")
+      expect(embed_long.output).to include("<div class=\"wiki-link-embed-content\"><h1 id=\"a-long-document\">A Long Document</h1><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div>")
     end
 
     it "full output; long" do
-      expect(embed_long.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Long Doc</div><div class=\"wiki-link-embed-content\"><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div><a class=\"wiki-link-embed-link\" href=\"/docs/long-doc/\"></a></div>\n")
+      expect(embed_long.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Long Doc</div><div class=\"wiki-link-embed-content\"><h1 id=\"a-long-document\">A Long Document</h1><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div><a class=\"wiki-link-embed-link\" href=\"/docs/long-doc/\"></a></div>\n")
     end
     
     # header fragment

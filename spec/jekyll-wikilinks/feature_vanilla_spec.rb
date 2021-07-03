@@ -23,6 +23,7 @@ RSpec.describe(JekyllWikiLinks::Generator) do
   # header link/url fragments
   let(:link_header)                     { find_by_title(site.collections["docs"].docs, "Link Header") }
   let(:link_header_missing_doc)         { find_by_title(site.collections["docs"].docs, "Link Header Missing") }
+  let(:link_header_whitespace)          { find_by_title(site.collections["docs"].docs, "Link Header Whitespace") }
   # block link
   let(:link_block)                      { find_by_title(site.collections["docs"].docs, "Link Block") }
 
@@ -167,10 +168,18 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     # todo: page <-> post
   end
 
-  context "[[wikilink]] filename attributes" do
+  context "with regard to whitespace" do
     
-    it "may contain whitespace; full output" do
+    it "wikilinked filenames may contain whitespace; full output" do
       expect(link_whitespace_in_filename.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/doc/fb6bf728-948f-489e-9c9f-bb2b92677192/\">whitespace in filename</a>.</p>\n")
+    end
+
+    it "header text containing whitespace is sluggified for url fragments" do
+      expect(link_header_whitespace.output).to include("href=\"/docs/long-doc/#a-long-document\"")
+    end
+
+    it "header text containing whitespace; full output" do
+      expect(link_header_whitespace.output).to eq("<p>This doc contains a link to a header <a class=\"wiki-link\" href=\"/docs/long-doc/#a-long-document\">long doc &gt; A Long Document</a>.</p>\n")
     end
 
   end

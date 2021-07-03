@@ -1,6 +1,7 @@
 ---
 title: Long Doc
 ---
+# A Long Document
 # One
 - a
 - b

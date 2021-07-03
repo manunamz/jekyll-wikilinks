@@ -120,7 +120,8 @@ module JekyllWikiLinks
             lnk_doc_rel_url
           ) if wikilink.embedded?
 				elsif (link_lvl == "header" && DocManager.doc_has_header?(linked_doc, wikilink.header_txt))
-					lnk_doc_rel_url += "\#" + wikilink.header_txt.downcase
+          # from: https://github.com/jekyll/jekyll/blob/6855200ebda6c0e33f487da69e4e02ec3d8286b7/Rakefile#L74
+					lnk_doc_rel_url += "\#" + Jekyll::Utils.slugify(wikilink.header_txt)
 					wikilink_inner_txt = "#{fname_inner_txt} > #{wikilink.header_txt}" if wikilink_inner_txt.nil?
 				elsif (link_lvl == "block" && DocManager.doc_has_block_id?(linked_doc, wikilink.block_id))
 					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
@@ -134,7 +135,7 @@ module JekyllWikiLinks
 			end
 		end
   end
-  
+
   # the wikilink class knows everything about the original markdown syntax and its semantic meaning
   class WikiLink
     attr_accessor :embed, :link_type, :filename, :header_txt, :block_id, :label_txt
