@@ -18,7 +18,7 @@ wikilinks:
 d3_graph_data:
   enabled: true
   exclude: []
-  assets_rel_path: "/assets"
+  path: "/assets"
 ```
 
 The `enable` flags may be toggled to turn off the plugin or turn off `d3_graph_data` generation. Any jekyll type ("pages", "posts", or collection names such as "docs" or "notes") may be added to a list of `exclude`s for either wikilinks or graph generation.
