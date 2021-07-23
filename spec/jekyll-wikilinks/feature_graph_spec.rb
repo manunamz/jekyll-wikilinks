@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "jekyll"
+
 require "jekyll-wikilinks"
 require "spec_helper"
 
@@ -34,124 +34,145 @@ RSpec.describe(JekyllWikiLinks::Generator) do
     FileUtils.rm_rf(Dir["#{site_dir()}"])
   end
 
-  context "when target [[wikilink]] doc exists" do
+  context "graph" do
 
-    it "generates graph data" do
-      expect(graph_generated_fpath).to eq(File.join(fixtures_dir, "/assets/graph-net-web.json"))
-      expect(graph_static_file).to be_a(Jekyll::StaticFile)
-      expect(graph_static_file.relative_path).not_to be(nil)
-      expect(graph_data.class).to be(Hash)
+    context "config" do
+
+      context "when disabled" do
+        let(:config_overrides) { { "d3_graph_data" => { "enabled" => false } } }
+        
+        it "does not generate graph data" do
+          expect { File.read("#{fixtures_dir("/assets/graph-net-web.json")}") }.to raise_error(Errno::ENOENT)
+          expect { File.read("#{site_dir("/assets/graph-net-web.json")}") }.to raise_error(Errno::ENOENT)
+        end
+
+      end
+
+      context "when certain jekyll types are excluded" do
+        let(:config_overrides) { { "d3_graph_data" => { "exclude" => ["pages", "posts"] } } }
+
+        it "does not generate graph data for those jekyll types" do
+          expect(graph_data["nodes"].find { |n| n["title"] == "One Page" }).to eql(nil)
+          expect(graph_data["nodes"].find { |n| n["title"] == "One Post" }).to eql(nil)
+
+          expect(graph_data["links"].find { |n| n["source"] == "One Page" }).to eql(nil)
+          expect(graph_data["links"].find { |n| n["source"] == "One Post" }).to eql(nil)
+        end
+
+      end
+
+      context "when assets location is set" do
+        let(:config_overrides) { { "d3_graph_data" => { "path" => "/custom_assets_path" } } }
+
+        before(:context) do
+          assets_path = File.join(fixtures_dir, "custom_assets_path")
+          Dir.mkdir(assets_path)
+        end
+
+        after(:context) do
+          # cleanup generated assets
+          FileUtils.rm_rf(Dir["#{fixtures_dir("/custom_assets_path/graph-net-web.json")}"])
+          FileUtils.rm_rf(Dir["#{fixtures_dir("/custom_assets_path")}"])
+        end
+
+        it "writes graph file to custom location" do
+          expect(find_generated_file("/custom_assets_path/graph-net-web.json")).to eq(File.join(fixtures_dir, "/custom_assets_path/graph-net-web.json"))
+          expect(find_static_file("/custom_assets_path/graph-net-web.json")).to be_a(Jekyll::StaticFile)
+          expect(find_static_file("/custom_assets_path/graph-net-web.json").relative_path).to eq"/custom_assets_path/graph-net-web.json"
+        end
+      end
+
     end
 
-    it "generated graph data contains nodes of format: { nodes: [ {id: '', url: '', label: ''}, ... ] }" do
-      expect(graph_node.keys).to include("id")
-      expect(graph_node.keys).to include("url")
-      expect(graph_node.keys).to include("label")
-    end
+    context "default behavior" do
 
-    it "nodes' 'id's equal their url (since urls should be unique)" do
-      expect(graph_node["id"]).to eq(graph_node["url"])
-    end
+      it "generates graph data" do
+        expect(graph_generated_fpath).to eq(File.join(fixtures_dir, "/assets/graph-net-web.json"))
+        expect(graph_static_file).to be_a(Jekyll::StaticFile)
+        expect(graph_static_file.relative_path).not_to be(nil)
+        expect(graph_data.class).to be(Hash)
+      end
 
-    it "nodes' 'label's equal their doc title" do
-      expect(graph_node["label"]).to eq(base_case_a.data["title"])
-    end
+      context "when target [[wikilink]] doc exists" do
 
-    it "nodes' 'url's equal their doc urls" do
-      expect(graph_node["url"]).to eq(base_case_a.url)
-    end
+        context "node" do
 
-    it "generated graph data contains links of format: { links: [ { source: '', target: ''}, ... ] }" do
-      expect(graph_link.keys).to include("source")
-      expect(graph_link.keys).to include("target")
-    end
+          it "format: { nodes: [ {id: '', url: '', label: ''}, ... ] }" do
+            expect(graph_node.keys).to include("id")
+            expect(graph_node.keys).to include("url")
+            expect(graph_node.keys).to include("label")
+          end
 
-    it "links' 'source' and 'target' attributes equal some nodes' id" do
-      expect(graph_link["source"]).to eq(graph_node["id"])
-      expect(graph_link["target"]).to eq("/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/")
-    end
+          it "'id' equals their url (since urls should be unique)" do
+            expect(graph_node["id"]).to eq(graph_node["url"])
+          end
 
-  end
+          it "'label' equal their doc title" do
+            expect(graph_node["label"]).to eq(base_case_a.data["title"])
+          end
 
-  context "when target [[wikilink]] doc does not exist" do
+          it "'url's equal their doc urls" do
+            expect(graph_node["url"]).to eq(base_case_a.url)
+          end
+        end
 
-    it "generates graph data" do
-      expect(graph_generated_fpath).to eq(File.join(fixtures_dir, "/assets/graph-net-web.json"))
-      expect(graph_static_file).to be_a(Jekyll::StaticFile)
-      expect(graph_static_file.relative_path).not_to be(nil)
-      expect(graph_data.class).to be(Hash)
-    end
+        context "link" do
 
-    it "generated graph data contains nodes of format: { nodes: [ {id: '', url: '', label: ''}, ... ] }" do
-      expect(missing_link_graph_node.keys).to include("id")
-      expect(missing_link_graph_node.keys).to include("url")
-      expect(missing_link_graph_node.keys).to include("label")
-    end
+          it "format: { links: [ { source: '', target: ''}, ... ] }" do
+            expect(graph_link.keys).to include("source")
+            expect(graph_link.keys).to include("target")
+          end
 
-    it "nodes' 'id's equal their url (since urls should be unique)" do
-      expect(missing_link_graph_node["id"]).to eq(missing_link_graph_node["url"])
-    end
+          it "'source' and 'target' attributes equal some nodes' id" do
+            expect(graph_link["source"]).to eq(graph_node["id"])
+            expect(graph_link["target"]).to eq("/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/")
+          end
 
-    it "nodes' 'label's equal their doc title" do
-      expect(missing_link_graph_node["label"]).to eq(missing_doc.data["title"])
-    end
+        end
 
-    it "nodes' 'url's equal their doc urls" do
-      expect(missing_link_graph_node["url"]).to eq(missing_doc.url)
-    end
+      end
 
-    it "generated graph data contains links of format: { links: [ { source: '', target: ''}, ... ] }" do
-      expect(missing_target_graph_link.keys).to include("source")
-      expect(missing_target_graph_link.keys).to include("target")
-    end
+      context "when target [[wikilink]] doc does not exist" do
 
-    it "links' missing 'target' equals the [[wikitext]] in brackets." do
-      expect(missing_target_graph_link["target"]).to eq("no.doc")
+        it "generated graph data contains nodes of format: { nodes: [ {id: '', url: '', label: ''}, ... ] }" do
+          expect(missing_link_graph_node.keys).to include("id")
+          expect(missing_link_graph_node.keys).to include("url")
+          expect(missing_link_graph_node.keys).to include("label")
+        end
+
+        context "node" do
+
+          it "'id's equal their url (since urls should be unique)" do
+            expect(missing_link_graph_node["id"]).to eq(missing_link_graph_node["url"])
+          end
+
+          it "'label's equal their doc title" do
+            expect(missing_link_graph_node["label"]).to eq(missing_doc.data["title"])
+          end
+
+          it "'url's equal their doc urls" do
+            expect(missing_link_graph_node["url"]).to eq(missing_doc.url)
+          end
+
+        end
+
+        context "link" do
+
+          it "format: { links: [ { source: '', target: ''}, ... ] }" do
+            expect(missing_target_graph_link.keys).to include("source")
+            expect(missing_target_graph_link.keys).to include("target")
+          end
+
+          it "missing 'target' equals the [[wikitext]] in brackets." do
+            expect(missing_target_graph_link["target"]).to eq("no.doc")
+          end
+
+        end
+      
+      end
+
     end
   
   end
 
-  context "when graph is disabled in configs" do
-    let(:config_overrides) { { "d3_graph_data" => { "enabled" => false } } }
-    
-    it "does not generate graph data" do
-      expect { File.read("#{fixtures_dir("/assets/graph-net-web.json")}") }.to raise_error(Errno::ENOENT)
-      expect { File.read("#{site_dir("/assets/graph-net-web.json")}") }.to raise_error(Errno::ENOENT)
-    end
-
-  end
-
-  context "when certain jekyll types are excluded in graph configs" do
-    let(:config_overrides) { { "d3_graph_data" => { "exclude" => ["pages", "posts"] } } }
-
-    it "does not generate graph data for those jekyll types" do
-      expect(graph_data["nodes"].find { |n| n["title"] == "One Page" }).to eql(nil)
-      expect(graph_data["nodes"].find { |n| n["title"] == "One Post" }).to eql(nil)
-
-      expect(graph_data["links"].find { |n| n["source"] == "One Page" }).to eql(nil)
-      expect(graph_data["links"].find { |n| n["source"] == "One Post" }).to eql(nil)
-    end
-
-  end
-
-  context "when graph assets location is set" do
-    let(:config_overrides) { { "d3_graph_data" => { "assets_rel_path" => "/custom_assets_path" } } }
-
-    before(:context) do
-      assets_path = File.join(fixtures_dir, "custom_assets_path")
-      Dir.mkdir(assets_path)
-    end
-
-    after(:context) do
-      # cleanup generated assets
-      FileUtils.rm_rf(Dir["#{fixtures_dir("/custom_assets_path/graph-net-web.json")}"])
-      FileUtils.rm_rf(Dir["#{fixtures_dir("/custom_assets_path")}"])
-    end
-
-    it "writes graph file to custom location" do
-      expect(find_generated_file("/custom_assets_path/graph-net-web.json")).to eq(File.join(fixtures_dir, "/custom_assets_path/graph-net-web.json"))
-      expect(find_static_file("/custom_assets_path/graph-net-web.json")).to be_a(Jekyll::StaticFile)
-      expect(find_static_file("/custom_assets_path/graph-net-web.json").relative_path).to eq"/custom_assets_path/graph-net-web.json"
-    end
-  end
 end
