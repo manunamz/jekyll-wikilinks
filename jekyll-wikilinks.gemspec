@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["manunamz"]
   spec.email         = ["manunamz@pm.me"]
 
-  spec.summary       = "Add jekyll support for [[wikilinks]] (in markdown)."
+  spec.summary       = "Add jekyll support for [[wikilinks]] (in markdown files)."
   # spec.description   = "TODO: Write a longer description or delete this line."
   spec.homepage      = "https://github.com/manunamz/jekyll-wikilinks"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/manunamz/jekyll-wikilinks"
-  # spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
+  spec.metadata["changelog_uri"] = "https://github.com/manunamz/jekyll-wikilinks/blob/main/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.

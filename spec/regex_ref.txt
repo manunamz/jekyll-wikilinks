@@ -1,4 +1,4 @@
-If parsing has bugs, test on https://rubular.com/ with the one-liner from wikilinks.rb and the below info:
+If parsing has bugs, test on https://rubular.com/ with the regex from parser.rb and the below info:
 
 test text:
 ----------

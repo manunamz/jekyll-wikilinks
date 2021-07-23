@@ -3,7 +3,6 @@ require "json"
 require "jekyll"
 require "jekyll-wikilinks"
 
-
 Jekyll.logger.log_level = :error
 
 RSpec.configure do |config|
@@ -70,7 +69,7 @@ RSpec.configure do |config|
     all_links = JSON.parse(graph_file)["links"]
     target_link = all_links.find_all { |l| l["source"] == "/doc/a2157bb4-d3a6-4301-8984-b267074c45f3/" } # "Missing Doc" link as source
     if target_link.size > 1
-      raise "Expected only one link with 'source' as \"None Fish\" note to exist."
+      raise "Expected only one link with 'source' as \"Missing Doc\" note to exist."
     else
       return target_link[0]
     end
