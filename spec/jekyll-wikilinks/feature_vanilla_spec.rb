@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "jekyll"
+
 require "jekyll-wikilinks"
 require "spec_helper"
 
