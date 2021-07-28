@@ -3,7 +3,7 @@
 require "jekyll-wikilinks"
 require "spec_helper"
 
-RSpec.describe(JekyllWikiLinks::TypeFilters) do
+RSpec.describe(Jekyll::WikiLinks::TypeFilters) do
   let(:doc)        { instance_double("Document", :collection => "docs", :content => "a document", :title=> "A Document") }
   let(:post)       { instance_double("Document", :collection => "posts", :content => "a post", :title=>"A Post") }
   let(:page)       { instance_double("Page", :relative_path => "_pages/a-page.md", :content => "a page", :title=>"A Page") }

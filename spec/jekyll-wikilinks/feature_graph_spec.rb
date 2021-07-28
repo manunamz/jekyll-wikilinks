@@ -3,7 +3,7 @@
 require "jekyll-wikilinks"
 require "spec_helper"
 
-RSpec.describe(JekyllWikiLinks::Generator) do
+RSpec.describe(Jekyll::WikiLinks::Generator) do
   include_context "shared jekyll configs"
   let(:config_overrides) { {} }
   let(:site)                            { Jekyll::Site.new(config) }

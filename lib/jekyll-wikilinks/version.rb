@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
-module JekyllWikiLinks
-  VERSION = "0.0.6"
+module Jekyll
+  module WikiLinks
+
+    VERSION = "0.0.6"
+    
+  end
 end

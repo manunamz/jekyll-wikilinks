@@ -4,7 +4,7 @@ require_relative "lib/jekyll-wikilinks/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "jekyll-wikilinks"
-  spec.version       = JekyllWikiLinks::VERSION
+  spec.version       = Jekyll::WikiLinks::VERSION
   spec.authors       = ["manunamz"]
   spec.email         = ["manunamz@pm.me"]
 
