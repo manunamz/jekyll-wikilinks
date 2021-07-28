@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   # spec.description   = "TODO: Write a longer description or delete this line."
   spec.homepage      = "https://github.com/manunamz/jekyll-wikilinks"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
-  spec.licenses      = ["MIT"]
+  spec.licenses      = ["GPL3"]
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
 
