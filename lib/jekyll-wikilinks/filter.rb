@@ -12,7 +12,7 @@ module Jekyll
         return if links.nil?
         target_links = []
         links.each do |l|
-          target_links << l if self.to_string(l['doc'].type) == doc_type.to_str
+          target_links << l if l['doc'].type.to_str == doc_type.to_str
         end
         return target_links.uniq
       end
@@ -23,20 +23,11 @@ module Jekyll
         return if links.nil?
         target_links = []
         link.each do |l|
-          target_links << l if self.to_string(l['type'].to_str) == link_type.to_str
+          target_links << l if l['type'].to_str == link_type.to_str
         end
         return target_links.uniq
       end
 
-      def to_string(type)
-        return type if type.is_a?(String)
-        type = type.to_s
-        begin
-          String(type)
-        rescue ::ArgumentError
-          raise ArgumentError, "invalid type"
-        end
-      end
     end
     
   end

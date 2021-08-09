@@ -157,7 +157,7 @@ module Jekyll
         @label_txt ||= label_txt
       end
 
-      # labeles are really flexible, so we need to handle them with a bit more care
+      # labels are really flexible, so we need to handle them with a bit more care
       def clean_label_txt
         return @label_txt.sub("[", "\\[").sub("]", "\\]")
       end
