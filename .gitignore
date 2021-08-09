@@ -1,6 +1,16 @@
 .bundle
 *.gem
 Gemfile.lock
+
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+
 spec/fixtures/_site
 spec/*fixtures/**/.jekyll-cache
-vendor/bundle
+# rspec failure tracking
+.rspec_status
