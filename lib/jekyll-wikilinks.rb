@@ -13,6 +13,7 @@ Liquid::Template.register_filter(Jekyll::WikiLinks::TypeFilters)
 
 module Jekyll
   module WikiLinks
+
     class Generator < Jekyll::Generator
       attr_accessor :site, :config, :md_docs, :doc_manager, :link_index, :parser, :graph_nodes, :graph_links
 
@@ -50,8 +51,8 @@ module Jekyll
         
         # setup markdown docs
         docs = []
-        docs += site.pages if !exclude?(:pages)
-        docs += site.docs_to_write.filter { |d| !exclude?(d.type) }
+        docs += @site.pages if !exclude?(:pages)
+        docs += @site.docs_to_write.filter { |d| !exclude?(d.type) }
         @md_docs = docs.filter {|doc| markdown_extension?(doc.extname) }
         
         # setup helper classes
@@ -94,11 +95,11 @@ module Jekyll
       end
 
       def markdown_converter
-        @markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
+        @markdown_converter ||= @site.find_converter_instance(CONVERTER_CLASS)
       end
 
       def option(key)
-        config[CONFIG_KEY] && config[CONFIG_KEY][key]
+        @config[CONFIG_KEY] && @config[CONFIG_KEY][key]
       end
 
       # graph config helpers
@@ -117,7 +118,7 @@ module Jekyll
       end
 
       def option_graph(key)
-        config[GRAPH_DATA_KEY] && config[GRAPH_DATA_KEY][key]
+        @config[GRAPH_DATA_KEY] && @config[GRAPH_DATA_KEY][key]
       end
 
       # graph helpers
@@ -132,20 +133,20 @@ module Jekyll
             if graph_nodes.none? { |node| node[:id] == missing_node_name }
               Jekyll.logger.warn "Net-Web node missing: ", missing_node_name
               Jekyll.logger.warn " in: ", doc.data['slug']  
-              graph_nodes << {
+              @graph_nodes << {
                 id: missing_node_name,
                 url: '',
                 label: missing_node_name,
               }
             end
-            graph_links << {
+            @graph_links << {
               source: relative_url(doc.url),
               target: missing_node_name,
             }
           end
         end
         # existing nodes
-        graph_nodes << {
+        @graph_nodes << {
           # TODO: when using real ids, be sure to convert id to string (to_s)
           id: relative_url(doc.url),
           url: relative_url(doc.url),
@@ -156,7 +157,7 @@ module Jekyll
         all_links.each do |link|
           linked_doc = link['doc']
           if !excluded_in_graph?(linked_doc.type)
-            graph_links << {
+            @graph_links << {
               source: relative_url(linked_doc.url),
               target: relative_url(doc.url),
             }
@@ -173,8 +174,8 @@ module Jekyll
         static_file = Jekyll::StaticFile.new(site, site.source, assets_path, "graph-net-web.json")
         # TODO: make write file location more flexible -- requiring a write location configuration feels messy...
         File.write(@site.source + static_file.relative_path, JSON.dump({
-          links: graph_links,
-          nodes: graph_nodes,
+          links: @graph_links,
+          nodes: @graph_nodes,
         }))
         # tests fail without manually adding the static file, but actual site builds seem to do ok
         # ...although there does seem to be a race condition which causes a rebuild to be necessary in order to detect the graph data file
@@ -186,13 +187,14 @@ module Jekyll
       # !! deprecated !!
 
       def old_config_warn()
-        if config.include?("wikilinks_collection")
+        if @config.include?("wikilinks_collection")
           Jekyll.logger.warn "As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details."
         end
-        if config.include?("assets_rel_path")
+        if @config.include?("assets_rel_path")
           Jekyll.logger.warn "As of 0.0.5, 'assets_rel_path' is now 'path'."
         end
       end
     end
+
   end
 end
