@@ -2,6 +2,7 @@
 
 require "jekyll-wikilinks"
 require "spec_helper"
+require "shared_context"
 
 RSpec.describe(Jekyll::WikiLinks::TypeFilters) do
   let(:doc)        { instance_double("Document", :collection => "docs", :content => "a document", :title=> "A Document") }
