@@ -41,7 +41,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(base_case_a.data.keys).to include('attributed')
         end
 
-        it "is an array of hashes with items { type => <str>, doc_url => <str> }" do
+        it "contains original doc data" do
           expect(base_case_a.data['attributed']).to eq([
             {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"},
             {"doc_url"=>"/docs/typed.block/", "type"=>"block-typed"}]
@@ -56,7 +56,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(typed_block.data.keys).to include("attributes")
         end
 
-        it "is an array of hashes with items { type => <str>, doc_url => <str> }" do
+        it "contains linked doc data" do
           expect(typed_block.data['attributes']).to eq([
             {"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"block-typed"}
           ])
@@ -79,22 +79,20 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(base_case_a.data.keys).to include("backlinks")
         end
 
-        it "is a hash of { type => basename }" do
-          expect(base_case_a.data.keys).to include("backlinks")
+        it "contains linked doc info" do
+          expect(base_case_a.data['backlinks']).to include({"doc_url"=>"/docs/typed.inline/", "type"=>"inline-typed"})
         end
 
       end
 
-      context "'forelinks" do
+      context "'forelinks'" do
 
         it "added to original document" do
           expect(typed_inline.data.keys).to include("attributes")
         end
 
-        it "is an array of hashes with items { type => <str> doc_url => <str> }" do
-          expect(typed_inline.data['forelinks']).to eq([
-            {"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"inline-typed"}
-          ])
+        it "contains linked doc info" do
+          expect(typed_inline.data['forelinks']).to include({"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"inline-typed"})
         end
 
       end
@@ -105,37 +103,41 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
   context "when there are multiple block style typed::[[wikilink]]s" do
 
-    it "adds 'attributed' to linked documents" do
-      expect(base_case_a.data.keys).to include('attributed')
-      expect(base_case_b.data.keys).to include('attributed')
+    context "metadata:" do
+
+      it "'attributes' added to original document" do
+        expect(typed_block_many.data.keys).to include("attributes")
+      end
+
+      it "'attributed' added to linked documents" do
+        expect(base_case_a.data.keys).to include('attributed')
+        expect(base_case_b.data.keys).to include('attributed')
+      end
+
     end
 
-    it "adds 'attributes' to original document" do
-      expect(typed_block_many.data.keys).to include("attributes")
-    end
 
-    # relationships
+    context "relationships" do
 
-    it "'attributes' added to original doc" do
-      expect(typed_block_many['attributes']).to eq([
-        {"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"many-block-typed"},
-        {"doc_url"=>"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/", "type"=>"many-block-typed"}
-      ])
-    end
+      it "'attributes' in original doc contain linked doc data" do
+        expect(typed_block_many['attributes']).to eq([
+          {"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"many-block-typed"},
+          {"doc_url"=>"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/", "type"=>"many-block-typed"}
+        ])
+      end
 
-    it "'attributed' added to first block-typed-linked doc" do
-      expect(base_case_a.data['attributed']).to_not be_nil
-      expect(base_case_a.data['attributed']).to eq([
-        {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"},
-        {"doc_url"=>"/docs/typed.block/", "type"=>"block-typed"}
-      ])
-    end
+      it "'attributed' in first linked doc contains original doc data" do
+        expect(base_case_a.data['attributed']).to include(
+          {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
+          )
+      end
 
-    it "'attributed' added to second block-typed-linked doc" do
-      expect(base_case_b.data['attributed']).to_not be_nil
-      expect(base_case_b.data['attributed']).to eq([
-        {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
-      ])
+      it "'attributed' in second linked doc contains original doc data" do
+        expect(base_case_b.data['attributed']).to include(
+          {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
+          )
+      end
+
     end
 
   end

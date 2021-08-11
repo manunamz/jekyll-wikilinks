@@ -220,21 +220,21 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     end
   end
 
-  context "when [[wikilink]]s references cross jekyll types (collection item, post, or page)" do
+  context "work as expected when [[wikilink]]s references cross jekyll types..." do
 
-    it "work as expected when post targets collection item; full output" do
+    it "post points to collection item; full output" do
       expect(one_post.output).to eq("<p>Posts support links, like to <a class=\"wiki-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.</p>\n")
     end
     
-    it "work as expected when collection item targets a post; full output" do
+    it "collection item points to post; full output" do
       expect(link_post.output).to eq("<p>This doc links to <a class=\"wiki-link\" href=\"/2020/12/08/one-post/\">one post</a>.</p>\n")
     end
 
-    it "work as expected when page targets collection item; full output" do
+    it "page points to collection item; full output" do
       expect(one_page.output).to eq("<p>This page links to a <a class=\"wiki-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.</p>\n")
     end
     
-    it "work as expected when collection item targets a page; full output" do
+    it "collection item points to page; full output" do
       expect(link_page.output).to eq("<p>This doc links to <a class=\"wiki-link\" href=\"/one-page/\">one page</a>.</p>\n")
     end
 
