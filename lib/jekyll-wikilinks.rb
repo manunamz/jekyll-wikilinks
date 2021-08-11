@@ -155,7 +155,7 @@ module Jekyll
         # TODO: this link calculation ends up with duplicates -- re-visit this later.
         all_links = doc.data['attributed'] + doc.data['backlinks']
         all_links.each do |link|
-          linked_doc = link['doc']
+          linked_doc = @doc_manager.get_doc_by_url(link['doc_url'])
           if !excluded_in_graph?(linked_doc.type)
             @graph_links << {
               source: relative_url(linked_doc.url),

@@ -58,7 +58,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       expect(base_case_b.output).to include("class=\"wiki-link\"")
     end
 
-    it "assigns a element's href to permalink" do
+    it "assigns a element's href to document url" do
       expect(base_case_a.output).to include("href=\"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/\"")
       expect(base_case_b.output).to include("href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"")
     end
@@ -70,48 +70,121 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     end
 
     it "downcases title in wikilink's rendered text" do
-      expect(base_case_b.output).to include("base case a")
-      expect(base_case_a.data['title'].downcase).to eq("base case a")
+      expect(base_case_b.output).to include(base_case_a.data['title'].downcase)
     end
 
-    # metadata attached to doc patch
+    context "metadata:" do
 
-    it "adds 'attributed' to document" do
-      expect(base_case_a.data['attributed']).to_not be_nil
-      expect(base_case_a.data['attributed'][0]['type']).to_not be_nil
-      expect(base_case_a.data['attributed'][0]['doc']).to_not be_nil
-      expect(base_case_b.data['attributed']).to_not be_nil
-    end
+      context "'attributed'" do
 
-    it "adds 'backlinks' to document" do
-      expect(base_case_a.data['backlinks']).to_not be_nil
-      expect(base_case_b.data['backlinks']).to_not be_nil
-    end
+        it "is added to document" do
+          expect(base_case_a.data['attributed']).to_not be_nil
+          expect(base_case_b.data['attributed']).to_not be_nil
+        end
 
-    it "'backlinks' includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(base_case_a.backlinks[0]['doc']).to be_a(Jekyll::Page)
-      expect(base_case_a.backlinks[1]['doc']).to be_a(Jekyll::Document)
-      # 'base_case_b' does not include any pages in its backlinks
-      # expect(base_case_b.instance_variable_get(:@backlinks)).to include(Jekyll::Page)
-      # expect(base_case_b.instance_variable_get(:@backlinks)[2]['doc']).to be_kind_of(Jekyll::Document)
-    end
+        it "is an array of hashes with keys 'type' and 'doc_url'" do
+          expect(base_case_a.data['attributed']).to be_a(Array)
+          expect(base_case_a.data['attributed'][0].keys).to eq([ "type", "doc_url" ])
+
+          expect(base_case_b.data['attributed']).to be_a(Array)
+          expect(base_case_b.data['attributed'][0].keys).to eq([ "type", "doc_url" ])
+        end
+
+        it "full contents" do
+          expect(base_case_a.data['attributed']).to eq([
+            {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"},
+            {"doc_url"=>"/docs/typed.block/", "type"=>"block-typed"}
+          ])
+          expect(base_case_b.data['attributed']).to eq([
+            {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
+          ])
+        end
+
+      end
+
+
+      context "'attributes'" do
+        
+        it "added to document" do
+          expect(base_case_a.data['attributes']).to_not be_nil
+          expect(base_case_b.data['attributes']).to_not be_nil
+        end
+
+        # 'attributes' is empty in this example -- see feature_types_spec.rb for more robust testing
+        it "is an array of hashes (with with keys 'type' and 'doc_url')" do
+          expect(base_case_a.data['attributes']).to be_a(Array)
+          # expect(base_case_a.data['attributes'][0].keys).to eq([ "type", "doc_url" ])
+          expect(base_case_a.data['attributes']).to eq([])
+
+          expect(base_case_b.data['attributes']).to be_a(Array)
+          # expect(base_case_b.data['attributes'][0].keys).to eq([ "type", "doc_url" ])
+          expect(base_case_b.data['attributes']).to eq([])
+        end
+
+      end
     
-    it "adds 'attributes' to document" do
-      expect(base_case_a.data['attributes']).to_not be_nil
-      expect(base_case_b.data['attributes']).to_not be_nil
+      context "'backlinks" do
+
+        it "added to document" do
+          expect(base_case_a.data['backlinks']).to_not be_nil
+          expect(base_case_b.data['backlinks']).to_not be_nil
+        end
+
+        it "'backlinks' contain array of hashes with keys 'type' and 'doc_url'" do
+          expect(base_case_a.data['backlinks']).to be_a(Array)
+          expect(base_case_a.data['backlinks'][0].keys).to eq([ "type", "doc_url" ])
+
+          expect(base_case_b.data['backlinks']).to be_a(Array)
+          expect(base_case_b.data['backlinks'][0].keys).to eq([ "type", "doc_url" ])
+        end
+
+        it "full contents" do
+          expect(base_case_a.data['backlinks']).to eq([
+            {"doc_url"=>"/one-page/", "type"=>nil},
+            {"doc_url"=>"/2020/12/08/one-post/", "type"=>nil},
+            {"doc_url"=>"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/", "type"=>nil},
+            {"doc_url"=>"/doc/2849a030-c72d-4a9f-9d1e-9e9a18449e04/", "type"=>nil},
+            {"doc_url"=>"/doc/c7317432-6211-49fa-bc0d-7322ad6eecd4/", "type"=>nil},
+            {"doc_url"=>"/docs/typed.inline/", "type"=>"inline-typed"},
+            {"doc_url"=>"/docs/with-html/", "type"=>nil}
+          ])
+          expect(base_case_b.data['backlinks']).to eq([
+            {"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>nil},
+            {"doc_url"=>"/docs/embed/", "type"=>nil}
+          ])
+        end
+
+      end
+
+      context "'forelinks'" do
+
+        it "added to document" do
+          expect(base_case_a.data['forelinks']).to_not be_nil
+          expect(base_case_b.data['forelinks']).to_not be_nil
+        end
+
+        it "contains array of hashes with keys 'type' and 'doc_url'" do
+          expect(base_case_a.data['forelinks']).to be_a(Array)
+          expect(base_case_a.data['forelinks'][0].keys).to eq([ "type", "doc_url" ])
+
+          expect(base_case_b.data['forelinks']).to be_a(Array)
+          expect(base_case_b.data['forelinks'][0].keys).to eq([ "type", "doc_url" ])
+        end
+
+        it "full contents" do
+          expect(base_case_a.data['forelinks']).to eq([
+            {"doc_url"=>"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/", "type"=>nil}
+          ])
+          expect(base_case_b.data['forelinks']).to eq([
+            {"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>nil}
+          ])
+        end
+
+      end
+
     end
 
-    it "adds 'forelinks' to document" do
-      expect(base_case_a.data['forelinks']).to_not be_nil
-      expect(base_case_b.data['forelinks']).to_not be_nil
-    end
-
-    it "'forelinks' includes all jekyll types -- pages, docs (posts and collections)" do
-      expect(base_case_a.forelinks[0]['doc']).to be_a(Jekyll::Document)
-      # 'base_case_b' does not include any pages in its backlinks
-      # expect(base_case_b.instance_variable_get(:@forelinks)).to include(Jekyll::Page)
-      # expect(base_case_b.instance_variable_get(:@forelinks)[0]['doc']).to include(Jekyll::Document)
-    end
+    # full
 
     it "full output" do
       expect(base_case_a.output).to eq("<p>This <a class=\"wiki-link\" href=\"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/\">base case b</a> has a littlecar.</p>\n")
