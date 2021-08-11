@@ -44,7 +44,7 @@ module Jekyll
         return nil
       end
 
-      # 'bname' -> 'basename' (filename with)
+      # 'bname' -> 'basename'
       def get_image_by_bname(filename)
         return nil if filename.nil? || @static_files.size == 0 || !SUPPORTED_IMG_FORMATS.any?{ |ext| ext == File.extname(filename).downcase }
         docs = @static_files.select{ |d| File.basename(d.relative_path) == filename }
