@@ -3,23 +3,6 @@ require_relative "naming_const"
 module Jekyll
   module WikiLinks
     
-    REGEX_LINK_EMBED = /(?<embed>(\!))/i                           # 0 (capture index for WikiLinks class)
-    REGEX_LINK_TYPE = /::/
-    REGEX_LINK_HEADER = /\#/
-    REGEX_LINK_BLOCK = /\#\^/
-    REGEX_LINK_LABEL = /\|/
-    REGEX_WIKI_LINKS = %r{
-      (#{REGEX_LINK_EMBED})?
-      (#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE})?
-      \[\[
-        #{REGEX_FILENAME}
-        (#{REGEX_LINK_HEADER}#{REGEX_HEADER_TXT})?
-        (#{REGEX_LINK_BLOCK}#{REGEX_BLOCK_ID_TXT})?
-        (#{REGEX_LINK_LABEL}#{REGEX_LABEL_TXT})?
-      \]\]
-    }x
-    REGEX_TYPED_LINK_BLOCK = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\[\[#{REGEX_FILENAME}\]\]\n/i
-
     # more of a "parser" than a parser
     class Parser
       attr_accessor :doc_manager, :markdown_converter, :wikilinks, :typed_link_blocks
@@ -112,7 +95,7 @@ module Jekyll
   				lnk_doc_rel_url = relative_url(linked_doc.url) if linked_doc&.url
           # TODO not sure about downcase
   				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
-  				
+
           link_lvl = wikilink.describe['level']
   				if (link_lvl == "file")
   					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?
@@ -231,7 +214,7 @@ module Jekyll
 
       def level
         return "file" if described?(FILENAME) && !described?(HEADER_TXT) && !described?(BLOCK_ID)
-        return "header" if described?(FILENAME) && described?(HEADER_TXT) && !described?(BLOCK_ID)    
+        return "header" if described?(FILENAME) && described?(HEADER_TXT) && !described?(BLOCK_ID)
         return "block" if described?(FILENAME) && !described?(HEADER_TXT) && described?(BLOCK_ID)
         return "invalid"
       end

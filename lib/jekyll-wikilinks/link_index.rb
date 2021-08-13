@@ -9,10 +9,6 @@ module Jekyll
       # Use Jekyll's native relative_url filter
       include Jekyll::Filters::URLFilters
 
-      # identify missing links in doc via .invalid-wiki-link class and nested doc-text.
-      REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
-      REGEX_VALID_WIKI_LINK = /<a\sclass="wiki-link(\slink-type\s(?<link-type>([^"]+)))?"\shref="(?<link-url>([^"]+))">/i
-
       def initialize(site, md_docs)
         @context ||= Jekyll::WikiLinks::Context.new(site)
         @index = {}

@@ -5,15 +5,7 @@ module Jekyll
 
     class DocManager
       attr_accessor :md_docs, :static_files
-
-      # kramdown header regexes
-      # atx header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L29
-      REGEX_ATX_HEADER = /^\#{1,6}[\t ]*([^ \t].*)\n/i
-      # setext header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L17
-      REGEX_SETEXT_HEADER = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
-      # obsidian-style
-      REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}^\n/i
-
+      
       def initialize(md_docs, static_files)
         @md_docs ||= md_docs
         @static_files ||= static_files
@@ -55,18 +47,18 @@ module Jekyll
       def self.doc_has_header?(doc, header)
         return nil if header.nil?
         # leading + trailing whitespace is ignored when matching headers
-        header_results = doc.content.scan(REGEX_ATX_HEADER).flatten.map { |htxt| htxt.strip } 
-        setext_header_results = doc.content.scan(REGEX_SETEXT_HEADER).flatten.map { |htxt| htxt.strip } 
+        header_results = doc.content.scan(REGEX_ATX_HEADER).flatten.map { |htxt| htxt.strip }
+        setext_header_results = doc.content.scan(REGEX_SETEXT_HEADER).flatten.map { |htxt| htxt.strip }
         return header_results.include?(header.strip) || setext_header_results.include?(header.strip)
       end
 
       def self.doc_has_block_id?(doc, block_id)
         return nil if block_id.nil?
         # leading + trailing whitespace is ignored when matching blocks
-        block_id_results = doc.content.scan(REGEX_BLOCK).flatten.map { |bid| bid.strip } 
+        block_id_results = doc.content.scan(REGEX_BLOCK).flatten.map { |bid| bid.strip }
         return block_id_results.include?(block_id)
       end
     end
-    
+
   end
 end
