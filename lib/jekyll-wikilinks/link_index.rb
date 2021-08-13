@@ -32,15 +32,18 @@ module Jekyll
       def populate_attributes(doc, typed_link_blocks)
         typed_link_blocks.each do |tl|
           attr_doc = @doc_manager.get_doc_by_fname(tl.filename)
-          
-          @index[doc.url].attributes << {
-            'type' => tl.link_type, 
-            'doc_url' => attr_doc.url,
-          }
-          @index[attr_doc.url].attributed << {
-            'type' => tl.link_type,
-            'doc_url' => doc.url,
-          }
+          if !attr_doc.nil?
+            @index[doc.url].attributes << {
+              'type' => tl.link_type,
+              'doc_url' => attr_doc.url,
+            }
+            @index[attr_doc.url].attributed << {
+              'type' => tl.link_type,
+              'doc_url' => doc.url,
+            }
+          else
+            Jekyll.logger.warn("Typed block link's document not found for #{tl.filename}")
+          end
         end
       end
 
@@ -51,7 +54,7 @@ module Jekyll
           doc.content.scan(REGEX_LINK_TYPE).each do |m|
             ltype, lurl = m[0], m[1]
             @index[doc.url].forelinks << {
-              'type' => ltype, 
+              'type' => ltype,
               'doc_url' => lurl,
             }
           end
@@ -61,7 +64,7 @@ module Jekyll
               ltype, lurl = m[0], m[1]
               if lurl == relative_url(doc.url)
                 @index[doc.url].backlinks << {
-                  'type' => ltype, 
+                  'type' => ltype,
                   'doc_url' => doc_to_backlink.url,
                 }
               end
@@ -81,6 +84,6 @@ module Jekyll
         end
       end
     end
-    
+
   end
 end
