@@ -11,6 +11,7 @@ require_relative "jekyll-wikilinks/version"
 
 Liquid::Template.register_filter(Jekyll::WikiLinks::TypeFilters)
 
+
 module Jekyll
   module WikiLinks
 
@@ -50,14 +51,23 @@ module Jekyll
         # setup helper classes
         @doc_manager = DocManager.new(@md_docs, @site.static_files)
         @parser = Parser.new(@context, @markdown_converter, @doc_manager)
-        @site.link_index = LinkIndex.new(@site, @doc_manager)
+        @site.link_index = LinkIndex.new(@site, @md_docs)
 
-        # parse + populate index
+        # parse
         @md_docs.each do |doc|
           @parser.parse(doc.content)
-          @site.link_index.populate_attributes(doc, @parser.typed_link_blocks)
+          # attributes are handled alongside parsing since
+          # they need access to the parser's discovered 'typed_link_blocks'
+          # and remove the text from the document
+          @site.link_index.populate_attributes(doc, @parser.typed_link_blocks, @md_docs)
         end
-        @site.link_index.process
+        # build link_index
+        # (wait until all docs are processed before assigning metadata,
+        # so all backlinks are collected for assignment)
+        @md_docs.each do |doc|
+          @site.link_index.populate_links(doc, @md_docs)
+          @site.link_index.assign_metadata(doc)
+        end
       end
 
       # config helpers
