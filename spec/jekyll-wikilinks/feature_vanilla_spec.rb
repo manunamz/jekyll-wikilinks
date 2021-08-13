@@ -8,7 +8,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   include_context "shared jekyll configs"
   let(:config_overrides) { {} }
   let(:site)                            { Jekyll::Site.new(config) }
-  
+
   # file
   let(:base_case_a)                     { find_by_title(site.collections["docs"].docs, "Base Case A") }
   let(:base_case_b)                     { find_by_title(site.collections["docs"].docs, "Base Case B") }
@@ -37,8 +37,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   end
 
   after(:each) do
-    # cleanup generated assets
-    FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
     # cleanup _site/ dir
     FileUtils.rm_rf(Dir["#{site_dir()}"])
   end
@@ -104,7 +102,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
 
       context "'attributes'" do
-        
+
         it "added to document" do
           expect(base_case_a.data['attributes']).to_not be_nil
           expect(base_case_b.data['attributes']).to_not be_nil
@@ -122,7 +120,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         end
 
       end
-    
+
       context "'backlinks" do
 
         it "added to document" do
@@ -225,7 +223,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     it "post points to collection item; full output" do
       expect(one_post.output).to eq("<p>Posts support links, like to <a class=\"wiki-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.</p>\n")
     end
-    
+
     it "collection item points to post; full output" do
       expect(link_post.output).to eq("<p>This doc links to <a class=\"wiki-link\" href=\"/2020/12/08/one-post/\">one post</a>.</p>\n")
     end
@@ -233,7 +231,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     it "page points to collection item; full output" do
       expect(one_page.output).to eq("<p>This page links to a <a class=\"wiki-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.</p>\n")
     end
-    
+
     it "collection item points to page; full output" do
       expect(link_page.output).to eq("<p>This doc links to <a class=\"wiki-link\" href=\"/one-page/\">one page</a>.</p>\n")
     end
@@ -243,7 +241,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   end
 
   context "with regard to whitespace" do
-    
+
     it "wikilinked filenames may contain whitespace; full output" do
       expect(link_whitespace_in_filename.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/doc/fb6bf728-948f-489e-9c9f-bb2b92677192/\">whitespace in filename</a>.</p>\n")
     end
@@ -259,7 +257,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   end
 
   context "markdown file contains html" do
-    
+
     it "preserves html" do
       expect(with_html.output).to include("<div class=\"box\">")
       expect(with_html.output).to include("</div>")
@@ -269,15 +267,15 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       expect(with_html.output).to_not include("[[base-case.a]]")
       expect(with_html.output).to include("<a class=\"wiki-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>")
     end
-    
+
     it "full output" do
       expect(with_html.output).to eq("<p>This doc has some HTML:</p>\n\n<div class=\"box\">\n  And inside is a link: <a class=\"wiki-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">base case a</a>.\n</div>\n")
     end
-  
+
   end
 
   context "when target [[wikilink]] doc does not exist" do
-    
+
     it "injects a span element with descriptive title" do
       expect(missing_doc.output).to include("<span title=\"Content not found.\"")
       expect(missing_doc.output).to include("</span>")

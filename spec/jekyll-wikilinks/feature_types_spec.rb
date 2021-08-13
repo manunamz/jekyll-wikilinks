@@ -8,14 +8,14 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   include_context "shared jekyll configs"
   let(:config_overrides) { {} }
   let(:site)                            { Jekyll::Site.new(config) }
-  
+
   let(:base_case_a)                     { find_by_title(site.collections["docs"].docs, "Base Case A") }
   let(:base_case_b)                     { find_by_title(site.collections["docs"].docs, "Base Case B") }
 
   let(:typed_inline)                    { find_by_title(site.collections["docs"].docs, "Typed Link Inline") }
   let(:typed_block)                     { find_by_title(site.collections["docs"].docs, "Typed Link Block") }
   let(:typed_block_many)                { find_by_title(site.collections["docs"].docs, "Typed Link Block Many") }
-  
+
   # makes markdown tests work
   subject { described_class.new(site.config) }
 
@@ -25,8 +25,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   end
 
   after(:each) do
-    # cleanup generated assets
-    FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
     # cleanup _site/ dir
     FileUtils.rm_rf(Dir["#{site_dir()}"])
   end
@@ -70,7 +68,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
 
   context "when inline style typed::[[wikilink]] exists" do
-    
+
     context "metadata:" do
 
       context "'backlinks'" do

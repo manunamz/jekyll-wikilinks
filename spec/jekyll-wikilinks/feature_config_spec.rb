@@ -8,11 +8,11 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   include_context "shared jekyll configs"
   let(:config_overrides) { {} }
   let(:site)                            { Jekyll::Site.new(config) }
-  
+
   let(:base_case_a)                     { find_by_title(site.collections["docs"].docs, "Base Case A") }
   let(:base_case_b)                     { find_by_title(site.collections["docs"].docs, "Base Case B") }
   let(:one_page)                        { find_by_title(site.pages, "One Page") }
-  
+
   # makes markdown tests work
   subject { described_class.new(site.config) }
 
@@ -22,8 +22,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   end
 
   after(:each) do
-    # cleanup generated assets
-    FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
     # cleanup _site/ dir
     FileUtils.rm_rf(Dir["#{site_dir()}"])
   end

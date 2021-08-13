@@ -8,11 +8,11 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   include_context "shared jekyll configs"
   let(:config_overrides) { {} }
   let(:site)                            { Jekyll::Site.new(config) }
-  
+
   let(:embed)                           { find_by_title(site.collections["docs"].docs, "Embed") }
   let(:embed_long)                      { find_by_title(site.collections["docs"].docs, "Embed Long") }
   let(:embed_img)                       { find_by_title(site.collections["docs"].docs, "Embed Image") }
-  
+
   # makes markdown tests work
   subject { described_class.new(site.config) }
 
@@ -22,8 +22,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   end
 
   after(:each) do
-    # cleanup generated assets
-    FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
     # cleanup _site/ dir
     FileUtils.rm_rf(Dir["#{site_dir()}"])
   end
@@ -53,7 +51,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     it "full output; long" do
       expect(embed_long.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Long Doc</div><div class=\"wiki-link-embed-content\"><h1 id=\"a-long-document\">A Long Document</h1><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div><a class=\"wiki-link-embed-link\" href=\"/docs/long-doc/\"></a></div>\n")
     end
-    
+
     # header fragment
 
     it "processes header url fragments; full output" do
@@ -61,7 +59,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       expect(1).to eq(2)
       # expect(embed_header_long.output).to eq("")
     end
-  
+
     # block fragment
 
     it "processes header url fragments; full output" do

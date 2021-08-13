@@ -13,7 +13,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:link_header_label)               { find_by_title(site.collections["docs"].docs, "Link Header Labelled") }
   let(:label_sq_br)                     { find_by_title(site.collections["docs"].docs, "Labelled With Square Brackets") }
   let(:label_missing_doc)               { find_by_title(site.collections["docs"].docs, "Labelled Missing Doc") }
-  let(:labelled_link_header_missing)    { find_by_title(site.collections["docs"].docs, "Labelled Link Header Missing") }  
+  let(:labelled_link_header_missing)    { find_by_title(site.collections["docs"].docs, "Labelled Link Header Missing") }
 
   # makes markdown tests work
   subject { described_class.new(site.config) }
@@ -24,8 +24,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   end
 
   after(:each) do
-    # cleanup generated assets
-    FileUtils.rm_rf(Dir["#{fixtures_dir("/assets/graph-net-web.json")}"])
     # cleanup _site/ dir
     FileUtils.rm_rf(Dir["#{site_dir()}"])
   end
@@ -66,7 +64,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     it "processes header url fragments; full output" do
       expect(link_header_label.output).to eq("<p>This doc contains a link to a header with <a class=\"wiki-link\" href=\"/docs/long-doc/#two\">labelled text</a>.</p>\n")
     end
-  
+
   end
 
   context "when target [[wikilink]] using piped labels does not exist" do
