@@ -10,25 +10,31 @@ module Jekyll
       # "doc_type" is the jekyll type ("pages", "posts", "<collection-name>")
       def doc_type(links, doc_type)
         return if links.nil?
-        target_links = []
+        site = @context.registers[:site]
+        target_linked_docs = []
         links.each do |l|
-          target_links << l if l['doc'].type.to_str == doc_type.to_str
+          docs = site.documents.select{ |d| d.url == l['doc_url'] && d.type.to_s == doc_type.to_s }
+          target_linked_docs << docs.first if !docs.nil? && docs.size == 1
         end
-        return target_links.uniq
+        return target_linked_docs.uniq
       end
 
       # usage: {% assign author_links = page.links | link_type = "author" %}
       # "link_type" is the wikilink's type, the string that appears before the link in `link-type::[[wikilink]]`.
       def link_type(links, link_type)
         return if links.nil?
-        target_links = []
+        site = @context.registers[:site]
+        target_linked_docs = []
         link.each do |l|
-          target_links << l if l['type'].to_str == link_type.to_str
+          if l['type'].to_s == link_type.to_s
+            docs = site.documents.select{ |d| d.url == l['doc_url'] }
+            target_linked_docs << docs.first if !docs.nil? && docs.size == 1
+          end
         end
-        return target_links.uniq
+        return target_linked_docs.uniq
       end
 
     end
-    
+
   end
 end
