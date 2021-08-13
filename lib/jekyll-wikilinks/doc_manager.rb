@@ -1,11 +1,11 @@
-require_relative "naming_const"
+require_relative "regex"
 
 module Jekyll
   module WikiLinks
 
     class DocManager
       attr_accessor :md_docs, :static_files
-      
+
       def initialize(md_docs, static_files)
         @md_docs ||= md_docs
         @static_files ||= static_files

@@ -1,8 +1,8 @@
-require_relative "naming_const"
+require_relative "regex"
 
 module Jekyll
   module WikiLinks
-    
+
     # more of a "parser" than a parser
     class Parser
       attr_accessor :doc_manager, :markdown_converter, :wikilinks, :typed_link_blocks

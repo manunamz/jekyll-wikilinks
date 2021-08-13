@@ -1,4 +1,4 @@
-require 'jekyll-wikilinks/naming_const' # for REGEX_NOT_GREEDY
+require 'jekyll-wikilinks/regex' # for REGEX_NOT_GREEDY
 
 module Jekyll
   module WikiLinks

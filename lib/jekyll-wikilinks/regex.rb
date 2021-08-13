@@ -1,4 +1,4 @@
-# naming_const.rb
+# regex.rb
 # regex constants defining supported file types and valid names for files, variables, or text
 #
 
@@ -6,6 +6,8 @@ module Jekyll
   module WikiLinks
     #
     # markdown wikilink syntax
+    #
+    ## wikilink usable char syntax requirements
     #
     # TODO: Fix REGEX_NOT_GREEDY
     # REGEX_NOT_GREEDY = /[^(?!\]\])]+/i
@@ -19,6 +21,25 @@ module Jekyll
     REGEX_HEADER_TXT = /(?<header-txt>([^\!\#\^\|\[\]]+))/i          # 3
     REGEX_BLOCK_ID_TXT = /(?<block-id>([^\\\/:\!\#\^\|\[\]]+))/i     # 4
     REGEX_LABEL_TXT = /(?<label-txt>(#{REGEX_NOT_GREEDY}))/i         # 5
+    #
+    ## wikilink special char syntax requirements
+    #
+    REGEX_LINK_EMBED = /(?<embed>(\!))/i                           # 0 (capture index for WikiLinks class)
+    REGEX_LINK_TYPE = /::/
+    REGEX_LINK_HEADER = /\#/
+    REGEX_LINK_BLOCK = /\#\^/
+    REGEX_LINK_LABEL = /\|/
+    REGEX_WIKI_LINKS = %r{
+      (#{REGEX_LINK_EMBED})?
+      (#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE})?
+      \[\[
+        #{REGEX_FILENAME}
+        (#{REGEX_LINK_HEADER}#{REGEX_HEADER_TXT})?
+        (#{REGEX_LINK_BLOCK}#{REGEX_BLOCK_ID_TXT})?
+        (#{REGEX_LINK_LABEL}#{REGEX_LABEL_TXT})?
+      \]\]
+    }x
+    REGEX_TYPED_LINK_BLOCK = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\[\[#{REGEX_FILENAME}\]\]\n/i
     #
     # wikilink targets (headers and blocks)
     #
