@@ -3,10 +3,10 @@ require "jekyll"
 
 require_relative "jekyll-wikilinks/context"
 require_relative "jekyll-wikilinks/doc_manager"
+require_relative "jekyll-wikilinks/filter"
 require_relative "jekyll-wikilinks/link_index"
 require_relative "jekyll-wikilinks/parser"
-
-require_relative "jekyll-wikilinks/filter"
+require_relative "jekyll-wikilinks/site"
 require_relative "jekyll-wikilinks/version"
 
 Liquid::Template.register_filter(Jekyll::WikiLinks::TypeFilters)
@@ -49,14 +49,14 @@ module Jekyll
         # setup helper classes
         @doc_manager = DocManager.new(@md_docs, @site.static_files)
         @parser = Parser.new(@context, @markdown_converter, @doc_manager)
-        @link_index = LinkIndex.new(@site, @doc_manager)
+        @site.link_index = LinkIndex.new(@site, @doc_manager)
 
         # parse + populate index
         @md_docs.each do |doc|
           @parser.parse(doc.content)
-          @link_index.populate_attributes(doc, @parser.typed_link_blocks)
+          @site.link_index.populate_attributes(doc, @parser.typed_link_blocks)
         end
-        @link_index.process
+        @site.link_index.process
       end
 
       # config helpers
