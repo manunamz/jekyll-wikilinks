@@ -15,7 +15,8 @@ module Jekyll
   module WikiLinks
 
     class Generator < Jekyll::Generator
-      attr_accessor :site, :config, :md_docs, :doc_manager, :link_index, :parser
+      # for testing
+      attr_reader :config
 
       # Use Jekyll's native relative_url filter
       include Jekyll::Filters::URLFilters

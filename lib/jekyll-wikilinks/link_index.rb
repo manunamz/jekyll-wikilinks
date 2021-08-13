@@ -2,7 +2,7 @@ module Jekyll
   module WikiLinks
 
     class LinkIndex
-      attr_accessor :index
+      attr_reader :index
 
       # Use Jekyll's native relative_url filter
       include Jekyll::Filters::URLFilters
