@@ -1,16 +1,27 @@
-.bundle
+# Ruby Gem
 *.gem
+.bundle
 Gemfile.lock
+**/vendor/bundle
+/pkg/
+
+# Jekyll cache & metadata
+.jekyll-cache/
+.jekyll-metadata
+_site/
+
+# rspec
+spec/fixtures/_site
+spec/*fixtures/**/.jekyll-cache
+# rspec failure tracking
+.rspec_status
+
+# macos
+.DS_Store
 
 /.yardoc
 /_yardoc/
 /coverage/
 /doc/
-/pkg/
 /spec/reports/
 /tmp/
-
-spec/fixtures/_site
-spec/*fixtures/**/.jekyll-cache
-# rspec failure tracking
-.rspec_status
