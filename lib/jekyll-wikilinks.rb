@@ -102,6 +102,9 @@ module Jekyll
         if @config.include?("assets_rel_path")
           Jekyll.logger.warn "As of 0.0.5, 'assets_rel_path' is now 'path'."
         end
+        if @config.include?("d3_graph_data")
+          Jekyll.logger.warn "As of 0.0.6, 'd3_graph_data' should now be 'd3' and requires the 'jekyll-d3' plugin."
+        end
       end
     end
 
