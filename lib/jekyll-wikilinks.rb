@@ -95,11 +95,15 @@ module Jekyll
 
       # !! deprecated !!
 
+      def option_exist?(key)
+        @config[CONFIG_KEY] && @config[CONFIG_KEY].include?(key)
+      end
+
       def old_config_warn()
         if @config.include?("wikilinks_collection")
           Jekyll.logger.warn "As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details."
         end
-        if @config.include?("assets_rel_path")
+        if option_exist?("assets_rel_path")
           Jekyll.logger.warn "As of 0.0.5, 'assets_rel_path' is now 'path'."
         end
         if @config.include?("d3_graph_data")
