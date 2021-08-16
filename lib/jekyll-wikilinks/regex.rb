@@ -13,9 +13,9 @@ module Jekyll
     # REGEX_NOT_GREEDY = /[^(?!\]\])]+/i
     # REGEX_NOT_GREEDY = /(?!\]\]).*/i
     REGEX_NOT_GREEDY = /[^\]]+/i
-    # <variables> only work with 'match' function, not with 'scan' function. :/
-    # oh well...they are there for easier debugging...
-    # valid naming conventions                                       # capture indeces for WikiLinks class (0 is 'embed')
+    #  <variables> only work with 'match' function, not with 'scan' function. :/
+    #  oh well...they are there for easier debugging...
+    #  valid naming conventions                                      # capture indeces for WikiLinks class (0 is 'embed')
     REGEX_LINK_TYPE_TXT = /(?<link-type-txt>([^\n\s\!\#\^\|\]]+))/i  # 1
     REGEX_FILENAME = /(?<filename>([^\\\/:\#\^\|\[\]]+))/i           # 2
     REGEX_HEADER_TXT = /(?<header-txt>([^\!\#\^\|\[\]]+))/i          # 3
@@ -43,12 +43,12 @@ module Jekyll
     #
     # wikilink targets (headers and blocks)
     #
-    # kramdown header regexes
-    # atx header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L29
+    ## kramdown header regexes
+    ### atx header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L29
     REGEX_ATX_HEADER = /^\#{1,6}[\t ]*([^ \t].*)\n/i
-    # setext header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L17
+    ### setext header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L17
     REGEX_SETEXT_HEADER = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
-    # obsidian-style
+    ## obsidian-style
     REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}^\n/i
     #
     # parsing for wikilinks in html
