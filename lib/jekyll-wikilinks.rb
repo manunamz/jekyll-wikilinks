@@ -11,7 +11,6 @@ require_relative "jekyll-wikilinks/version"
 
 Liquid::Template.register_filter(Jekyll::WikiLinks::TypeFilters)
 
-
 module Jekyll
   module WikiLinks
 
@@ -46,7 +45,10 @@ module Jekyll
         docs += @site.pages if !exclude?(:pages)
         docs += @site.docs_to_write.filter { |d| !exclude?(d.type) }
         @md_docs = docs.filter {|doc| markdown_extension?(doc.extname) }
-        return if @md_docs.empty?
+
+        if @md_docs.empty?
+          Jekyll.logger.debug("No documents to process.")
+        end
 
         # setup helper classes
         @doc_manager = DocManager.new(@md_docs, @site.static_files)
