@@ -53,6 +53,7 @@ module Jekyll
           }
         end
         # ...process its backlinks
+        # TODO: can probably get rid of this and only add backlink per forelink
         md_docs.each do |doc_to_backlink|
           doc_to_backlink.content.scan(REGEX_VALID_WIKI_LINK).each do |m|
             ltype, lurl = m[0], m[1]
@@ -63,10 +64,11 @@ module Jekyll
               }
             end
           end
-          doc_to_backlink.content.scan(REGEX_INVALID_WIKI_LINK).each do |m|
-            ltext = m[0]
-            @index[doc.url].missing << ltext
-          end
+        end
+        # ...process missing links
+        doc.content.scan(REGEX_INVALID_WIKI_LINK).each do |m|
+          ltext = m[0]
+          @index[doc.url].missing << ltext
         end
       end
 
