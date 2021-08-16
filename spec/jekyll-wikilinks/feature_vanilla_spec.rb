@@ -121,7 +121,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
       end
 
-      context "'backlinks" do
+      context "'backlinks'" do
 
         it "added to document" do
           expect(base_case_a.data['backlinks']).to_not be_nil

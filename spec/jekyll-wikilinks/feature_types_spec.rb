@@ -39,7 +39,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(base_case_a.data.keys).to include('attributed')
         end
 
-        it "contains original doc data" do
+        it "contains original doc data; full content" do
           expect(base_case_a.data['attributed']).to eq([
             {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"},
             {"doc_url"=>"/docs/typed.block/", "type"=>"block-typed"}]
@@ -54,7 +54,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(typed_block.data.keys).to include("attributes")
         end
 
-        it "contains linked doc data" do
+        it "contains linked doc data; full content" do
           expect(typed_block.data['attributes']).to eq([
             {"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"block-typed"}
           ])
@@ -77,7 +77,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(base_case_a.data.keys).to include("backlinks")
         end
 
-        it "contains linked doc info" do
+        it "contains linked doc info; full content" do
           expect(base_case_a.data['backlinks']).to include({"doc_url"=>"/docs/typed.inline/", "type"=>"inline-typed"})
         end
 
@@ -89,7 +89,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(typed_inline.data.keys).to include("attributes")
         end
 
-        it "contains linked doc info" do
+        it "contains linked doc info; full content" do
           expect(typed_inline.data['forelinks']).to include({"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"inline-typed"})
         end
 
@@ -124,13 +124,13 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         ])
       end
 
-      it "'attributed' in first linked doc contains original doc data" do
+      it "'attributed' in first linked doc contains original doc data; full content" do
         expect(base_case_a.data['attributed']).to include(
           {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
           )
       end
 
-      it "'attributed' in second linked doc contains original doc data" do
+      it "'attributed' in second linked doc contains original doc data; full content" do
         expect(base_case_b.data['attributed']).to include(
           {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
           )
