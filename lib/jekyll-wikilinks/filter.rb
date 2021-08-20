@@ -13,10 +13,12 @@ module Jekyll
         site = @context.registers[:site]
         target_linked_docs = []
         links.each do |l|
-          docs = site.documents.select{ |d| d.url == l['doc_url'] && d.type.to_s == doc_type.to_s }
-          target_linked_docs << docs.first if !docs.nil? && docs.size == 1
+          doc = site.documents.select{ |d| d.url == l['doc_url'] && d.type.to_s == doc_type.to_s }
+          if doc.nil? || doc.size != 1
+            links.delete(l)
+          end
         end
-        return target_linked_docs.uniq
+        return links.uniq
       end
 
       # usage: {% assign author_links = page.links | link_type = "author" %}
@@ -28,7 +30,9 @@ module Jekyll
         link.each do |l|
           if l['type'].to_s == link_type.to_s
             docs = site.documents.select{ |d| d.url == l['doc_url'] }
-            target_linked_docs << docs.first if !docs.nil? && docs.size == 1
+            if !docs.nil? && docs.size == 1
+              links.delete(l)
+            end
           end
         end
         return target_linked_docs.uniq
