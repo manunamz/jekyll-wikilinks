@@ -74,15 +74,23 @@ module Jekyll
         ].join("\n").gsub!("\n", "")
       end
 
-      def build_html_img_embed(img_file)
-        "<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"#{relative_url(img_file.relative_path)}\"/></span></p>"
+      def build_html_img_embed(static_doc, is_svg=false)
+        svg_content = ""
+        if is_svg
+          File.open(static_doc.path, "r") do |svg_img|
+            svg_content = svg_img.read
+          end
+          return "<p><span class=\"wiki-link-embed-image\">#{svg_content}</span></p>"
+        else
+          return "<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"#{relative_url(static_doc.relative_path)}\"/></span></p>"
+        end
       end
 
   		def build_html(wikilink)
         if wikilink.is_img?
-  			  linked_doc = @doc_manager.get_image_by_bname(wikilink.filename)
+  			  linked_static_doc = @doc_manager.get_image_by_bname(wikilink.filename)
           if wikilink.embedded? && wikilink.is_img?
-            return build_html_img_embed(linked_doc)
+            return build_html_img_embed(linked_static_doc, is_svg=wikilink.is_img_svg?)
           end
         end
         linked_doc = @doc_manager.get_doc_by_fname(wikilink.filename)
@@ -203,6 +211,10 @@ module Jekyll
       def is_img?
         # github supported image formats: https://docs.github.com/en/github/managing-files-in-a-repository/working-with-non-code-files/rendering-and-diffing-images
         return SUPPORTED_IMG_FORMATS.any?{ |ext| ext == File.extname(@filename).downcase }
+      end
+
+      def is_img_svg?
+        return File.extname(@filename).downcase == ".svg"
       end
 
       def described?(chunk)
