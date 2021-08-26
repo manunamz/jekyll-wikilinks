@@ -100,7 +100,7 @@ module Jekyll
   				# label
   				wikilink_inner_txt = wikilink.clean_label_txt if wikilink.labelled?
 
-  				lnk_doc_rel_url = relative_url(linked_doc.url) if linked_doc&.url
+  				lnk_doc_rel_url = relative_url(linked_doc.url)
           # TODO not sure about downcase
   				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
 
