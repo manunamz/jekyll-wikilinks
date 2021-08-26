@@ -25,11 +25,12 @@ module Jekyll
 
         # parse
         @site.doc_mngr.all.each do |doc|
-          @parser.parse(doc.content)
+          @parser.parse_blocks(doc.content)
           # attributes are handled alongside parsing since
           # they need access to the parser's discovered 'typed_link_blocks'
           # and remove the text from the document
           @site.link_index.populate_attributes(doc, @parser.typed_link_blocks, @site.doc_mngr.all)
+          @parser.parse_inlines(doc.content)
         end
         # build link_index
         # (wait until all docs are processed before assigning metadata,

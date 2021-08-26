@@ -19,9 +19,8 @@ module Jekyll
         @wikilinks, @typed_link_blocks = [], []
       end
 
-      def parse(doc_content)
+      def parse_blocks(doc_content)
         @typed_link_blocks, @wikilinks = [], []
-        # process blocks
         typed_link_block_matches = doc_content.scan(REGEX_TYPED_LINK_BLOCK)
         if !typed_link_block_matches.nil? && typed_link_block_matches.size != 0
           typed_link_block_matches.each do |wl_match|
@@ -37,7 +36,10 @@ module Jekyll
             @typed_link_blocks << typed_link_block_wikilink
           end
         end
-        # process inlines
+      end
+
+      def parse_inlines(doc_content)
+        @wikilinks = []
         wikilink_matches = doc_content.scan(REGEX_WIKI_LINKS)
         if !wikilink_matches.nil? && wikilink_matches.size != 0
           wikilink_matches.each do |wl_match|
