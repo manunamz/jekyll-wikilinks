@@ -27,10 +27,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     FileUtils.rm_rf(Dir["#{site_dir()}"])
   end
 
-  it "saves the config" do
-    expect(subject.config).to eql(site.config)
-  end
-
   context "processes markdown" do
 
     context "detecting markdown" do
