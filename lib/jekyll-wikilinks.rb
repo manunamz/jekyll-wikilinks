@@ -2,6 +2,7 @@
 require "jekyll"
 
 require_relative "jekyll-wikilinks/context"
+require_relative "jekyll-wikilinks/converter"
 require_relative "jekyll-wikilinks/doc_manager"
 require_relative "jekyll-wikilinks/filter"
 require_relative "jekyll-wikilinks/link_index"

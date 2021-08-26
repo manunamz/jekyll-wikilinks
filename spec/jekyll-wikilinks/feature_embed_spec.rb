@@ -41,15 +41,40 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     end
 
     it "full output; short" do
-      expect(embed.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Base Case A</div><div class=\"wiki-link-embed-content\"><p>This <a class=\"wiki-link\" href=\"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/\">base case b</a> has a littlecar.</p></div><a class=\"wiki-link-embed-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"></a></div>\n")
+      expect(embed.output).to eq("<p>The following link should be embedded:</p>
+
+<div class=\"wiki-link-embed\">
+<div class=\"wiki-link-embed-title\">Base Case A</div>
+<div class=\"wiki-link-embed-content\"><p>This <a class=\"wiki-link\" href=\"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/\">base case b</a> has a littlecar.</p></div>
+<a class=\"wiki-link-embed-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"></a>
+</div>\n")
     end
 
     it "converts/'markdownifies' nested content'" do
-      expect(embed_long.output).to include("<div class=\"wiki-link-embed-content\"><h1 id=\"a-long-document\">A Long Document</h1><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div>")
+      expect(embed_long.output).to include("<div class=\"wiki-link-embed-title\">Long Doc</div>
+<div class=\"wiki-link-embed-content\">
+<h1 id=\"a-long-document\">A Long Document</h1>
+<h1 id=\"one\">One</h1>
+<ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li>
+</ul>
+<p>Some more text to verify that block_id captures are not over-capturing.</p>
+</div>")
     end
 
-    it "full output; long" do
-      expect(embed_long.output).to eq("<p>The following link should be embedded:</p>\n\n<div class=\"wiki-link-embed\"><div class=\"wiki-link-embed-title\">Long Doc</div><div class=\"wiki-link-embed-content\"><h1 id=\"a-long-document\">A Long Document</h1><h1 id=\"one\">One</h1><ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li></ul><p>Some more text to verify that block_id captures are not over-capturing.</p></div><a class=\"wiki-link-embed-link\" href=\"/docs/long-doc/\"></a></div>\n")
+    it "full output" do
+      expect(embed_long.output).to eq("<p>The following link should be embedded:</p>
+
+<div class=\"wiki-link-embed\">
+<div class=\"wiki-link-embed-title\">Long Doc</div>
+<div class=\"wiki-link-embed-content\">
+<h1 id=\"a-long-document\">A Long Document</h1>
+<h1 id=\"one\">One</h1>
+<ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li>
+</ul>
+<p>Some more text to verify that block_id captures are not over-capturing.</p>
+</div>
+<a class=\"wiki-link-embed-link\" href=\"/docs/long-doc/\"></a>
+</div>\n")
     end
 
     # header fragment
@@ -71,7 +96,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     # images
 
     it "processes images" do
-      expect(embed_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"/assets/image.png\" /></span></p>\n")
+      expect(embed_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"/assets/image.png\"></span></p>\n")
     end
   end
 end

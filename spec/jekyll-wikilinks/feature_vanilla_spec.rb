@@ -27,6 +27,8 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:link_header_whitespace)          { find_by_title(site.collections["docs"].docs, "Link Header Whitespace") }
   # block link
   let(:link_block)                      { find_by_title(site.collections["docs"].docs, "Link Block") }
+  # web-link
+  let(:web_link)                        { find_by_title(site.collections["docs"].docs, "Web Link") }
 
   # makes markdown tests work
   subject { described_class.new(site.config) }
@@ -99,7 +101,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         end
 
       end
-
 
       context "'attributes'" do
 
@@ -304,4 +305,17 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     end
 
   end
+
+  context "web links (non-wiki-links)" do
+
+    it "have a 'web-link' css class added to their 'a' element" do
+      expect(web_link.content).to include("web-link")
+    end
+
+    it "full output" do
+      expect(web_link.content).to eq("<p>A <a href=\"www.example.com\" class=\"web-link\">web link</a>.</p>\n")
+    end
+
+  end
+
 end
