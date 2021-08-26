@@ -6,7 +6,7 @@ require "jekyll"
 module Jekyll
 
   class Site
-    attr_accessor :link_index
+    attr_accessor :doc_mngr, :link_index
   end
 
 end

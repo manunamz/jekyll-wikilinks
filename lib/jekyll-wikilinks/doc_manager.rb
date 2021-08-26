@@ -4,13 +4,31 @@ require_relative "regex"
 module Jekyll
   module WikiLinks
 
+    #
+    # this class is responsible for answering any questions
+    # related to jekyll markdown documents
+    # that are meant to be processed by the wikilinks plugin
+    #
     class DocManager
-      attr_accessor :md_docs, :static_files
+      CONVERTER_CLASS = Jekyll::Converters::Markdown
 
-      def initialize(md_docs, static_files)
-        @md_docs ||= md_docs
-        @static_files ||= static_files
+      def initialize(site)
+        return if $conf.disabled?
+
+        markdown_converter = site.find_converter_instance(CONVERTER_CLASS)
+        # filter docs based on configs
+        docs = []
+        docs += site.pages if !$conf.exclude?(:pages)
+        docs += site.docs_to_write.filter { |d| !$conf.exclude?(d.type) }
+        @md_docs = docs.filter { |doc| markdown_converter.matches(doc.extname) }
+        if @md_docs.nil? || @md_docs.empty?
+          Jekyll.logger.debug("No documents to process.")
+        end
+
+        @static_files ||= site.static_files
       end
+
+      # accessors
 
       def all
         return @md_docs

@@ -10,10 +10,12 @@ module Jekyll
       # Use Jekyll's native relative_url filter
       include Jekyll::Filters::URLFilters
 
-      def initialize(context, markdown_converter, doc_manager)
-        @context ||= context
-        @doc_manager ||= doc_manager
-        @markdown_converter ||= markdown_converter
+      CONVERTER_CLASS = Jekyll::Converters::Markdown
+
+      def initialize(site)
+        @context ||= Jekyll::WikiLinks::Context.new(site)
+        @doc_manager ||= site.doc_mngr
+        @markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
         @wikilinks, @typed_link_blocks = [], []
       end
 

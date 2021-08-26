@@ -10,6 +10,15 @@ Jekyll::Hooks.register :site, :after_init do |site|
   $conf = Jekyll::WikiLinks::PluginConfig.new(site.config)
 end
 
+# Jekyll.logger.debug "Excluded jekyll types: ", option(EXCLUDE_KEY)
+
+Jekyll::Hooks.register :site, :post_read do |site|
+  site.doc_mngr = Jekyll::WikiLinks::DocManager.new(site)
+  # # setup helper classes
+  # @parser = Parser.new(@site)
+  # @site.link_index = LinkIndex.new(@site)
+end
+
 Liquid::Template.register_filter(Jekyll::WikiLinks::TypeFilters)
 
 module Jekyll

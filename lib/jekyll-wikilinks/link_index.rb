@@ -9,10 +9,10 @@ module Jekyll
       # Use Jekyll's native relative_url filter
       include Jekyll::Filters::URLFilters
 
-      def initialize(site, md_docs)
+      def initialize(site)
         @context ||= Jekyll::WikiLinks::Context.new(site)
         @index = {}
-        md_docs.each do |doc|
+        site.doc_mngr.all.each do |doc|
           @index[doc.url] = LinksInfo.new()
         end
       end
