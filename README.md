@@ -15,9 +15,23 @@ Defaults look like this:
 wikilinks:
   enabled: true
   exclude: []
+  css:
+    link:
+      exclude: []
+# TODO
+      wiki: 'wiki-link'
+      web: 'web-link'
+      invalid: 'invalid-link'
+      embed: 'wiki-link-embed-link'
+    embed:
+      container: 'wiki-link-embed'
+      title: 'wiki-link-embed-title'
+      content: 'wiki-link-embed-content'
 ```
 
 The `enabled` flags may be toggled to turn off the plugin or turn off `d3_graph_data` generation. Any jekyll type ("pages", "posts", or collection names such as "docs" or "notes") may be added to a list of `exclude`s for either wikilinks or graph generation.
+
+The css-level `exclude` defines a list of css classes that should not have the `wiki` css class applied to it.
 
 ## Syntax
 - File level links: `[[filename]]`
@@ -79,15 +93,40 @@ The `enabled` flags may be toggled to turn off the plugin or turn off `d3_graph_
     - CAVEATS: ⚠️ Link type information is currently unused.
     - HTML: Same as embed HTML format above.
 
-### MetaData
+### More Syntax
+
+For more note-taking-related syntaxes such as \==highlights== and \~~strikethroughs~~:
+
+- For kramdown, check out their [project page](https://github.com/gettalong/kramdown/projects/1).
+  - For highlights see [this ticket](https://github.com/gettalong/kramdown/issues/559).
+  - For strikethroughs see [this ticket](https://github.com/gettalong/kramdown/issues/594)).
+- For something that is functional now, check out the [redcarpet markdown parser](https://github.com/vmg/redcarpet).
+
+
+## MetaData
 The following metadata are stored as frontmatter variables and are accessible in liquid templates:
 
-- `attributed` (block-level typed baclinks)
+- `attributed` (block-level typed backlinks)
 - `attributes` (block-level typed forelinks)
-- `backlinks`
-- `forelinks` ('forward' links)
+- `backlinks`  (typed and untyped back links)
+- `forelinks`  (typed and untyped 'forward' links)
+- `missing`    (typed and untyped forelinks)
 
-All metadata are arrays of hashes with key values `type` and `doc`. `type` retrieves a string that is the link type's name and `doc` retrieves the linked jekyll document.
+All metadata are arrays of hashes of the form:
+
+```
+[
+  {
+    type: <str>,
+    doc_url: <url_str>,
+  },
+  {
+    ...
+  }
+]
+```
+
+They may be accessed in liquid templates:
 
 ```
 <!-- render as 👉 "link-type: title" -->
