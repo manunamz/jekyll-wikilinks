@@ -12,6 +12,7 @@ module Jekyll
       def initialize(config)
         @config ||= config
         self.old_config_warn()
+        Jekyll.logger.debug "Excluded jekyll types: ", option(EXCLUDE_KEY) unless disabled?
       end
 
       def disabled?
