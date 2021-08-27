@@ -8,7 +8,9 @@ module Jekyll
 
       # usage: {% assign note_links = page.links | doc_type = "notes" %}
       def doc_type(links, doc_type)
-        return if links.nil? || links.empty?
+        Jekyll.logger.error("'links' should not be nil") if links.nil?
+        return "No doc type given" if doc_type.empty?
+        return [] if links.empty?
 
         site = @context.registers[:site]
         links.each do |l|
@@ -22,7 +24,9 @@ module Jekyll
 
       # usage: {% assign author_links = page.links | link_type = "author" %}
       def link_type(links, link_type)
-        return if links.nil? || links.empty?
+        Jekyll.logger.error("'links' should not be nil") if links.nil?
+        return "No link type given" if link_type.empty?
+        return [] if links.empty?
 
         site = @context.registers[:site]
         links.each do |l|
