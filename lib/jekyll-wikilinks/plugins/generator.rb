@@ -23,10 +23,6 @@ module Jekyll
         @parser = Parser.new(@site)
         @site.link_index = LinkIndex.new(@site)
 
-        # TODO: these can be switched to converters if the
-        #       LinkIndex and document's url
-        #       were available to the converter plugin
-        # parse
         @site.doc_mngr.all.each do |doc|
           @parser.parse(doc.content)
           @site.link_index.populate_forward(doc, @parser.typed_link_blocks, @site.doc_mngr.all)
