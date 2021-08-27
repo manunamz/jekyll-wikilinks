@@ -41,8 +41,8 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
         it "contains original doc data; full content" do
           expect(base_case_a.data['attributed']).to eq([
-            {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"},
-            {"doc_url"=>"/docs/typed.block/", "type"=>"block-typed"}]
+            {"url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"},
+            {"url"=>"/docs/typed.block/", "type"=>"block-typed"}]
            )
         end
 
@@ -56,7 +56,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
         it "contains linked doc data; full content" do
           expect(typed_block.data['attributes']).to eq([
-            {"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"block-typed"}
+            {"url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"block-typed"}
           ])
         end
 
@@ -78,7 +78,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         end
 
         it "contains linked doc info; full content" do
-          expect(base_case_a.data['backlinks']).to include({"doc_url"=>"/docs/typed.inline/", "type"=>"inline-typed"})
+          expect(base_case_a.data['backlinks']).to include({"url"=>"/docs/typed.inline/", "type"=>"inline-typed"})
         end
 
       end
@@ -90,7 +90,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         end
 
         it "contains linked doc info; full content" do
-          expect(typed_inline.data['forelinks']).to include({"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"inline-typed"})
+          expect(typed_inline.data['forelinks']).to include({"url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"inline-typed"})
         end
 
       end
@@ -119,20 +119,20 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
       it "'attributes' in original doc contain linked doc data" do
         expect(typed_block_many['attributes']).to eq([
-          {"doc_url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"many-block-typed"},
-          {"doc_url"=>"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/", "type"=>"many-block-typed"}
+          {"url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"many-block-typed"},
+          {"url"=>"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/", "type"=>"many-block-typed"}
         ])
       end
 
       it "'attributed' in first linked doc contains original doc data; full content" do
         expect(base_case_a.data['attributed']).to include(
-          {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
+          {"url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
           )
       end
 
       it "'attributed' in second linked doc contains original doc data; full content" do
         expect(base_case_b.data['attributed']).to include(
-          {"doc_url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
+          {"url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
           )
       end
 

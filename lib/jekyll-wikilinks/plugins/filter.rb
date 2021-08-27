@@ -14,7 +14,7 @@ module Jekyll
 
         site = @context.registers[:site]
         links.each do |l|
-          doc = site.documents.select{ |d| d.url == l['doc_url'] && d.type.to_s == doc_type.to_s }
+          doc = site.documents.select{ |d| d.url == l['url'] && d.type.to_s == doc_type.to_s }
           if doc.nil? || doc.size != 1
             links.delete(l)
           end
@@ -31,7 +31,7 @@ module Jekyll
         site = @context.registers[:site]
         links.each do |l|
           if l['type'].to_s == link_type.to_s
-            docs = site.documents.select{ |d| d.url == l['doc_url'] }
+            docs = site.documents.select{ |d| d.url == l['url'] }
             if !docs.nil? && docs.size == 1
               links.delete(l)
             end

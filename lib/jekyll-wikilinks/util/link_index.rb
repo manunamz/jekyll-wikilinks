@@ -33,7 +33,7 @@ module Jekyll
           if !attr_doc.nil?
             @index[doc.url].attributes << {
               'type' => tlb.link_type,
-              'doc_url' => attr_doc.url,
+              'url' => attr_doc.url,
             }
           else
             Jekyll.logger.warn("Typed block link's document not found for #{tlb.filename}")
@@ -46,7 +46,7 @@ module Jekyll
           if !link_doc.nil?
             @index[doc.url].forelinks << {
               'type' => ltype,
-              'doc_url' => lurl,
+              'url' => lurl,
             }
           end
         end
@@ -61,19 +61,19 @@ module Jekyll
         md_docs.each do |doc_to_link|
           # attributed
           @index[doc_to_link.url].attributes.each do |al|
-            if self.remove_baseurl(al['doc_url']) == doc.url
+            if self.remove_baseurl(al['url']) == doc.url
               @index[doc.url].attributed << {
                 'type' => al['type'],
-                'doc_url' => doc_to_link.url,
+                'url' => doc_to_link.url,
               }
             end
           end
           # backlinks
           @index[doc_to_link.url].forelinks.each do |l|
-            if self.remove_baseurl(l['doc_url']) == doc.url
+            if self.remove_baseurl(l['url']) == doc.url
               @index[doc.url].backlinks << {
                 'type' => l['type'],
-                'doc_url' => doc_to_link.url,
+                'url' => doc_to_link.url,
               }
             end
           end
