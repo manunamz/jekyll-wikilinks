@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 require "jekyll"
 
-require_relative "patch/context"
-require_relative "patch/doc_manager"
-require_relative "patch/site"
+require_relative "../patch/context"
+require_relative "../patch/doc_manager"
+require_relative "../patch/site"
+require_relative "../util/link_index"
+require_relative "../util/parser"
 require_relative "converter"
-require_relative "util/link_index"
-require_relative "util/parser"
 
 module Jekyll
   module WikiLinks
@@ -23,6 +23,9 @@ module Jekyll
         @parser = Parser.new(@site)
         @site.link_index = LinkIndex.new(@site)
 
+        # TODO: these can be switched to converters if the
+        #       LinkIndex and document's url
+        #       were available to the converter plugin
         # parse
         @site.doc_mngr.all.each do |doc|
           @parser.parse_blocks(doc.content)

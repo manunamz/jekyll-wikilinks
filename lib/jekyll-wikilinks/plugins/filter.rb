@@ -6,6 +6,9 @@ module Jekyll
     module TypeFilters
       # 'links' accepts both untyped links, typed links, and attributes; fore and back.
 
+      def docs(links)
+      end
+
       # usage: {% assign note_links = page.links | doc_type = "notes" %}
       # "doc_type" is the jekyll type ("pages", "posts", "<collection-name>")
       def doc_type(links, doc_type)
