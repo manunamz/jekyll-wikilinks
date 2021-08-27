@@ -19,6 +19,11 @@ module Jekyll
         @wikilinks, @typed_link_blocks = [], []
       end
 
+      def parse(doc_content)
+        self.parse_blocks(doc_content)
+        self.parse_inlines(doc_content)
+      end
+
       def parse_blocks(doc_content)
         @typed_link_blocks, @wikilinks = [], []
         typed_link_block_matches = doc_content.scan(REGEX_TYPED_LINK_BLOCK)

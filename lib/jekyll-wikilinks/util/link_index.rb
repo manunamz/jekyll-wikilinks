@@ -25,26 +25,20 @@ module Jekyll
         doc.data['missing']    = @index[doc.url].missing.uniq
       end
 
-      def populate_attributes(doc, typed_link_blocks, md_docs)
-        typed_link_blocks.each do |tl|
-          attr_doc = md_docs.detect { |d| File.basename(d.basename, File.extname(d.basename)) == tl.filename }
+      def populate_forward(doc, typed_link_blocks, md_docs)
+        # attributes
+        typed_link_blocks.each do |tlb|
+          attr_doc = md_docs.detect { |d| File.basename(d.basename, File.extname(d.basename)) == tlb.filename }
           if !attr_doc.nil?
             @index[doc.url].attributes << {
-              'type' => tl.link_type,
+              'type' => tlb.link_type,
               'doc_url' => attr_doc.url,
             }
-            @index[attr_doc.url].attributed << {
-              'type' => tl.link_type,
-              'doc_url' => doc.url,
-            }
           else
-            Jekyll.logger.warn("Typed block link's document not found for #{tl.filename}")
+            Jekyll.logger.warn("Typed block link's document not found for #{tlb.filename}")
           end
         end
-      end
-
-      def populate_links(doc, md_docs)
-        # ...process its forelinks
+        # forelinks
         doc.content.scan(REGEX_VALID_WIKI_LINK).each do |m|
           ltype, lurl = m[0], m[1]
           @index[doc.url].forelinks << {
@@ -52,23 +46,33 @@ module Jekyll
             'doc_url' => lurl,
           }
         end
-        # ...process its backlinks
-        # TODO: can probably get rid of this and only add backlink per forelink
-        md_docs.each do |doc_to_backlink|
-          doc_to_backlink.content.scan(REGEX_VALID_WIKI_LINK).each do |m|
-            ltype, lurl = m[0], m[1]
-            if lurl == relative_url(doc.url)
-              @index[doc.url].backlinks << {
-                'type' => ltype,
-                'doc_url' => doc_to_backlink.url,
-              }
-            end
-          end
-        end
         # ...process missing links
         doc.content.scan(REGEX_INVALID_WIKI_LINK).each do |m|
           ltext = m[0]
           @index[doc.url].missing << ltext
+        end
+      end
+
+      def populate_backward(doc, md_docs)
+        md_docs.each do |doc_to_link|
+          # attributed
+          @index[doc_to_link.url].attributes.each do |al|
+            if al['doc_url'] == doc.url
+              @index[doc.url].attributed << {
+                'type' => al['type'],
+                'doc_url' => doc_to_link.url,
+              }
+            end
+          end
+          # backlinks
+          @index[doc_to_link.url].forelinks.each do |l|
+            if l['doc_url'] == doc.url
+              @index[doc.url].backlinks << {
+                'type' => l['type'],
+                'doc_url' => doc_to_link.url,
+              }
+            end
+          end
         end
       end
 

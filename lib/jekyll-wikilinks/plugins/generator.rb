@@ -28,18 +28,13 @@ module Jekyll
         #       were available to the converter plugin
         # parse
         @site.doc_mngr.all.each do |doc|
-          @parser.parse_blocks(doc.content)
-          # attributes are handled alongside parsing since
-          # they need access to the parser's discovered 'typed_link_blocks'
-          # and remove the text from the document
-          @site.link_index.populate_attributes(doc, @parser.typed_link_blocks, @site.doc_mngr.all)
-          @parser.parse_inlines(doc.content)
+          @parser.parse(doc.content)
+          @site.link_index.populate_forward(doc, @parser.typed_link_blocks, @site.doc_mngr.all)
         end
-        # build link_index
-        # (wait until all docs are processed before assigning metadata,
-        # so all backlinks are collected for assignment)
+        # wait until all docs are processed before assigning backward facing metadata,
+        # this ensures all attributed/backlinks are collected for assignment
         @site.doc_mngr.all.each do |doc|
-          @site.link_index.populate_links(doc, @site.doc_mngr.all)
+          @site.link_index.populate_backward(doc, @site.doc_mngr.all)
           @site.link_index.assign_metadata(doc)
         end
       end
