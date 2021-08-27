@@ -8,6 +8,8 @@ require_relative "jekyll-wikilinks/version"
 # setup config
 require_relative "jekyll-wikilinks/config"
 Jekyll::Hooks.register :site, :after_init do |site|
+  # global '$conf' to ensure that all local jekyll plugins
+  # are reading from the same configuration
   $conf = Jekyll::WikiLinks::PluginConfig.new(site.config)
 end
 
