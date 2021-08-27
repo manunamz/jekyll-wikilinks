@@ -1,4 +1,4 @@
-require 'jekyll-wikilinks/regex'
+require_relative 'regex'
 
 module Jekyll
   module WikiLinks

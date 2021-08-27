@@ -5,8 +5,8 @@ require_relative "patch/context"
 require_relative "patch/doc_manager"
 require_relative "patch/site"
 require_relative "converter"
-require_relative "link_index"
-require_relative "parser"
+require_relative "util/link_index"
+require_relative "util/parser"
 
 module Jekyll
   module WikiLinks
