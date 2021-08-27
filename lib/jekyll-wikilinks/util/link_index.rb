@@ -10,6 +10,7 @@ module Jekyll
       include Jekyll::Filters::URLFilters
 
       def initialize(site)
+        @baseurl = site.baseurl
         @context ||= Jekyll::WikiLinks::Context.new(site)
         @index = {}
         site.doc_mngr.all.each do |doc|
@@ -41,10 +42,13 @@ module Jekyll
         # forelinks
         doc.content.scan(REGEX_VALID_WIKI_LINK).each do |m|
           ltype, lurl = m[0], m[1]
-          @index[doc.url].forelinks << {
-            'type' => ltype,
-            'doc_url' => lurl,
-          }
+          link_doc = md_docs.detect{ |d| d.url == self.remove_baseurl(lurl) }
+          if !link_doc.nil?
+            @index[doc.url].forelinks << {
+              'type' => ltype,
+              'doc_url' => lurl,
+            }
+          end
         end
         # ...process missing links
         doc.content.scan(REGEX_INVALID_WIKI_LINK).each do |m|
@@ -57,7 +61,7 @@ module Jekyll
         md_docs.each do |doc_to_link|
           # attributed
           @index[doc_to_link.url].attributes.each do |al|
-            if al['doc_url'] == doc.url
+            if self.remove_baseurl(al['doc_url']) == doc.url
               @index[doc.url].attributed << {
                 'type' => al['type'],
                 'doc_url' => doc_to_link.url,
@@ -66,7 +70,7 @@ module Jekyll
           end
           # backlinks
           @index[doc_to_link.url].forelinks.each do |l|
-            if l['doc_url'] == doc.url
+            if self.remove_baseurl(l['doc_url']) == doc.url
               @index[doc.url].backlinks << {
                 'type' => l['type'],
                 'doc_url' => doc_to_link.url,
@@ -74,6 +78,11 @@ module Jekyll
             end
           end
         end
+      end
+
+      def remove_baseurl(url)
+        return url.gsub(@baseurl, '') if !@baseurl.nil?
+        return url
       end
 
       class LinksInfo
