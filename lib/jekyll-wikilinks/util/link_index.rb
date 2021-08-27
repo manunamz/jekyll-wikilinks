@@ -18,11 +18,11 @@ module Jekyll
       end
 
       def assign_metadata(doc)
-        doc.data['attributed'] = @index[doc.url].attributed
-        doc.data['attributes'] = @index[doc.url].attributes
-        doc.data['backlinks']  = @index[doc.url].backlinks
-        doc.data['forelinks']  = @index[doc.url].forelinks
-        doc.data['missing']    = @index[doc.url].missing
+        doc.data['attributed'] = @index[doc.url].attributed.uniq
+        doc.data['attributes'] = @index[doc.url].attributes.uniq
+        doc.data['backlinks']  = @index[doc.url].backlinks.uniq
+        doc.data['forelinks']  = @index[doc.url].forelinks.uniq
+        doc.data['missing']    = @index[doc.url].missing.uniq
       end
 
       def populate_attributes(doc, typed_link_blocks, md_docs)
