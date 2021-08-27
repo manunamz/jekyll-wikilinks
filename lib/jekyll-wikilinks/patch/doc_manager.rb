@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require_relative "regex"
+require_relative "../regex"
 
 module Jekyll
   module WikiLinks

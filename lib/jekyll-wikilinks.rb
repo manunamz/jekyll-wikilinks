@@ -12,7 +12,7 @@ Jekyll::Hooks.register :site, :after_init do |site|
 end
 
 # setup docs (based on configs)
-require_relative "jekyll-wikilinks/doc_manager"
+require_relative "jekyll-wikilinks/patch/doc_manager"
 Jekyll::Hooks.register :site, :post_read do |site|
   if !$conf.disabled?
     site.doc_mngr = Jekyll::WikiLinks::DocManager.new(site)

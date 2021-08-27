@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 require "jekyll"
 
-require_relative "context"
+require_relative "patch/context"
+require_relative "patch/doc_manager"
+require_relative "patch/site"
 require_relative "converter"
-require_relative "doc_manager"
 require_relative "link_index"
 require_relative "parser"
-require_relative "site"
 
 module Jekyll
   module WikiLinks
