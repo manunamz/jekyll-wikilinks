@@ -15,6 +15,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:typed_inline)                    { find_by_title(site.collections["docs"].docs, "Typed Link Inline") }
   let(:typed_block)                     { find_by_title(site.collections["docs"].docs, "Typed Link Block") }
   let(:typed_block_many)                { find_by_title(site.collections["docs"].docs, "Typed Link Block Many") }
+  let(:typed_block_list_many)           { find_by_title(site.collections["docs"].docs, "Typed Link Block List Many") }
 
   # makes markdown tests work
   subject { described_class.new(site.config) }
@@ -28,44 +29,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     # cleanup _site/ dir
     FileUtils.rm_rf(Dir["#{site_dir()}"])
   end
-
-  context "when block style typed::[[wikilink]] exists" do
-
-    context "metadata:" do
-
-      context "'attributed'" do
-
-        it "added to linked document" do
-          expect(base_case_a.data.keys).to include('attributed')
-        end
-
-        it "contains original doc data; full content" do
-          expect(base_case_a.data['attributed']).to eq([
-            {"url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"},
-            {"url"=>"/docs/typed.block/", "type"=>"block-typed"}]
-           )
-        end
-
-      end
-
-      context "'attributes'" do
-
-        it "added to original document" do
-          expect(typed_block.data.keys).to include("attributes")
-        end
-
-        it "contains linked doc data; full content" do
-          expect(typed_block.data['attributes']).to eq([
-            {"url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"block-typed"}
-          ])
-        end
-
-      end
-
-    end
-
-  end
-
 
   context "when inline style typed::[[wikilink]] exists" do
 
@@ -93,47 +56,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(typed_inline.data['forelinks']).to include({"url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"inline-typed"})
         end
 
-      end
-
-    end
-
-  end
-
-  context "when there are multiple block style typed::[[wikilink]]s" do
-
-    context "metadata:" do
-
-      it "'attributes' added to original document" do
-        expect(typed_block_many.data.keys).to include("attributes")
-      end
-
-      it "'attributed' added to linked documents" do
-        expect(base_case_a.data.keys).to include('attributed')
-        expect(base_case_b.data.keys).to include('attributed')
-      end
-
-    end
-
-
-    context "relationships" do
-
-      it "'attributes' in original doc contain linked doc data" do
-        expect(typed_block_many['attributes']).to eq([
-          {"url"=>"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/", "type"=>"many-block-typed"},
-          {"url"=>"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/", "type"=>"many-block-typed"}
-        ])
-      end
-
-      it "'attributed' in first linked doc contains original doc data; full content" do
-        expect(base_case_a.data['attributed']).to include(
-          {"url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
-          )
-      end
-
-      it "'attributed' in second linked doc contains original doc data; full content" do
-        expect(base_case_b.data['attributed']).to include(
-          {"url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
-          )
       end
 
     end

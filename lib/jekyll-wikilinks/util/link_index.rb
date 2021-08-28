@@ -26,14 +26,33 @@ module Jekyll
         doc.data['missing']    = @index[doc.url].missing.uniq
       end
 
-      def populate_forward(doc, typed_link_blocks, md_docs)
+      def populate_forward(doc, typed_link_blocks, typed_link_block_lists, md_docs)
         # attributes
+        ## list
+        typed_link_block_lists.each do |tlbl|
+          urls = []
+          tlbl.list_items.each do |bullet_type, filename|
+            attr_doc = md_docs.detect { |d| File.basename(d.basename, File.extname(d.basename)) == filename }
+            if !attr_doc.nil?
+              urls << attr_doc.url
+            end
+          end
+          if !urls.nil? && !urls.empty?
+            @index[doc.url].attributes << {
+              'type' => tlbl.link_type,
+              'urls' => urls,
+            }
+          else
+            Jekyll.logger.warn("Typed block link's document not found for #{tlb.filename}")
+          end
+        end
+        ## single
         typed_link_blocks.each do |tlb|
           attr_doc = md_docs.detect { |d| File.basename(d.basename, File.extname(d.basename)) == tlb.filename }
           if !attr_doc.nil?
             @index[doc.url].attributes << {
               'type' => tlb.link_type,
-              'url' => attr_doc.url,
+              'urls' => [ attr_doc.url ],
             }
           else
             Jekyll.logger.warn("Typed block link's document not found for #{tlb.filename}")
@@ -61,11 +80,20 @@ module Jekyll
         md_docs.each do |doc_to_link|
           # attributed
           @index[doc_to_link.url].attributes.each do |al|
-            if self.remove_baseurl(al['url']) == doc.url
-              @index[doc.url].attributed << {
-                'type' => al['type'],
-                'url' => doc_to_link.url,
-              }
+            urls = al['urls'].map { |url| self.remove_baseurl(url) }
+            if urls.include?(doc.url)
+              target_attr = @index[doc.url].attributed.detect { |atr| atr['type'] == al['type']}
+              # add
+              if !target_attr.nil?
+                target_attr['urls'] << doc_to_link.url
+              # create new
+              else
+                urls = @index[doc.url].attributed.detect { |a| a['type'] == al['type'] }
+                @index[doc.url].attributed << {
+                  'type' => al['type'],
+                  'urls' => [ doc_to_link.url ],
+                }
+              end
             end
           end
           # backlinks
@@ -89,11 +117,11 @@ module Jekyll
         attr_accessor :attributes, :attributed, :backlinks, :forelinks, :missing
 
         def initialize
-          @attributed = [] # block typed backlinks
-          @attributes = [] # block typed forelinks
-          @backlinks  = [] # inline typed and basic backlinks
-          @forelinks  = [] # inline typed and basic forelinks
-          @missing    = [] # missing forelinks
+          @attributed = [] # block typed backlinks;            { 'type' => str, 'urls' => [ str ] }
+          @attributes = [] # block typed forelinks;            { 'type' => str, 'urls' => [ str ] }
+          @backlinks  = [] # inline typed and basic backlinks; { 'type' => str, 'url'  => str }
+          @forelinks  = [] # inline typed and basic forelinks; { 'type' => str, 'url'  => str }
+          @missing    = [] # missing forelinks;                [ str ]
         end
       end
     end

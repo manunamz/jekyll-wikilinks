@@ -25,7 +25,7 @@ module Jekyll
 
         @site.doc_mngr.all.each do |doc|
           @parser.parse(doc.content)
-          @site.link_index.populate_forward(doc, @parser.typed_link_blocks, @site.doc_mngr.all)
+          @site.link_index.populate_forward(doc, @parser.typed_link_blocks, @parser.typed_link_block_lists, @site.doc_mngr.all)
         end
         # wait until all docs are processed before assigning backward facing metadata,
         # this ensures all attributed/backlinks are collected for assignment

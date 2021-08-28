@@ -37,7 +37,8 @@ module Jekyll
     REGEX_SETEXT_HEADER = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
     ## list item: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/list.rb#L49
     # REGEX_LIST_ITEM = /(^ {0,3}[+*-])([\t| ].*?\n)/i
-    REGEX_LIST_ITEM = /(^ {0,3}[+*-])([\t| ](?:\[\[#{REGEX_FILENAME}\]\]))/i
+    # REGEX_LIST_ITEM = /(^ {0,3}(?<bullet>[+*-]))([\t| ](?:\[\[#{REGEX_FILENAME}\]\]))/i
+    REGEX_LIST_ITEM = /(^ {0,3}(?<bullet>[+*-]))(\s(?:\[\[#{REGEX_FILENAME}\]\]))/i
     ## new-markdown-style
     REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}^\n/i
 
@@ -60,6 +61,11 @@ module Jekyll
       \]\]
     }x
     REGEX_TYPED_LINK_BLOCK = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\[\[#{REGEX_FILENAME}\]\]\n/i
+        # REGEX_TYPED_LINK_BLOCK_LIST_COMMA = /(?:(?<link-type-txt>([^\n\s\!\#\^\|\]]+))::|\G)\s*(?:\[\[(?<filename>([^\\\/:\#\^\|\[\]]+))\]\])\s*(?:,)?/i
+    # REGEX_TYPED_LINK_BLOCK_LIST_COMMA = /(?:#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}|\G)\s*(?:\[\[#{REGEX_FILENAME}\]\])\s*(?:,)?/i
+        # REGEX_TYPED_LINK_BLOCK_LIST_MKDN = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\n|\G(?:(^ {0,3}[+*-])([\t| ](?:\[\[(?<filename>([^\\\/:\#\^\|\[\]]+))\]\])?\n))/i
+        # REGEX_TYPED_LINK_BLOCK_LIST_MKDN = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\n|\G(?:(^ {0,3}[+*-])([\t| ](?:\[\[#{REGEX_FILENAME}\]\])?\n))/i
+    REGEX_TYPED_LINK_BLOCK_LIST_MKDN = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\n|\G(?:#{REGEX_LIST_ITEM}\n)/i
     #
     # parsing for wikilinks in html
     #

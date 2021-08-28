@@ -75,6 +75,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
     context "metadata:" do
 
+      # see feature_blocks_spec.rb for more robust testing
       context "'attributed'" do
 
         it "is added to document" do
@@ -82,26 +83,27 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(base_case_b.data['attributed']).to_not be_nil
         end
 
-        it "is an array of hashes with keys 'type' and 'url'" do
+        it "is an array of hashes with keys 'type' and 'urls'" do
           expect(base_case_a.data['attributed']).to be_a(Array)
-          expect(base_case_a.data['attributed'][0].keys).to eq([ "type", "url" ])
+          expect(base_case_a.data['attributed'][0].keys).to eq([ "type", "urls" ])
 
           expect(base_case_b.data['attributed']).to be_a(Array)
-          expect(base_case_b.data['attributed'][0].keys).to eq([ "type", "url" ])
+          expect(base_case_b.data['attributed'][0].keys).to eq([ "type", "urls" ])
         end
 
         it "full contents" do
           expect(base_case_a.data['attributed']).to eq([
-            {"url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"},
-            {"url"=>"/docs/typed.block/", "type"=>"block-typed"}
+            {"type"=>"many-block-typed", "urls"=>["/docs/typed.block.many/"]},
+            {"type"=>"block-typed", "urls"=>["/docs/typed.block/"]}
           ])
           expect(base_case_b.data['attributed']).to eq([
-            {"url"=>"/docs/typed.block.many/", "type"=>"many-block-typed"}
+            {"type"=>"many-block-typed", "urls"=>["/docs/typed.block.many/"]}
           ])
         end
 
       end
 
+      # see feature_blocks_spec.rb for more robust testing
       context "'attributes'" do
 
         it "added to document" do
@@ -109,8 +111,8 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(base_case_b.data['attributes']).to_not be_nil
         end
 
-        # 'attributes' is empty in this example -- see feature_types_spec.rb for more robust testing
-        it "is an array of hashes (with with keys 'type' and 'url')" do
+        # 'attributes' is empty in this example -- see feature_blocks_spec.rb for more robust testing
+        it "is an array of hashes (with with keys 'type' and 'urls')" do
           expect(base_case_a.data['attributes']).to be_a(Array)
           # expect(base_case_a.data['attributes'][0].keys).to eq([ "type", "url" ])
           expect(base_case_a.data['attributes']).to eq([])
