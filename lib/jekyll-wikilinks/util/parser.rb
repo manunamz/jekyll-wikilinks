@@ -61,8 +61,10 @@ module Jekyll
         # replace text
         return if @wikilinks.nil?
         @wikilinks.each do |wikilink|
-          doc_content.sub!(
-            wikilink.md_link_regex,
+          doc_content.gsub!(
+            # TODO: Keep this around just in case something breaks -- remove 2021.10.01 (also gsub! -> sub!)
+            # wikilink.md_link_regex,
+            wikilink.md_link_str,
             self.build_html(wikilink)
           )
         end
@@ -179,22 +181,23 @@ module Jekyll
         return "#{embed}#{link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]"
       end
 
-      def md_link_regex
-        regex_embed = embedded? ? REGEX_LINK_EMBED : %r{}
-        regex_link_type = typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
-        filename = described?(FILENAME) ? @filename : ""
-        if described?(HEADER_TXT)
-          header = %r{#{REGEX_LINK_HEADER}#{@header_txt}}
-          block = %r{}
-        elsif described?(BLOCK_ID)
-          header = %r{}
-          block = %r{#{REGEX_LINK_BLOCK}#{@block_id}}
-        elsif !described?(FILENAME)
-          Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_link_regex' for details"
-        end
-        label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{clean_label_txt}} : %r{}
-        return %r{#{regex_embed}#{regex_link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]}
-      end
+      # TODO: Keep this around just in case something breaks -- remove 2021.10.01
+      # def md_link_regex
+      #   regex_embed = embedded? ? REGEX_LINK_EMBED : %r{}
+      #   regex_link_type = typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
+      #   filename = described?(FILENAME) ? @filename : ""
+      #   if described?(HEADER_TXT)
+      #     header = %r{#{REGEX_LINK_HEADER}#{@header_txt}}
+      #     block = %r{}
+      #   elsif described?(BLOCK_ID)
+      #     header = %r{}
+      #     block = %r{#{REGEX_LINK_BLOCK}#{@block_id}}
+      #   elsif !described?(FILENAME)
+      #     Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_link_regex' for details"
+      #   end
+      #   label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{clean_label_txt}} : %r{}
+      #   return %r{#{regex_embed}#{regex_link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]}
+      # end
 
       def describe
         return {
