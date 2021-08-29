@@ -21,13 +21,13 @@ module Jekyll
 
       def parse(doc_content)
         @wikilink_blocks, @wikilinks = [], [], []
-        self.parse_blocks(doc_content)
+        self.parse_block_singles(doc_content)
         self.parse_block_lists_mkdn(doc_content)
         self.parse_block_lists_comma(doc_content)
         self.parse_inlines(doc_content)
       end
 
-      def parse_blocks(doc_content)
+      def parse_block_singles(doc_content)
         bullet_type = ""
         typed_link_block_matches = doc_content.scan(REGEX_TYPED_LINK_BLOCK)
         if !typed_link_block_matches.nil? && typed_link_block_matches.size != 0
