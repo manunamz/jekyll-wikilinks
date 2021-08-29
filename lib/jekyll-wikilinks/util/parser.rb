@@ -41,7 +41,7 @@ module Jekyll
               nil,
             )
             @typed_link_blocks << typed_link_block_wikilink
-            doc_content.gsub!(typed_link_block_wikilink.md_link_str, "")
+            doc_content.gsub!(typed_link_block_wikilink.md_link_regex, "")
           end
         end
       end
@@ -72,7 +72,7 @@ module Jekyll
               # process previous wikilink_list
               if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
                 @typed_link_block_lists << processing_wikilink_list
-                doc_content.gsub!(processing_wikilink_list.md_str, "")
+                doc_content.gsub!(processing_wikilink_list.md_regex, "")
               end
               processing_link_type = link_type
               processing_wikilink_list = WikiLinkBlockList.new(processing_link_type, bullet_type, link_filename_1)
@@ -85,8 +85,7 @@ module Jekyll
           # process previous wikilink_list
           if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
             @typed_link_block_lists << processing_wikilink_list
-            # puts processing_wikilink_list.md_str
-            doc_content.gsub!(processing_wikilink_list.md_str, "")
+            doc_content.gsub!(processing_wikilink_list.md_regex, "")
           end
         end
       end
@@ -129,7 +128,7 @@ module Jekyll
               # process previous wikilink_list
               if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
                 @typed_link_block_lists << processing_wikilink_list
-                doc_content.gsub!(processing_wikilink_list.md_str, "")
+                doc_content.gsub!(processing_wikilink_list.md_regex, "")
               end
               processing_link_type = link_type
               processing_wikilink_list = WikiLinkBlockList.new(processing_link_type)
@@ -141,7 +140,7 @@ module Jekyll
           # process previous wikilink_list
           if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
             @typed_link_block_lists << processing_wikilink_list
-            doc_content.gsub!(processing_wikilink_list.md_str, "")
+            doc_content.gsub!(processing_wikilink_list.md_regex, "")
           end
         end
       end
@@ -167,7 +166,7 @@ module Jekyll
           doc_content.gsub!(
             # TODO: Keep this around just in case something breaks -- remove 2021.10.01 (also gsub! -> sub!)
             # wikilink.md_link_regex,
-            wikilink.md_link_str,
+            wikilink.md_link_regex,
             self.build_html(wikilink)
           )
         end
@@ -258,6 +257,30 @@ module Jekyll
         @list_items << [ bullet_type, filename ]
       end
 
+      def md_regex
+        if typed? && has_items?
+
+          if bullet_type? == ","
+            tmp_list_items = @list_items.dup
+            first_item = tmp_list_items.shift()
+            link_type = /#{@link_type}#{REGEX_LINK_TYPE}\[\[#{first_item[1]}\]\]\s*/i
+            list_item_strs = tmp_list_items.map { |li| /#{li[0]}\s*\[\[#{li[1]}\]\]/i }
+            md_link_regex = /#{link_type}#{list_item_strs.join('')}/i
+
+          elsif "+*-".include?(bullet_type?)
+            link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}\n}
+            list_item_strs = @list_items.map { |li| /#{Regexp.escape(li[0])}\s\[\[#{li[1]}\]\]\n/i }
+            md_link_regex = /#{link_type}#{list_item_strs.join("")}/i
+
+          else
+            Jekyll.logger.error("Not a valid bullet_type: #{bullet_type?}")
+          end
+          return md_link_regex
+        else
+          Jekyll.logger.error("WikiLinkBlockList.md_regex error")
+        end
+      end
+
       def md_str
         if typed? && has_items?
           if bullet_type? == ","
@@ -314,6 +337,7 @@ module Jekyll
         return @label_txt.sub("[", "\\[").sub("]", "\\]")
       end
 
+      # TODO: remove this once parsing is migrated to nokogiri...?
       def md_link_str
         embed = embedded? ? "!" : ""
         link_type = typed? ? "#{@link_type}::" : ""
@@ -331,23 +355,22 @@ module Jekyll
         return "#{embed}#{link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]"
       end
 
-      # TODO: Keep this around just in case something breaks -- remove 2021.10.01
-      # def md_link_regex
-      #   regex_embed = embedded? ? REGEX_LINK_EMBED : %r{}
-      #   regex_link_type = typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
-      #   filename = described?(FILENAME) ? @filename : ""
-      #   if described?(HEADER_TXT)
-      #     header = %r{#{REGEX_LINK_HEADER}#{@header_txt}}
-      #     block = %r{}
-      #   elsif described?(BLOCK_ID)
-      #     header = %r{}
-      #     block = %r{#{REGEX_LINK_BLOCK}#{@block_id}}
-      #   elsif !described?(FILENAME)
-      #     Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_link_regex' for details"
-      #   end
-      #   label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{clean_label_txt}} : %r{}
-      #   return %r{#{regex_embed}#{regex_link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]}
-      # end
+      def md_link_regex
+        regex_embed = embedded? ? REGEX_LINK_EMBED : %r{}
+        regex_link_type = typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
+        filename = described?(FILENAME) ? @filename : ""
+        if described?(HEADER_TXT)
+          header = %r{#{REGEX_LINK_HEADER}#{@header_txt}}
+          block = %r{}
+        elsif described?(BLOCK_ID)
+          header = %r{}
+          block = %r{#{REGEX_LINK_BLOCK}#{@block_id}}
+        elsif !described?(FILENAME)
+          Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_link_regex' for details"
+        end
+        label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{clean_label_txt}} : %r{}
+        return %r{#{regex_embed}#{regex_link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]}
+      end
 
       def describe
         return {
