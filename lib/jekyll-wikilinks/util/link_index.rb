@@ -43,7 +43,7 @@ module Jekyll
               'urls' => urls,
             }
           else
-            Jekyll.logger.warn("Typed block link's document not found for #{tlb.filename}")
+            Jekyll.logger.warn("No documents found for urls: #{urls}")
           end
         end
         ## single
