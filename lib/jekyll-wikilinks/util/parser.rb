@@ -259,19 +259,18 @@ module Jekyll
 
       def md_regex
         if typed? && has_items?
-
+          # bullet-comma
           if bullet_type? == ","
             tmp_list_items = @list_items.dup
             first_item = tmp_list_items.shift()
             link_type = /#{@link_type}#{REGEX_LINK_TYPE}\[\[#{first_item[1]}\]\]\s*/i
-            list_item_strs = tmp_list_items.map { |li| /#{li[0]}\s*\[\[#{li[1]}\]\]/i }
+            list_item_strs = tmp_list_items.map { |li| /#{li[0]}\s*\[\[#{li[1]}\]\]\s*/i }
             md_link_regex = /#{link_type}#{list_item_strs.join('')}/i
-
+          # bullet-md
           elsif !bullet_type?.match(REGEX_BULLET).nil?
             link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}\n}
             list_item_strs = @list_items.map { |li| /#{Regexp.escape(li[0])}\s\[\[#{li[1]}\]\]\n/i }
             md_link_regex = /#{link_type}#{list_item_strs.join("")}/i
-
           else
             Jekyll.logger.error("Not a valid bullet_type: #{bullet_type?}")
           end

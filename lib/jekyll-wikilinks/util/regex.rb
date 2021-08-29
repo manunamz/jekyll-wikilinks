@@ -9,9 +9,11 @@ module Jekyll
     #
     # from: https://docs.github.com/en/github/managing-files-in-a-repository/working-with-non-code-files/rendering-and-diffing-images
     SUPPORTED_IMG_FORMATS = Set.new(['.png', '.jpg', '.gif', '.psd', '.svg'])
+
     #
     # markdown wikilink syntax
     #
+
     ## wikilink usable char syntax requirements
     #
     # TODO: Fix REGEX_NOT_GREEDY
@@ -46,7 +48,7 @@ module Jekyll
     ## wikilink special char syntax requirements
     #
     REGEX_LINK_EMBED = /(?<embed>(\!))/i                           # 0 (capture index for WikiLinks class)
-    REGEX_LINK_TYPE = /::/
+    REGEX_LINK_TYPE = /\s*::\s*/
     REGEX_LINK_HEADER = /\#/
     REGEX_LINK_BLOCK = /\#\^/
     REGEX_LINK_LABEL = /\|/

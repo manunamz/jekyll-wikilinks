@@ -15,5 +15,6 @@ block-typed-list-plus::
 
 block-typed-list-comma::[[block.a]],[[block.b]]
 block-typed-list-comma-ws::[[block.a]], [[block.b]]
+block-typed-list-ws-comma-ws :: [[block.a]], [[block.b]]
 
 Add multiple block level typed wikilinks to create wikipedia-style infoboxes!
