@@ -5,7 +5,7 @@ module Jekyll
 
     # more of a "parser" than a parser
     class Parser
-      attr_accessor :doc_manager, :markdown_converter, :wikilinks, :wikilink_blocks
+      attr_accessor :doc_manager, :markdown_converter, :wikilink_inlines, :wikilink_blocks
 
       # Use Jekyll's native relative_url filter
       include Jekyll::Filters::URLFilters
@@ -16,11 +16,11 @@ module Jekyll
         @context ||= Jekyll::WikiLinks::Context.new(site)
         @doc_manager ||= site.doc_mngr
         @markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
-        @wikilink_blocks, @wikilinks = [], [], []
+        @wikilink_blocks, @wikilink_inlines = [], [], []
       end
 
       def parse(doc_content)
-        @wikilink_blocks, @wikilinks = [], [], []
+        @wikilink_blocks, @wikilink_inlines = [], [], []
         self.parse_block_singles(doc_content)
         self.parse_block_lists_mkdn(doc_content)
         self.parse_block_lists_comma(doc_content)
@@ -149,7 +149,7 @@ module Jekyll
         wikilink_matches = doc_content.scan(REGEX_WIKI_LINKS)
         if !wikilink_matches.nil? && wikilink_matches.size != 0
           wikilink_matches.each do |wl_match|
-            @wikilinks << WikiLink.new(
+            @wikilink_inlines << WikiLink.new(
               wl_match[0],
               wl_match[1],
               wl_match[2],
@@ -160,8 +160,8 @@ module Jekyll
           end
         end
         # replace text
-        return if @wikilinks.nil?
-        @wikilinks.each do |wikilink|
+        return if @wikilink_inlines.nil?
+        @wikilink_inlines.each do |wikilink|
           doc_content.gsub!(
             # TODO: Keep this around just in case something breaks -- remove 2021.10.01 (also gsub! -> sub!)
             # wikilink.md_link_regex,
