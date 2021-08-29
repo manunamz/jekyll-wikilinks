@@ -5,7 +5,7 @@ module Jekyll
 
     # more of a "parser" than a parser
     class Parser
-      attr_accessor :doc_manager, :markdown_converter, :wikilinks, :typed_link_blocks, :typed_link_block_lists
+      attr_accessor :doc_manager, :markdown_converter, :wikilinks, :wikilink_blocks
 
       # Use Jekyll's native relative_url filter
       include Jekyll::Filters::URLFilters
@@ -16,11 +16,11 @@ module Jekyll
         @context ||= Jekyll::WikiLinks::Context.new(site)
         @doc_manager ||= site.doc_mngr
         @markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
-        @typed_link_block_lists, @typed_link_blocks, @wikilinks = [], [], []
+        @wikilink_blocks, @wikilinks = [], [], []
       end
 
       def parse(doc_content)
-        @typed_link_block_lists, @typed_link_blocks, @wikilinks = [], [], []
+        @wikilink_blocks, @wikilinks = [], [], []
         self.parse_blocks(doc_content)
         self.parse_block_lists_mkdn(doc_content)
         self.parse_block_lists_comma(doc_content)
@@ -39,7 +39,7 @@ module Jekyll
               bullet_type,
               filename,
             )
-            @typed_link_block_lists << typed_link_block_wikilink
+            @wikilink_blocks << typed_link_block_wikilink
             doc_content.gsub!(typed_link_block_wikilink.md_regex, "")
           end
         end
@@ -70,7 +70,7 @@ module Jekyll
             if !link_type.nil?
               # process previous wikilink_list
               if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
-                @typed_link_block_lists << processing_wikilink_list
+                @wikilink_blocks << processing_wikilink_list
                 doc_content.gsub!(processing_wikilink_list.md_regex, "")
               end
               processing_link_type = link_type
@@ -83,7 +83,7 @@ module Jekyll
           end
           # process previous wikilink_list
           if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
-            @typed_link_block_lists << processing_wikilink_list
+            @wikilink_blocks << processing_wikilink_list
             doc_content.gsub!(processing_wikilink_list.md_regex, "")
           end
         end
@@ -126,7 +126,7 @@ module Jekyll
             if !link_type.nil?
               # process previous wikilink_list
               if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
-                @typed_link_block_lists << processing_wikilink_list
+                @wikilink_blocks << processing_wikilink_list
                 doc_content.gsub!(processing_wikilink_list.md_regex, "")
               end
               processing_link_type = link_type
@@ -138,7 +138,7 @@ module Jekyll
           end
           # process previous wikilink_list
           if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
-            @typed_link_block_lists << processing_wikilink_list
+            @wikilink_blocks << processing_wikilink_list
             doc_content.gsub!(processing_wikilink_list.md_regex, "")
           end
         end

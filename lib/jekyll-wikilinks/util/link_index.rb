@@ -26,10 +26,9 @@ module Jekyll
         doc.data['missing']    = @index[doc.url].missing.uniq
       end
 
-      def populate_forward(doc, typed_link_blocks, typed_link_block_lists, md_docs)
-        # attributes
-        ## list
-        typed_link_block_lists.each do |tlbl|
+      def populate_forward(doc, wikilink_blocks, md_docs)
+        # attributes - blocks
+        wikilink_blocks.each do |tlbl|
           urls = []
           tlbl.list_items.each do |bullet_type, filename|
             attr_doc = md_docs.detect { |d| File.basename(d.basename, File.extname(d.basename)) == filename }
@@ -46,19 +45,7 @@ module Jekyll
             Jekyll.logger.warn("No documents found for urls: #{urls}")
           end
         end
-        ## single
-        typed_link_blocks.each do |tlb|
-          attr_doc = md_docs.detect { |d| File.basename(d.basename, File.extname(d.basename)) == tlb.filename }
-          if !attr_doc.nil?
-            @index[doc.url].attributes << {
-              'type' => tlb.link_type,
-              'urls' => [ attr_doc.url ],
-            }
-          else
-            Jekyll.logger.warn("Typed block link's document not found for #{tlb.filename}")
-          end
-        end
-        # forelinks
+        # forelinks - inlines
         doc.content.scan(REGEX_VALID_WIKI_LINK).each do |m|
           ltype, lurl = m[0], m[1]
           link_doc = md_docs.detect{ |d| d.url == self.remove_baseurl(lurl) }
