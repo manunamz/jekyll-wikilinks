@@ -28,20 +28,19 @@ module Jekyll
       end
 
       def parse_blocks(doc_content)
-        # @typed_link_blocks, @wikilinks = [], []
+        bullet_type = ""
         typed_link_block_matches = doc_content.scan(REGEX_TYPED_LINK_BLOCK)
         if !typed_link_block_matches.nil? && typed_link_block_matches.size != 0
           typed_link_block_matches.each do |wl_match|
-            typed_link_block_wikilink = WikiLink.new(
-              nil,
-              wl_match[0],
-              wl_match[1],
-              nil,
-              nil,
-              nil,
+            link_type = wl_match[0]
+            filename = wl_match[1]
+            typed_link_block_wikilink = WikiLinkBlock.new(
+              link_type,
+              bullet_type,
+              filename,
             )
-            @typed_link_blocks << typed_link_block_wikilink
-            doc_content.gsub!(typed_link_block_wikilink.md_link_regex, "")
+            @typed_link_block_lists << typed_link_block_wikilink
+            doc_content.gsub!(typed_link_block_wikilink.md_regex, "")
           end
         end
       end
@@ -75,7 +74,7 @@ module Jekyll
                 doc_content.gsub!(processing_wikilink_list.md_regex, "")
               end
               processing_link_type = link_type
-              processing_wikilink_list = WikiLinkBlockList.new(processing_link_type, bullet_type, link_filename_1)
+              processing_wikilink_list = WikiLinkBlock.new(processing_link_type, bullet_type, link_filename_1)
               processing_wikilink_list.add_item(bullet_type, link_filename_2) if !link_filename_2.nil?
             else
               Jekyll.logger.error("'processing_wikilink_list' was nil") if processing_wikilink_list.nil?
@@ -131,7 +130,7 @@ module Jekyll
                 doc_content.gsub!(processing_wikilink_list.md_regex, "")
               end
               processing_link_type = link_type
-              processing_wikilink_list = WikiLinkBlockList.new(processing_link_type)
+              processing_wikilink_list = WikiLinkBlock.new(processing_link_type)
             else
               Jekyll.logger.error("'processing_wikilink_list' was nil") if processing_wikilink_list.nil?
               processing_wikilink_list.add_item(bullet_type, link_filename)
@@ -242,7 +241,7 @@ module Jekyll
   		end
     end
 
-    class WikiLinkBlockList
+    class WikiLinkBlock
       attr_accessor :link_type, :list_items
 
       # parameters ordered by appearance in regex
@@ -259,8 +258,13 @@ module Jekyll
 
       def md_regex
         if typed? && has_items?
+          # single
+          if bullet_type?.empty?
+            link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}}
+            list_item_strs = @list_items.map { |li| /\[\[#{li[1]}\]\]\n/i }
+            md_link_regex = /#{link_type}#{list_item_strs.join("")}/i
           # bullet-comma
-          if bullet_type? == ","
+          elsif bullet_type? == ","
             tmp_list_items = @list_items.dup
             first_item = tmp_list_items.shift()
             link_type = /#{@link_type}#{REGEX_LINK_TYPE}\[\[#{first_item[1]}\]\]\s*/i
