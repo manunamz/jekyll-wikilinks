@@ -267,7 +267,7 @@ module Jekyll
             list_item_strs = tmp_list_items.map { |li| /#{li[0]}\s*\[\[#{li[1]}\]\]/i }
             md_link_regex = /#{link_type}#{list_item_strs.join('')}/i
 
-          elsif "+*-".include?(bullet_type?)
+          elsif !bullet_type?.match(REGEX_BULLET).nil?
             link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}\n}
             list_item_strs = @list_items.map { |li| /#{Regexp.escape(li[0])}\s\[\[#{li[1]}\]\]\n/i }
             md_link_regex = /#{link_type}#{list_item_strs.join("")}/i
