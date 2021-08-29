@@ -146,6 +146,8 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
               "urls"=>["/docs/block.a/", "/docs/block.b/"]},
             {"type"=>"block-typed-list-comma",
               "urls"=>["/docs/block.a/", "/docs/block.b/"]},
+            {"type"=>"block-typed-list-comma-ws",
+              "urls"=>["/docs/block.a/", "/docs/block.b/"]},
           ])
         end
 
