@@ -26,7 +26,7 @@ module Jekyll
     REGEX_LINK_TYPE_TXT = /(?<link-type-txt>([^\n\s\!\#\^\|\]]+))/i  # 1
     REGEX_FILENAME = /(?<filename>([^\\\/:\#\^\|\[\]]+))/i           # 2
     REGEX_HEADER_TXT = /(?<header-txt>([^\!\#\^\|\[\]]+))/i          # 3
-    REGEX_BLOCK_ID_TXT = /(?<block-id>([^\\\/:\!\#\^\|\[\]]+))/i     # 4
+    REGEX_BLOCK_ID_TXT = /(?<block-id>([^\\\/:\!\#\^\|\[\]^\n]+))/i     # 4
     REGEX_LABEL_TXT = /(?<label-txt>(#{REGEX_NOT_GREEDY}))/i         # 5
 
     #
@@ -42,7 +42,7 @@ module Jekyll
     # REGEX_LIST_ITEM = /(^ {0,3}[+*-])([\t| ].*?\n)/i
     REGEX_LIST_ITEM = /(^ {0,3}#{REGEX_BULLET})(\s(?:\[\[#{REGEX_FILENAME}\]\]))/i
     ## new-markdown-style
-    REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}^\n/i
+    REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}/i
 
     #
     ## wikilink special char syntax requirements
