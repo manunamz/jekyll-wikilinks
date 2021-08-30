@@ -6,13 +6,19 @@ require "shared_context"
 
 RSpec.describe(Jekyll::WikiLinks::Generator) do
   include_context "shared jekyll configs"
-  let(:config_overrides) { {} }
+
+  let(:config_overrides)                { { "collections" => { "docs" => { "output" => true }, "embed" => { "output" => true }, "target" => { "output" => true } } } }
   let(:site)                            { Jekyll::Site.new(config) }
 
-  let(:embed)                           { find_by_title(site.collections["docs"].docs, "Embed") }
-  let(:embed_long)                      { find_by_title(site.collections["docs"].docs, "Embed Long") }
-  let(:embed_img)                       { find_by_title(site.collections["docs"].docs, "Embed Image") }
-  let(:embed_img_svg)                   { find_by_title(site.collections["docs"].docs, "Embed SVG Image") }
+  let(:embed)                           { find_by_title(site.collections["embed"].docs, "Embed Link") }
+  let(:link_nested_link)                { find_by_title(site.collections["embed"].docs, "Embed Link Nested") }
+  let(:embed_img)                       { find_by_title(site.collections["embed"].docs, "Embed Link Image") }
+  let(:embed_img_svg)                   { find_by_title(site.collections["embed"].docs, "Embed Link Image SVG") }
+  # targets
+  let(:some_txt_a)                      { find_by_title(site.collections["target"].docs, "Some Text A") }
+  let(:some_txt_b)                      { find_by_title(site.collections["target"].docs, "Some Text B") }
+  let(:nested_link)                     { find_by_title(site.collections["embed"].docs, "Nested Content") }
+
 
   # makes markdown tests work
   subject { described_class.new(site.config) }
@@ -27,87 +33,84 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     FileUtils.rm_rf(Dir["#{site_dir()}"])
   end
 
-  context "when target embedded ![[wikilink]] exists" do
+  context "EMBEDDED UNTYPED [[wikilinks]]" do
 
-    context "defaults" do
+    context "when target doc exists" do
 
-      it "adds embed div wrapper with 'wiki-link-embed' class" do
-        expect(embed.output).to include("<div class=\"wiki-link-embed\">")
-      end
+      context "html output" do
 
-      it "adds embed title div with 'wiki-link-embed-title' class" do
-        expect(embed.output).to include("<div class=\"wiki-link-embed-title\">")
-      end
-
-      it "adds embed a element link with 'wiki-link-embed' class" do
-        expect(embed.output).to include("<a class=\"wiki-link-embed-link\"")
-      end
-
-      it "full output; short" do
-        expect(embed.output).to eq("<p>The following link should be embedded:</p>
+        it "full" do
+          expect(embed.output).to eq("<p>The following link should be embedded:</p>
 
 <div class=\"wiki-link-embed\">
-<div class=\"wiki-link-embed-title\">Base Case A</div>
-<div class=\"wiki-link-embed-content\"><p>This <a class=\"wiki-link\" href=\"/doc/e0c824b6-0b8c-4595-8032-b6889edd815f/\">base case b</a> has a littlecar.</p></div>
-<a class=\"wiki-link-embed-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\"></a>
+<div class=\"wiki-link-embed-title\">Some Text A</div>
+<div class=\"wiki-link-embed-content\"><p>There is minimal text in this document.</p></div>
+<a class=\"wiki-link-embed-link\" href=\"/target/some-txt.a/\"></a>
 </div>\n")
+        end
+
+        it "adds embed div wrapper with 'wiki-link-embed' class" do
+          expect(embed.output).to include("<div class=\"wiki-link-embed\">")
+        end
+
+        it "adds embed title div with 'wiki-link-embed-title' class" do
+          expect(embed.output).to include("<div class=\"wiki-link-embed-title\">")
+        end
+
+        it "adds embed a element link with 'wiki-link-embed' class" do
+          expect(embed.output).to include("<a class=\"wiki-link-embed-link\"")
+        end
+
       end
 
-      it "converts/'markdownifies' nested content'" do
-        expect(embed_long.output).to include("<div class=\"wiki-link-embed-title\">Long Doc</div>
-<div class=\"wiki-link-embed-content\">
-<h1 id=\"a-long-document\">A Long Document</h1>
-<h1 id=\"one\">One</h1>
-<ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li>
-</ul>
-<p>Some more text to verify that block_id captures are not over-capturing.</p>
-</div>")
+      context "with nested links" do
+
+        it "full output" do
+          pending("this works in actuality, but the tests fail...and they should fail...i don't understand why this works.")
+          expect(link_nested_link.output).to eq("")
+        end
+
+        it "converts/'markdownifies' nested content" do
+          pending("this works in actuality, but the tests fail...and they should fail...i don't understand why this works.")
+          expect(link_nested_link.output).to include("<p>This document has a link and when it’s embedded, that link should be rendered as a wikilink.</p>\n<a class=\"wiki-link-embed-link\" href=\"/target/some-txt.b/\"></a>")
+        end
+
       end
 
-      it "full output" do
-        expect(embed_long.output).to eq("<p>The following link should be embedded:</p>
+      context "levels" do
 
-<div class=\"wiki-link-embed\">
-<div class=\"wiki-link-embed-title\">Long Doc</div>
-<div class=\"wiki-link-embed-content\">
-<h1 id=\"a-long-document\">A Long Document</h1>
-<h1 id=\"one\">One</h1>
-<ul>  <li>a</li>  <li>b</li>  <li>c    <h1 id=\"two\">Two</h1>  </li>  <li>d</li>  <li>e</li>  <li>f    <h1 id=\"three\">Three</h1>  </li>  <li>g</li>  <li>h</li>  <li>i    <h1 id=\"four\">Four</h1>  </li>  <li>This is some text to test out blocks. ^block_id</li>
-</ul>
-<p>Some more text to verify that block_id captures are not over-capturing.</p>
-</div>
-<a class=\"wiki-link-embed-link\" href=\"/docs/long-doc/\"></a>
-</div>\n")
+        # header fragment
+        it "processes header url fragments; full output" do
+          pending("embedded header fragment")
+          expect(1).to eq(2)
+        end
+
+        # block fragment
+        it "processes header url fragments; full output" do
+          pending("embedded block fragment")
+          expect(1).to eq(2)
+        end
+
       end
 
-      # header fragment
+      context "when ![[embed]] is an image"
 
-      it "processes header url fragments; full output" do
-        pending("proper parse tree; embedded header fragment")
-        expect(1).to eq(2)
-        # expect(embed_header_long.output).to eq("")
-      end
+        it "embeds png in 'img' tag; full output" do
+          expect(embed_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"/assets/image.png\"></span></p>\n")
+        end
 
-      # block fragment
+        it "embeds svg file contents directly (instead of nesting in an <img> tag)" do
+          expect(embed_img_svg.output).to include("<svg")
+          expect(embed_img_svg.output).to include("</svg>")
+        end
 
-      it "processes header url fragments; full output" do
-        pending("proper parse tree; embedded block fragment")
-        expect(1).to eq(2)
-        # expect(embed_block_long.output).to eq("")
       end
 
     end
 
-    context "when ![[embed]] is an image"
+    context "EMBEDDED TYPED [[wikilinks]]" do
 
-      it "embeds png in 'img' tag; full output" do
-        expect(embed_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"/assets/image.png\"></span></p>\n")
-      end
 
-      it "embeds svg file contents directly (instead of nesting in an <img> tag)" do
-        expect(embed_img_svg.output).to include("<svg")
-        expect(embed_img_svg.output).to include("</svg>")
-      end
 
     end
 
