@@ -229,11 +229,11 @@ module Jekyll
   					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
   					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
   				else
-  					return '<span title="Content not found." class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
+  					return '<span class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
   				end
   				return '<a class="wiki-link' + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
   			else
-  				return '<span title="Content not found." class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
+  				return '<span class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
   			end
   		end
     end

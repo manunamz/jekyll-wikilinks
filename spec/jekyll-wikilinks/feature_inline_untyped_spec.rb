@@ -153,11 +153,11 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       context "html output" do
 
         it "full" do
-          expect(link_missing_doc.output).to eq("<p>This doc contains a wikilink to <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[missing.doc]]</span>.</p>\n")
+          expect(link_missing_doc.output).to eq("<p>This doc contains a wikilink to <span class=\"invalid-wiki-link\">[[missing.doc]]</span>.</p>\n")
         end
 
         it "injects a span element with descriptive title" do
-          expect(link_missing_doc.output).to include("<span title=\"Content not found.\"")
+          expect(link_missing_doc.output).to include("<span ")
           expect(link_missing_doc.output).to include("</span>")
         end
 
@@ -171,7 +171,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
 
         # it "handles header url fragments; full output" do
-        #   expect(link_header_missing_doc.output).to eq("<p>This doc contains an invalid link with an invalid header <span title=\"Content not found.\" class=\"invalid-wiki-link\">[[long-doc#Zero]]</span>.</p>\n")
+        #   expect(link_header_missing_doc.output).to eq("<p>This doc contains an invalid link with an invalid header <span class=\"invalid-wiki-link\">[[long-doc#Zero]]</span>.</p>\n")
         # end
 
       end
