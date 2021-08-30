@@ -10,6 +10,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:config_overrides)              { { "collections" => { "block_list" => { "output" => true }, "target" => { "output" => true } } } }
   let(:site)                          { Jekyll::Site.new(config) }
 
+  # TODO: test whitespace
   # links
   let(:link_comma)                    { find_by_title(site.collections["block_list"].docs, "Block List Link Comma") }
   let(:link_comma_w_whitespace)       { find_by_title(site.collections["block_list"].docs, "Block List Link Comma With Whitespace") }

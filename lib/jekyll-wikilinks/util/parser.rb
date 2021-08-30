@@ -145,7 +145,6 @@ module Jekyll
       end
 
       def parse_inlines(doc_content)
-        # @wikilinks = []
         wikilink_matches = doc_content.scan(REGEX_WIKI_LINKS)
         if !wikilink_matches.nil? && wikilink_matches.size != 0
           wikilink_matches.each do |wl_match|
@@ -163,8 +162,6 @@ module Jekyll
         return if @wikilink_inlines.nil?
         @wikilink_inlines.each do |wikilink|
           doc_content.gsub!(
-            # TODO: Keep this around just in case something breaks -- remove 2021.10.01 (also gsub! -> sub!)
-            # wikilink.md_link_regex,
             wikilink.md_link_regex,
             self.build_html(wikilink)
           )

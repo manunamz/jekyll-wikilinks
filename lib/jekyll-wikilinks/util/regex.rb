@@ -26,7 +26,7 @@ module Jekyll
     REGEX_LINK_TYPE_TXT = /(?<link-type-txt>([^\n\s\!\#\^\|\]]+))/i  # 1
     REGEX_FILENAME = /(?<filename>([^\\\/:\#\^\|\[\]]+))/i           # 2
     REGEX_HEADER_TXT = /(?<header-txt>([^\!\#\^\|\[\]]+))/i          # 3
-    REGEX_BLOCK_ID_TXT = /(?<block-id>([^\\\/:\!\#\^\|\[\]^\n]+))/i     # 4
+    REGEX_BLOCK_ID_TXT = /(?<block-id>([^\\\/:\!\#\^\|\[\]^\n]+))/i  # 4
     REGEX_LABEL_TXT = /(?<label-txt>(#{REGEX_NOT_GREEDY}))/i         # 5
 
     #

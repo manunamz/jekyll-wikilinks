@@ -8,7 +8,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   include_context "shared jekyll configs"
 
   let(:config_overrides)              { { "collections" => { "typed" => { "output" => true }, "target" => { "output" => true } } } }
-  let(:site)                            { Jekyll::Site.new(config) }
+  let(:site)                          { Jekyll::Site.new(config) }
 
   # links
   let(:link)                          { find_by_title(site.collections["typed"].docs, "Typed Link") }
