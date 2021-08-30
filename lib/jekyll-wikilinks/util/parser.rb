@@ -263,20 +263,20 @@ module Jekyll
             link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}}
             list_item_strs = @list_items.map { |li| /\[\[#{li[1]}\]\]\n/i }
             md_link_regex = /#{link_type}#{list_item_strs.join("")}/i
-          # bullet-comma
+          # list (comma)
           elsif bullet_type? == ","
             tmp_list_items = @list_items.dup
             first_item = tmp_list_items.shift()
             link_type = /#{@link_type}#{REGEX_LINK_TYPE}\[\[#{first_item[1]}\]\]\s*/i
             list_item_strs = tmp_list_items.map { |li| /#{li[0]}\s*\[\[#{li[1]}\]\]\s*/i }
             md_link_regex = /#{link_type}#{list_item_strs.join('')}/i
-          # bullet-md
+          # list (md)
           elsif !bullet_type?.match(REGEX_BULLET).nil?
             link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}\n}
             list_item_strs = @list_items.map { |li| /#{Regexp.escape(li[0])}\s\[\[#{li[1]}\]\]\n/i }
             md_link_regex = /#{link_type}#{list_item_strs.join("")}/i
           else
-            Jekyll.logger.error("Not a valid bullet_type: #{bullet_type?}")
+            Jekyll.logger.error("bullet_types not uniform or invalid: #{bullet_type?}")
           end
           return md_link_regex
         else
