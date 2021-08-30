@@ -2,4 +2,4 @@
 title: Untyped Link Whitespace In Filename
 ---
 
-Link to [[whitespace in filename]].
+Link to [[w.whitespace in filename]].

@@ -19,16 +19,16 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:untyped_link_lvl_block)        { find_by_title(site.collections["untyped"].docs, "Untyped Link Block") }
   let(:untyped_link_page)             { find_by_title(site.collections["untyped"].docs, "Untyped Link Page") }
   let(:untyped_link_post)             { find_by_title(site.collections["untyped"].docs, "Untyped Link Post") }
+  let(:w_html)                        { find_by_title(site.collections["untyped"].docs, "With HTML") }
   # targets
-  let(:untyped_a)                     { find_by_title(site.collections["target"].docs, "Untyped A") }
-  let(:untyped_b)                     { find_by_title(site.collections["target"].docs, "Untyped B") }
+  let(:blank_a)                       { find_by_title(site.collections["target"].docs, "Blank A") }
+  let(:blank_b)                       { find_by_title(site.collections["target"].docs, "Blank B") }
   let(:whitespace_in_filename)        { find_by_title(site.collections["target"].docs, "Whitespace In Filename") }
   let(:w_header)                      { find_by_title(site.collections["target"].docs, "Level Header") }
   let(:w_block)                       { find_by_title(site.collections["target"].docs, "Level Block") }
   let(:one_page)                      { find_by_title(site.pages, "One Page") }
   let(:one_post)                      { find_by_title(site.collections["posts"].docs, "One Post") }
   let(:web_link)                      { find_by_title(site.collections["target"].docs, "Web Link") }
-  let(:untyped_w_html)                { find_by_title(site.collections["target"].docs, "With HTML") }
 
   # makes markdown tests work
   subject { described_class.new(site.config) }
@@ -50,8 +50,8 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       context "html output" do
 
         it "full" do
-          expect(untyped_link.output).to eq("<p>This doc contains a wikilink to <a class=\"wiki-link\" href=\"/target/untyped.a/\">untyped a</a>.</p>\n")
-          expect(untyped_a.output).to eq("\n")
+          expect(untyped_link.output).to eq("<p>This doc contains a wikilink to <a class=\"wiki-link\" href=\"/target/blank.a/\">blank a</a>.</p>\n")
+          expect(blank_a.output).to eq("\n")
         end
 
         it "injects a element" do
@@ -64,7 +64,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         end
 
         it "assigns 'a' tag's 'href' to document url" do
-          expect(untyped_link.output).to include("href=\"/target/untyped.a/\"")
+          expect(untyped_link.output).to include("href=\"/target/blank.a/\"")
         end
 
         it "generates a clean url when configs assign 'permalink' to 'pretty'" do
@@ -72,7 +72,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         end
 
         it "downcases title in wikilink's rendered text" do
-          expect(untyped_link.output).to include(untyped_a.data['title'].downcase)
+          expect(untyped_link.output).to include(blank_a.data['title'].downcase)
         end
 
       end
@@ -86,7 +86,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           end
 
           it "not added to document" do
-            expect(untyped_a.data['attributed']).to eq([])
+            expect(blank_a.data['attributed']).to eq([])
           end
 
         end
@@ -98,7 +98,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           end
 
           it "not added to linked document" do
-            expect(untyped_a.data['attributes']).to eq([])
+            expect(blank_a.data['attributes']).to eq([])
           end
 
         end
@@ -110,12 +110,12 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           end
 
           it "is added to linked document" do
-            expect(untyped_a.data['backlinks']).to_not eq([])
+            expect(blank_a.data['backlinks']).to_not eq([])
           end
 
           it "contain array of hashes with keys 'type' and 'url'" do
-            expect(untyped_a.data['backlinks']).to be_a(Array)
-            expect(untyped_a.data['backlinks'][0].keys).to eq([ "type", "url" ])
+            expect(blank_a.data['backlinks']).to be_a(Array)
+            expect(blank_a.data['backlinks'][0].keys).to eq([ "type", "url" ])
           end
 
         end
@@ -132,7 +132,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           end
 
           it "not added to linked document" do
-            expect(untyped_a.data['forelinks']).to eq([])
+            expect(blank_a.data['forelinks']).to eq([])
           end
 
         end
@@ -216,17 +216,17 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     context "works with html in markdown file: html output" do
 
       it "full" do
-        expect(untyped_w_html.output).to eq("<p>This doc has some HTML:</p>\n\n<div class=\"box\">\n  And inside is a link: <a class=\"wiki-link\" href=\"/target/untyped.b/\">untyped b</a>.\n</div>\n")
+        expect(w_html.output).to eq("<p>This doc has some HTML:</p>\n\n<div class=\"box\">\n  And inside is a link: <a class=\"wiki-link\" href=\"/target/blank.b/\">blank b</a>.\n</div>\n")
       end
 
       it "preserves html" do
-        expect(untyped_w_html.output).to include("<div class=\"box\">")
-        expect(untyped_w_html.output).to include("</div>")
+        expect(w_html.output).to include("<div class=\"box\">")
+        expect(w_html.output).to include("</div>")
       end
 
       it "handles wikilinks in html's innertext" do
-        expect(untyped_w_html.output).to_not include("[[untyped.b]]")
-        expect(untyped_w_html.output).to include("<a class=\"wiki-link\" href=\"/target/untyped.b/\">untyped b</a>")
+        expect(w_html.output).to_not include("[[blank.b]]")
+        expect(w_html.output).to include("<a class=\"wiki-link\" href=\"/target/blank.b/\">blank b</a>")
       end
 
     end
@@ -234,7 +234,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     context "works with whitespace in filename" do
 
       it "full" do
-        expect(untyped_link_whitespace.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/target/whitespace%20in%20filename/\">whitespace in filename</a>.</p>\n")
+        expect(untyped_link_whitespace.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/target/w.whitespace%20in%20filename/\">whitespace in filename</a>.</p>\n")
       end
 
     end
@@ -258,7 +258,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         context "html output" do
 
           it "full" do
-            expect(untyped_link_lvl_header.output).to eq("<p>This doc contains a link to a header <a class=\"wiki-link\" href=\"/target/untyped.lvl.header/#a-header\">level header &gt; A Header</a>.</p>\n")
+            expect(untyped_link_lvl_header.output).to eq("<p>This doc contains a link to a header <a class=\"wiki-link\" href=\"/target/lvl.header/#a-header\">level header &gt; A Header</a>.</p>\n")
           end
 
           it "header url fragments contain doc's filename and header text" do
@@ -267,7 +267,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
           it "header sluggified and is fragment in url" do
             expect(untyped_link_lvl_header.output).to include("#a-header")
-            expect(untyped_link_lvl_header.output).to include("href=\"/target/untyped.lvl.header/#a-header\"")
+            expect(untyped_link_lvl_header.output).to include("href=\"/target/lvl.header/#a-header\"")
           end
 
         end
@@ -303,7 +303,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         context "html output" do
 
           it "full" do
-            expect(untyped_link_lvl_block.output).to eq("<p>This doc contains a link to a block <a class=\"wiki-link\" href=\"/target/untyped.lvl.block/#block_id\">level block &gt; ^block_id</a>.</p>\n")
+            expect(untyped_link_lvl_block.output).to eq("<p>This doc contains a link to a block <a class=\"wiki-link\" href=\"/target/lvl.block/#block_id\">level block &gt; ^block_id</a>.</p>\n")
           end
 
           it "block url fragments contain doc's filename and block id" do
@@ -312,7 +312,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
           it "block url fragment in url" do
             expect(untyped_link_lvl_block.output).to include("#block_id")
-            expect(untyped_link_lvl_block.output).to include("href=\"/target/untyped.lvl.block/#block_id\"")
+            expect(untyped_link_lvl_block.output).to include("href=\"/target/lvl.block/#block_id\"")
           end
 
         end
