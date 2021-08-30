@@ -148,7 +148,7 @@ module Jekyll
         wikilink_matches = doc_content.scan(REGEX_WIKI_LINKS)
         if !wikilink_matches.nil? && wikilink_matches.size != 0
           wikilink_matches.each do |wl_match|
-            @wikilink_inlines << WikiLink.new(
+            @wikilink_inlines << WikiLinkInline.new(
               wl_match[0],
               wl_match[1],
               wl_match[2],
@@ -315,7 +315,7 @@ module Jekyll
     end
 
     # the wikilink class knows everything about the original markdown syntax and its semantic meaning
-    class WikiLink
+    class WikiLinkInline
       attr_accessor :embed, :link_type, :filename, :header_txt, :block_id, :label_txt
 
       FILENAME = "filename"
