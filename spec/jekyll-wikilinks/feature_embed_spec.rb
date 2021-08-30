@@ -7,13 +7,14 @@ require "shared_context"
 RSpec.describe(Jekyll::WikiLinks::Generator) do
   include_context "shared jekyll configs"
 
-  let(:config_overrides)                { { "collections" => { "docs" => { "output" => true }, "embed" => { "output" => true }, "target" => { "output" => true } } } }
+  let(:config_overrides)                { { "collections" => { "embed" => { "output" => true }, "target" => { "output" => true } } } }
   let(:site)                            { Jekyll::Site.new(config) }
 
-  let(:embed)                           { find_by_title(site.collections["embed"].docs, "Embed Link") }
+  # links
+  let(:link)                            { find_by_title(site.collections["embed"].docs, "Embed Link") }
   let(:link_nested_link)                { find_by_title(site.collections["embed"].docs, "Embed Link Nested") }
-  let(:embed_img)                       { find_by_title(site.collections["embed"].docs, "Embed Link Image") }
-  let(:embed_img_svg)                   { find_by_title(site.collections["embed"].docs, "Embed Link Image SVG") }
+  let(:link_img)                        { find_by_title(site.collections["embed"].docs, "Embed Link Image") }
+  let(:link_img_svg)                    { find_by_title(site.collections["embed"].docs, "Embed Link Image SVG") }
   # targets
   let(:some_txt_a)                      { find_by_title(site.collections["target"].docs, "Some Text A") }
   let(:some_txt_b)                      { find_by_title(site.collections["target"].docs, "Some Text B") }
@@ -40,7 +41,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       context "html output" do
 
         it "full" do
-          expect(embed.output).to eq("<p>The following link should be embedded:</p>
+          expect(link.output).to eq("<p>The following link should be embedded:</p>
 
 <div class=\"wiki-link-embed\">
 <div class=\"wiki-link-embed-title\">Some Text A</div>
@@ -50,15 +51,15 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         end
 
         it "adds embed div wrapper with 'wiki-link-embed' class" do
-          expect(embed.output).to include("<div class=\"wiki-link-embed\">")
+          expect(link.output).to include("<div class=\"wiki-link-embed\">")
         end
 
         it "adds embed title div with 'wiki-link-embed-title' class" do
-          expect(embed.output).to include("<div class=\"wiki-link-embed-title\">")
+          expect(link.output).to include("<div class=\"wiki-link-embed-title\">")
         end
 
         it "adds embed a element link with 'wiki-link-embed' class" do
-          expect(embed.output).to include("<a class=\"wiki-link-embed-link\"")
+          expect(link.output).to include("<a class=\"wiki-link-embed-link\"")
         end
 
       end
@@ -96,12 +97,12 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       context "when ![[embed]] is an image"
 
         it "embeds png in 'img' tag; full output" do
-          expect(embed_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"/assets/image.png\"></span></p>\n")
+          expect(link_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"/assets/image.png\"></span></p>\n")
         end
 
         it "embeds svg file contents directly (instead of nesting in an <img> tag)" do
-          expect(embed_img_svg.output).to include("<svg")
-          expect(embed_img_svg.output).to include("</svg>")
+          expect(link_img_svg.output).to include("<svg")
+          expect(link_img_svg.output).to include("</svg>")
         end
 
       end
@@ -110,7 +111,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
     context "EMBEDDED TYPED [[wikilinks]]" do
 
-
+      pending("TODO")
 
     end
 
