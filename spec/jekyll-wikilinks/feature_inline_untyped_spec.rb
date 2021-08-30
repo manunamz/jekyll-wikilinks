@@ -10,7 +10,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:config_overrides)              { { "collections" => { "untyped" => { "output" => true }, "target" => { "output" => true } } } }
   let(:site)                          { Jekyll::Site.new(config) }
 
-
   # links
   let(:link)                          { find_by_title(site.collections["untyped"].docs, "Untyped Link") }
   let(:link_missing_doc)              { find_by_title(site.collections["untyped"].docs, "Untyped Link Missing Doc") }
@@ -43,7 +42,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     FileUtils.rm_rf(Dir["#{site_dir()}"])
   end
 
-  context "UNTYPED [[wikilinks]]" do
+  context "INLINE UNTYPED [[wikilinks]]" do
 
     context "when target doc exists" do
 
@@ -54,12 +53,12 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(blank_a.output).to eq("\n")
         end
 
-        it "injects a element" do
+        it "injects 'a' tag" do
           expect(link.output).to include("<a")
           expect(link.output).to include("</a>")
         end
 
-        it "assigns 'wiki-link' class to a element" do
+        it "assigns 'wiki-link' class to 'a' tag" do
           expect(link.output).to include("class=\"wiki-link\"")
         end
 
@@ -72,7 +71,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         end
 
         it "downcases title in wikilink's rendered text" do
-          expect(link.output).to include(blank_a.data['title'].downcase)
+          expect(link.output).to include('>' + blank_a.data['title'].downcase + '<')
         end
 
       end
@@ -199,50 +198,54 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
     end
 
-    context "work as expected across jekyll doc types" do
+    context "some general valid expectations" do
 
-      it "post points to collection item; full output" do
-        expect(one_post.output).to eq("<p>This is a post.</p>\n")
+      context "work as expected across jekyll doc types" do
+
+        it "post points to collection item; full output" do
+          expect(one_post.output).to eq("<p>This is a post.</p>\n")
+        end
+
+        it "collection item points to post; full output" do
+          expect(link_post.output).to eq("<p>This doc links to <a class=\"wiki-link\" href=\"/2020/12/08/one-post/\">one post</a>.</p>\n")
+        end
+
+        it "page points to collection item; full output" do
+          expect(one_page.output).to eq("<p>This is a page.</p>\n")
+        end
+
+        it "collection item points to page; full output" do
+          expect(link_page.output).to eq("<p>This doc links to <a class=\"wiki-link\" href=\"/one-page/\">one page</a>.</p>\n")
+        end
+
+        # todo: collection-type-1 <-> collection-type-2
+        # todo: page <-> post
       end
 
-      it "collection item points to post; full output" do
-        expect(link_post.output).to eq("<p>This doc links to <a class=\"wiki-link\" href=\"/2020/12/08/one-post/\">one post</a>.</p>\n")
+      context "works with html in markdown file: html output" do
+
+        it "full" do
+          expect(link_nested_in_html.output).to eq("<p>This doc has some HTML:</p>\n\n<div class=\"box\">\n  And inside is a link: <a class=\"wiki-link\" href=\"/target/blank.b/\">blank b</a>.\n</div>\n")
+        end
+
+        it "preserves html" do
+          expect(link_nested_in_html.output).to include("<div class=\"box\">")
+          expect(link_nested_in_html.output).to include("</div>")
+        end
+
+        it "handles wikilinks in html's innertext" do
+          expect(link_nested_in_html.output).to_not include("[[blank.b]]")
+          expect(link_nested_in_html.output).to include("<a class=\"wiki-link\" href=\"/target/blank.b/\">blank b</a>")
+        end
+
       end
 
-      it "page points to collection item; full output" do
-        expect(one_page.output).to eq("<p>This is a page.</p>\n")
-      end
+      context "works with whitespace in filename" do
 
-      it "collection item points to page; full output" do
-        expect(link_page.output).to eq("<p>This doc links to <a class=\"wiki-link\" href=\"/one-page/\">one page</a>.</p>\n")
-      end
+        it "full" do
+          expect(link_w_whitespace.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/target/w.whitespace%20in%20filename/\">whitespace in filename</a>.</p>\n")
+        end
 
-      # todo: collection-type-1 <-> collection-type-2
-      # todo: page <-> post
-    end
-
-    context "works with html in markdown file: html output" do
-
-      it "full" do
-        expect(link_nested_in_html.output).to eq("<p>This doc has some HTML:</p>\n\n<div class=\"box\">\n  And inside is a link: <a class=\"wiki-link\" href=\"/target/blank.b/\">blank b</a>.\n</div>\n")
-      end
-
-      it "preserves html" do
-        expect(link_nested_in_html.output).to include("<div class=\"box\">")
-        expect(link_nested_in_html.output).to include("</div>")
-      end
-
-      it "handles wikilinks in html's innertext" do
-        expect(link_nested_in_html.output).to_not include("[[blank.b]]")
-        expect(link_nested_in_html.output).to include("<a class=\"wiki-link\" href=\"/target/blank.b/\">blank b</a>")
-      end
-
-    end
-
-    context "works with whitespace in filename" do
-
-      it "full" do
-        expect(link_w_whitespace.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/target/w.whitespace%20in%20filename/\">whitespace in filename</a>.</p>\n")
       end
 
     end
@@ -261,7 +264,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
     context "level:" do
 
-      context "header" do
+      context "#header" do
 
         context "html output" do
 
@@ -306,7 +309,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
       end
 
-      context "block" do
+      context "^block" do
 
         context "html output" do
 
