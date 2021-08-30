@@ -6,7 +6,7 @@ require "shared_context"
 
 RSpec.describe(Jekyll::WikiLinks) do
   include_context "shared jekyll configs"
-  let(:config_overrides) { {} }
+  let(:config_overrides)                { {} }
   let(:site)                            { Jekyll::Site.new(config) }
 
   let(:base_case_a)                     { find_by_title(site.collections["docs"].docs, "Base Case A") }

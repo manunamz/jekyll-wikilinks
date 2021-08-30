@@ -13,7 +13,7 @@ RSpec.shared_context "shared jekyll configs", :shared_context => :metadata do
   let(:config) do
     Jekyll.configuration(
       config_overrides.merge(
-        "collections"          => { "docs" => { "output" => true } },
+        # "collections"          => { "docs" => { "output" => true } },
         "permalink"            => "pretty",
         "skip_config_files"    => false,
         "source"               => fixtures_dir,
