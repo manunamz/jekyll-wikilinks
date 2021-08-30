@@ -7,28 +7,28 @@ require "shared_context"
 RSpec.describe(Jekyll::WikiLinks::Generator) do
   include_context "shared jekyll configs"
 
-  let(:config_overrides)              { { "collections" => { "untyped" => { "output" => true } } } }
+  let(:config_overrides)              { { "collections" => { "untyped" => { "output" => true }, "target" => { "output" => true } } } }
   let(:site)                          { Jekyll::Site.new(config) }
 
 
-  let(:web_link)                      { find_by_title(site.collections["untyped"].docs, "Web Link") }
-  # with links
+  # links
   let(:untyped_link)                  { find_by_title(site.collections["untyped"].docs, "Untyped Link") }
   let(:untyped_link_missing_doc)      { find_by_title(site.collections["untyped"].docs, "Untyped Link Missing Doc") }
-  let(:untyped_w_html)                { find_by_title(site.collections["untyped"].docs, "With HTML") }
   let(:untyped_link_whitespace)       { find_by_title(site.collections["untyped"].docs, "Untyped Link Whitespace In Filename") }
   let(:untyped_link_lvl_header)       { find_by_title(site.collections["untyped"].docs, "Untyped Link Header") }
   let(:untyped_link_lvl_block)        { find_by_title(site.collections["untyped"].docs, "Untyped Link Block") }
   let(:untyped_link_page)             { find_by_title(site.collections["untyped"].docs, "Untyped Link Page") }
   let(:untyped_link_post)             { find_by_title(site.collections["untyped"].docs, "Untyped Link Post") }
-  # linked to
-  let(:untyped_a)                     { find_by_title(site.collections["untyped"].docs, "Untyped A") }
-  let(:untyped_b)                     { find_by_title(site.collections["untyped"].docs, "Untyped B") }
-  let(:whitespace_in_filename)        { find_by_title(site.collections["untyped"].docs, "Whitespace In Filename") }
-  let(:w_header)                      { find_by_title(site.collections["untyped"].docs, "Level Header") }
-  let(:w_block)                       { find_by_title(site.collections["untyped"].docs, "Level Block") }
+  # targets
+  let(:untyped_a)                     { find_by_title(site.collections["target"].docs, "Untyped A") }
+  let(:untyped_b)                     { find_by_title(site.collections["target"].docs, "Untyped B") }
+  let(:whitespace_in_filename)        { find_by_title(site.collections["target"].docs, "Whitespace In Filename") }
+  let(:w_header)                      { find_by_title(site.collections["target"].docs, "Level Header") }
+  let(:w_block)                       { find_by_title(site.collections["target"].docs, "Level Block") }
   let(:one_page)                      { find_by_title(site.pages, "One Page") }
   let(:one_post)                      { find_by_title(site.collections["posts"].docs, "One Post") }
+  let(:web_link)                      { find_by_title(site.collections["target"].docs, "Web Link") }
+  let(:untyped_w_html)                { find_by_title(site.collections["target"].docs, "With HTML") }
 
   # makes markdown tests work
   subject { described_class.new(site.config) }
@@ -50,7 +50,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       context "html output" do
 
         it "full" do
-          expect(untyped_link.output).to eq("<p>This doc contains a wikilink to <a class=\"wiki-link\" href=\"/untyped/untyped.a/\">untyped a</a>.</p>\n")
+          expect(untyped_link.output).to eq("<p>This doc contains a wikilink to <a class=\"wiki-link\" href=\"/target/untyped.a/\">untyped a</a>.</p>\n")
           expect(untyped_a.output).to eq("\n")
         end
 
@@ -63,8 +63,8 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(untyped_link.output).to include("class=\"wiki-link\"")
         end
 
-        it "assigns a element's href to document url" do
-          expect(untyped_link.output).to include("href=\"/untyped/untyped.a/\"")
+        it "assigns 'a' tag's 'href' to document url" do
+          expect(untyped_link.output).to include("href=\"/target/untyped.a/\"")
         end
 
         it "generates a clean url when configs assign 'permalink' to 'pretty'" do
@@ -216,7 +216,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     context "works with html in markdown file: html output" do
 
       it "full" do
-        expect(untyped_w_html.output).to eq("<p>This doc has some HTML:</p>\n\n<div class=\"box\">\n  And inside is a link: <a class=\"wiki-link\" href=\"/untyped/untyped.b/\">untyped b</a>.\n</div>\n")
+        expect(untyped_w_html.output).to eq("<p>This doc has some HTML:</p>\n\n<div class=\"box\">\n  And inside is a link: <a class=\"wiki-link\" href=\"/target/untyped.b/\">untyped b</a>.\n</div>\n")
       end
 
       it "preserves html" do
@@ -226,7 +226,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
       it "handles wikilinks in html's innertext" do
         expect(untyped_w_html.output).to_not include("[[untyped.b]]")
-        expect(untyped_w_html.output).to include("<a class=\"wiki-link\" href=\"/untyped/untyped.b/\">untyped b</a>")
+        expect(untyped_w_html.output).to include("<a class=\"wiki-link\" href=\"/target/untyped.b/\">untyped b</a>")
       end
 
     end
@@ -234,7 +234,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
     context "works with whitespace in filename" do
 
       it "full" do
-        expect(untyped_link_whitespace.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/untyped/whitespace%20in%20filename/\">whitespace in filename</a>.</p>\n")
+        expect(untyped_link_whitespace.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/target/whitespace%20in%20filename/\">whitespace in filename</a>.</p>\n")
       end
 
     end
@@ -258,7 +258,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         context "html output" do
 
           it "full" do
-            expect(untyped_link_lvl_header.output).to eq("<p>This doc contains a link to a header <a class=\"wiki-link\" href=\"/untyped/untyped.lvl.header/#a-header\">level header &gt; A Header</a>.</p>\n")
+            expect(untyped_link_lvl_header.output).to eq("<p>This doc contains a link to a header <a class=\"wiki-link\" href=\"/target/untyped.lvl.header/#a-header\">level header &gt; A Header</a>.</p>\n")
           end
 
           it "header url fragments contain doc's filename and header text" do
@@ -267,7 +267,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
           it "header sluggified and is fragment in url" do
             expect(untyped_link_lvl_header.output).to include("#a-header")
-            expect(untyped_link_lvl_header.output).to include("href=\"/untyped/untyped.lvl.header/#a-header\"")
+            expect(untyped_link_lvl_header.output).to include("href=\"/target/untyped.lvl.header/#a-header\"")
           end
 
         end
@@ -303,7 +303,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         context "html output" do
 
           it "full" do
-            expect(untyped_link_lvl_block.output).to eq("<p>This doc contains a link to a block <a class=\"wiki-link\" href=\"/untyped/untyped.lvl.block/#block_id\">level block &gt; ^block_id</a>.</p>\n")
+            expect(untyped_link_lvl_block.output).to eq("<p>This doc contains a link to a block <a class=\"wiki-link\" href=\"/target/untyped.lvl.block/#block_id\">level block &gt; ^block_id</a>.</p>\n")
           end
 
           it "block url fragments contain doc's filename and block id" do
@@ -312,7 +312,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
           it "block url fragment in url" do
             expect(untyped_link_lvl_block.output).to include("#block_id")
-            expect(untyped_link_lvl_block.output).to include("href=\"/untyped/untyped.lvl.block/#block_id\"")
+            expect(untyped_link_lvl_block.output).to include("href=\"/target/untyped.lvl.block/#block_id\"")
           end
 
         end
