@@ -78,28 +78,14 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
       context "metadata:" do
 
-        context "'attributed'" do
-
-          it "not added to document" do
-            expect(link.data['attributed']).to eq([])
-          end
-
-          it "not added to document" do
-            expect(blank_a.data['attributed']).to eq([])
-          end
-
+        it "'attributed' not added to either document" do
+          expect(link.data['attributed']).to eq([])
+          expect(blank_a.data['attributed']).to eq([])
         end
 
-        context "'attributes'" do
-
-          it "not added to document" do
-            expect(link.data['attributes']).to eq([])
-          end
-
-          it "not added to linked document" do
-            expect(blank_a.data['attributes']).to eq([])
-          end
-
+        it "'attributes' not added to either document" do
+          expect(link.data['attributes']).to eq([])
+          expect(blank_a.data['attributes']).to eq([])
         end
 
         context "'backlinks'" do
@@ -295,14 +281,20 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
             expect(lvl_header.data['attributes']).to eq([])
           end
 
-          it "'backlinks' not added to either document" do
+          it "'backlinks' not added to original document" do
             expect(link_lvl_header.data['backlinks']).to eq([])
-            expect(lvl_header.data['attributes']).to eq([])
           end
 
-          it "'forelinks' not added to either document" do
-            expect(link_lvl_header.data['forelinks']).to eq([])
-            expect(lvl_header.data['attributes']).to eq([])
+          it "'backlinks' added to linked document" do
+            expect(lvl_header.data['backlinks']).to eq([{"type"=>nil, "url"=>"/untyped/link.lvl.header/"}])
+          end
+
+          it "'forelinks' added to original document" do
+            expect(link_lvl_header.data['forelinks']).to eq([{"type"=>nil, "url"=>"/target/lvl.header/"}])
+          end
+
+          it "'forelinks' not added to linked document" do
+            expect(lvl_header.data['forelinks']).to eq([])
           end
 
         end
@@ -340,14 +332,20 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
             expect(lvl_block.data['attributes']).to eq([])
           end
 
-          it "'backlinks' not added to either document" do
+          it "'backlinks' not added to original document" do
             expect(link_lvl_block.data['backlinks']).to eq([])
-            expect(lvl_block.data['attributes']).to eq([])
           end
 
-          it "'forelinks' not added to either document" do
-            expect(link_lvl_block.data['forelinks']).to eq([])
-            expect(lvl_block.data['attributes']).to eq([])
+          it "'backlinks' added to linked document" do
+            expect(lvl_block.data['backlinks']).to eq([{"type"=>nil, "url"=>"/untyped/link.lvl.block/"}])
+          end
+
+          it "'forelinks' added to original document" do
+            expect(link_lvl_block.data['forelinks']).to eq([{"type"=>nil, "url"=>"/target/lvl.block/"}])
+          end
+
+          it "'forelinks' not added to linked document" do
+            expect(lvl_block.data['forelinks']).to eq([])
           end
 
         end

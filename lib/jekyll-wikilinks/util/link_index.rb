@@ -6,12 +6,8 @@ module Jekyll
     class LinkIndex
       attr_reader :index
 
-      # Use Jekyll's native relative_url filter
-      include Jekyll::Filters::URLFilters
-
       def initialize(site)
         @baseurl = site.baseurl
-        @context ||= Jekyll::WikiLinks::Context.new(site)
         @index = {}
         site.doc_mngr.all.each do |doc|
           @index[doc.url] = LinksInfo.new()
@@ -26,7 +22,7 @@ module Jekyll
         doc.data['missing']    = @index[doc.url].missing.uniq
       end
 
-      def populate_forward(doc, wikilink_blocks, md_docs)
+      def populate_forward(doc, wikilink_blocks, wikilink_inlines, md_docs)
         # attributes - blocks
         wikilink_blocks.each do |tlbl|
           urls = []
@@ -46,13 +42,12 @@ module Jekyll
           end
         end
         # forelinks - inlines
-        doc.content.scan(REGEX_VALID_WIKI_LINK).each do |m|
-          ltype, lurl = m[0], m[1]
-          link_doc = md_docs.detect{ |d| d.url == self.remove_baseurl(lurl) }
+        wikilink_inlines.each do |wlil|
+          link_doc = md_docs.detect { |d| File.basename(d.basename, File.extname(d.basename)) == wlil.filename }
           if !link_doc.nil?
             @index[doc.url].forelinks << {
-              'type' => ltype,
-              'url' => lurl,
+              'type' => wlil.link_type,
+              'url' => link_doc.url,
             }
           end
         end
