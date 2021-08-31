@@ -203,7 +203,7 @@ module Jekyll
 
   		def build_html(wikilink)
         if wikilink.is_img?
-  			  linked_static_doc = @doc_manager.get_image_by_bname(wikilink.filename)
+  			  linked_static_doc = @doc_manager.get_image_by_fname(wikilink.filename)
           if wikilink.embedded? && wikilink.is_img?
             return build_html_img_embed(linked_static_doc, is_svg=wikilink.is_img_svg?)
           end
