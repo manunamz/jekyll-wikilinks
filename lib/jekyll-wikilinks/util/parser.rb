@@ -210,7 +210,7 @@ module Jekyll
         end
         linked_doc = @doc_manager.get_doc_by_fname(wikilink.filename)
   			if !linked_doc.nil?
-          link_type = wikilink.typed? ? " link-type #{wikilink.link_type}" : ""
+          link_type = wikilink.typed? ? " typed #{wikilink.link_type}" : ""
 
   				# label
   				wikilink_inner_txt = wikilink.clean_label_txt if wikilink.labelled?

@@ -79,7 +79,7 @@ RSpec.describe(Jekyll::WikiLinks) do
       } }
 
       it "does not process block::[[wikilinks]] as a block, but as an inline" do
-        expect(block_single_link.output).to include("<a class=\"wiki-link link-type block-single\" href=\"/target/blank.a/\">blank a</a>")
+        expect(block_single_link.output).to include("<a class=\"wiki-link typed block-single\" href=\"/target/blank.a/\">blank a</a>")
       end
 
     end

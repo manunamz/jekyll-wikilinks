@@ -36,7 +36,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       context "html output" do
 
         it "full" do
-          expect(link.output).to eq("<p>This doc contains a wikilink to <a class=\"wiki-link link-type inline-typed\" href=\"/target/blank.a/\">blank a</a>.</p>\n")
+          expect(link.output).to eq("<p>This doc contains a wikilink to <a class=\"wiki-link typed inline-typed\" href=\"/target/blank.a/\">blank a</a>.</p>\n")
           expect(blank_a.output).to eq("\n")
         end
 
@@ -50,9 +50,9 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(link.output).to include("wiki-link")
         end
 
-        it "assigns 'typed-link' class to 'a' tag" do
+        it "assigns 'typed' class to 'a' tag" do
           expect(link.output).to include("class=")
-          expect(link.output).to include("link-type")
+          expect(link.output).to include("typed")
         end
 
         it "assigns link type as class to 'a' tag" do
