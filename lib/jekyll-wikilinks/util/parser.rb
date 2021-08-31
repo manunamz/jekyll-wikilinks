@@ -177,14 +177,14 @@ module Jekyll
       def build_html_embed(title, content, url)
         # multi-line for readability
         return [
-          "<div class=\"wiki-link-embed\">",
-            "<div class=\"wiki-link-embed-title\">",
+          "<div class=\"#{$conf.css_name("embed_wrapper")}\">",
+            "<div class=\"#{$conf.css_name("embed_title")}\">",
               "#{title}",
             "</div>",
-            "<div class=\"wiki-link-embed-content\">",
+            "<div class=\"#{$conf.css_name("embed_content")}\">",
               "#{@markdown_converter.convert(content)}",
             "</div>",
-            "<a class=\"wiki-link-embed-link\" href=\"#{url}\"></a>",
+            "<a class=\"#{$conf.css_name("embed_wiki_link")}\" href=\"#{url}\"></a>",
           "</div>",
         ].join("\n").gsub!("\n", "")
       end
@@ -195,9 +195,9 @@ module Jekyll
           File.open(static_doc.path, "r") do |svg_img|
             svg_content = svg_img.read
           end
-          return "<p><span class=\"wiki-link-embed-image\">#{svg_content}</span></p>"
+          return "<p><span class=\"#{$conf.css_name("embed_image_wrapper")}\">#{svg_content}</span></p>"
         else
-          return "<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"#{relative_url(static_doc.relative_path)}\"/></span></p>"
+          return "<p><span class=\"#{$conf.css_name("embed_image_wrapper")}\"><img class=\"#{$conf.css_name("embed_image")}\" src=\"#{relative_url(static_doc.relative_path)}\"/></span></p>"
         end
       end
 
@@ -235,11 +235,11 @@ module Jekyll
   					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
   					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
   				else
-  					return '<span class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
+  					return '<span class="' + $conf.css_name("invalid_wiki") + '">' + wikilink.md_link_str + '</span>'
   				end
-  				return '<a class="wiki-link' + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
+  				return '<a class="' + $conf.css_name("wiki") + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
   			else
-  				return '<span class="invalid-wiki-link">' + wikilink.md_link_str + '</span>'
+  				return '<span class="' + $conf.css_name("invalid_wiki") + '">' + wikilink.md_link_str + '</span>'
   			end
   		end
     end

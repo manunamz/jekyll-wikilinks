@@ -31,9 +31,9 @@ module Jekyll
       def convert(content)
         excluded_classes = option_css(EXCLUDE_KEY)
         if excluded_classes.nil? || excluded_classes.empty?
-          css_def = "a:not(.wiki-link):not(.wiki-link-embed-link)"
+          css_def = "a:not(.#{$conf.css_name("wiki")}):not(.#{$conf.css_name("embed_wiki_link")})"
         else
-          css_def = "a" + ":not(.wiki-link):not(.wiki-link-embed-link)" + ":not(." + excluded_classes.join("):not(.") + ")"
+          css_def = "a:not(.#{$conf.css_name("wiki")}):not(.#{$conf.css_name("embed_wiki_link")}):not(.#{excluded_classes.join("):not(.")})"
         end
         parsed_content = Nokogiri::HTML::fragment(content)
         parsed_content.css(css_def).each do |link|

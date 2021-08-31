@@ -43,23 +43,27 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         it "full" do
           expect(link.output).to eq("<p>The following link should be embedded:</p>
 
-<div class=\"wiki-link-embed\">
-<div class=\"wiki-link-embed-title\">Some Text A</div>
-<div class=\"wiki-link-embed-content\"><p>There is minimal text in this document.</p></div>
-<a class=\"wiki-link-embed-link\" href=\"/target/some-txt.a/\"></a>
+<div class=\"embed-wrapper\">
+<div class=\"embed-title\">Some Text A</div>
+<div class=\"embed-content\"><p>There is minimal text in this document.</p></div>
+<a class=\"embed-wiki-link\" href=\"/target/some-txt.a/\"></a>
 </div>\n")
         end
 
-        it "adds embed div wrapper with 'wiki-link-embed' class" do
-          expect(link.output).to include("<div class=\"wiki-link-embed\">")
+        it "adds embed title div with 'embed-wrapper' class" do
+          expect(link.output).to include("<div class=\"embed-wrapper\">")
         end
 
-        it "adds embed title div with 'wiki-link-embed-title' class" do
-          expect(link.output).to include("<div class=\"wiki-link-embed-title\">")
+        it "adds embed title div with 'embed-title' class" do
+          expect(link.output).to include("<div class=\"embed-title\">")
         end
 
-        it "adds embed a element link with 'wiki-link-embed' class" do
-          expect(link.output).to include("<a class=\"wiki-link-embed-link\"")
+        it "adds embed title div with 'embed-content' class" do
+          expect(link.output).to include("<div class=\"embed-content\">")
+        end
+
+        it "adds embed a element link with 'embed-wiki-link' class" do
+          expect(link.output).to include("<a class=\"embed-wiki-link\"")
         end
 
       end
@@ -97,7 +101,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       context "when ![[embed]] is an image"
 
         it "embeds png in 'img' tag; full output" do
-          expect(link_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"wiki-link-embed-image\"><img class=\"wiki-link-img\" src=\"/assets/image.png\"></span></p>\n")
+          expect(link_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"embed-image-wrapper\"><img class=\"embed-image\" src=\"/assets/image.png\"></span></p>\n")
         end
 
         it "embeds svg file contents directly (instead of nesting in an <img> tag)" do

@@ -10,6 +10,7 @@ RSpec.describe(Jekyll::WikiLinks) do
   let(:site)                            { Jekyll::Site.new(config) }
 
   # links
+  let(:embed_link)                      { find_by_title(site.collections["embed"].docs, "Embed Link") }
   let(:inline_untyped_link)             { find_by_title(site.collections["untyped"].docs, "Untyped Link") }
   let(:block_single_link)               { find_by_title(site.collections["block_single"].docs, "Block Single Link") }
   # targets
@@ -84,18 +85,45 @@ RSpec.describe(Jekyll::WikiLinks) do
 
     end
 
-    context "when css classes are excluded" do
-      let(:config_overrides) { {
-        "collections" => { "untyped" => { "output" => true }, "target" => { "output" => true } },
-        "wikilinks" => { "css" => { "exclude" => [ "exclude-link" ] } },
-      } }
+    context "css configs:" do
 
-      it "does not classify 'a' tags as web links with excluded css classes" do
-        expect(css_exclude.output).to_not include("web-link")
+      context "classes are excluded" do
+        let(:config_overrides) { {
+          "collections" => { "untyped" => { "output" => true }, "target" => { "output" => true } },
+          "wikilinks" => { "css" => { "exclude" => [ "exclude-link" ] } },
+        } }
+
+        it "does not classify 'a' tags as web links with excluded css classes" do
+          expect(css_exclude.output).to_not include("web-link")
+        end
+
+        it "full output" do
+          expect(css_exclude.output).to eq("<p>An <a class=\"exclude-link\" href=\"www.example.com\">excluded css class</a>.</p>\n")
+        end
+
       end
 
-      it "full output" do
-        expect(css_exclude.output).to eq("<p>An <a class=\"exclude-link\" href=\"www.example.com\">excluded css class</a>.</p>\n")
+      context "custom css names" do
+        let(:config_overrides) { {
+          "collections" => { "embed" => { "output" => true }, "target" => { "output" => true } },
+          "wikilinks" => { "css" => { "name" => {
+            "embed_wrapper" => "custom-embed-wrapper",
+            "embed_title" => "custom-embed-title",
+            "embed_content" => "custom-content",
+            "embed_wiki_link" => "custom-embed-wiki-link",
+           } } },
+        } }
+
+        it "full" do
+          expect(embed_link.output).to eq("<p>The following link should be embedded:</p>
+
+<div class=\"custom-embed-wrapper\">
+<div class=\"custom-embed-title\">Some Text A</div>
+<div class=\"custom-content\"><p>There is minimal text in this document.</p></div>
+<a class=\"custom-embed-wiki-link\" href=\"/target/some-txt.a/\"></a>
+</div>\n")
+        end
+
       end
 
     end
