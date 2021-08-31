@@ -23,9 +23,11 @@ module Jekyll
 
       def parse(doc_content)
         @wikilink_blocks, @wikilink_inlines = [], [], []
-        self.parse_block_singles(doc_content)
-        self.parse_block_lists_mkdn(doc_content)
-        self.parse_block_lists_comma(doc_content)
+        if !$conf.disabled_attributes?
+          self.parse_block_singles(doc_content)
+          self.parse_block_lists_mkdn(doc_content)
+          self.parse_block_lists_comma(doc_content)
+        end
         self.parse_inlines(doc_content)
       end
 

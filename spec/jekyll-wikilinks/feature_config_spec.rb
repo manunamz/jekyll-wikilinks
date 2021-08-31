@@ -11,6 +11,7 @@ RSpec.describe(Jekyll::WikiLinks) do
 
   # links
   let(:inline_untyped_link)             { find_by_title(site.collections["untyped"].docs, "Untyped Link") }
+  let(:block_single_link)               { find_by_title(site.collections["block_single"].docs, "Block Single Link") }
   # targets
   let(:blank_a)                         { find_by_title(site.collections["target"].docs, "Blank A") }
   let(:css_exclude)                     { find_by_title(site.collections["target"].docs, "Excluded CSS") }
@@ -67,6 +68,18 @@ RSpec.describe(Jekyll::WikiLinks) do
 
       it "does not process [[wikilinks]] for those types" do
         expect(inline_untyped_link.output).to include("[[blank.a]]")
+      end
+
+    end
+
+    context "when 'attributes' are disabled in configs" do
+      let(:config_overrides) { {
+        "collections" => { "block_single" => { "output" => true }, "target" => { "output" => true } },
+        "wikilinks" => { "attributes" => { "enabled" => false } },
+      } }
+
+      it "does not process block::[[wikilinks]] as a block, but as an inline" do
+        expect(block_single_link.output).to include("<a class=\"wiki-link link-type block-single\" href=\"/target/blank.a/\">blank a</a>")
       end
 
     end

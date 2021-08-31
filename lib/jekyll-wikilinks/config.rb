@@ -5,6 +5,8 @@ module Jekyll
   module WikiLinks
 
     class PluginConfig
+
+      ATTR_KEY = "attributes"
       CONFIG_KEY = "wikilinks"
       ENABLED_KEY = "enabled"
       EXCLUDE_KEY = "exclude"
@@ -19,6 +21,10 @@ module Jekyll
         option(ENABLED_KEY) == false
       end
 
+      def disabled_attributes?
+        option_attributes(ENABLED_KEY) == false
+      end
+
       def exclude?(type)
         return false unless option(EXCLUDE_KEY)
         return option(EXCLUDE_KEY).include?(type.to_s)
@@ -26,6 +32,10 @@ module Jekyll
 
       def option(key)
         @config[CONFIG_KEY] && @config[CONFIG_KEY][key]
+      end
+
+      def option_attributes(key)
+        @config[CONFIG_KEY] && @config[CONFIG_KEY][ATTR_KEY] && @config[CONFIG_KEY][ATTR_KEY][key]
       end
 
       # !! deprecated !!
