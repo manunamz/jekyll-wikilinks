@@ -19,6 +19,8 @@ module Jekyll
         @wikilink_blocks, @wikilink_inlines = [], [], []
       end
 
+      # parsing
+
       def parse(doc_content)
         @wikilink_blocks, @wikilink_inlines = [], [], []
         self.parse_block_singles(doc_content)
@@ -168,6 +170,8 @@ module Jekyll
         end
       end
 
+      # building/converting
+
       def build_html_embed(title, content, url)
         # multi-line for readability
         return [
@@ -237,6 +241,26 @@ module Jekyll
   			end
   		end
     end
+
+    # validation
+
+    def has_target_attr?(attribute)
+      attribute.list_item.each do |li|
+        return false if @doc_manager.get_doc_by_fname(li[1]).nil?
+      end
+      return true
+    end
+
+    def has_target_wl?(wikilink)
+      level = wikilink.describe['level']
+      linked_doc = @doc_manager.get_doc_by_fname(wikilink.filename)
+      return false if linked_doc.nil?
+      return false if level == "header" && !DocManager.doc_has_header?(linked_doc, wikilink.header_txt)
+      return false if level == "block" && !DocManager.doc_has_block_id?(linked_doc, wikilink.block_id)
+      return true
+    end
+
+    # wikilinks
 
     class WikiLinkBlock
       attr_accessor :link_type, :list_items

@@ -73,8 +73,6 @@ module Jekyll
     #
     # identify missing links in doc via .invalid-wiki-link class and nested doc-text.
     REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
-    REGEX_VALID_WIKI_LINK = /<a\sclass="wiki-link(\slink-type\s(?<link-type>([^"]+)))?"\shref="(?<link-url>([^"]+))">/i
-    # REGEX_VALID_WIKI_LINK = /wiki-link[^=]*href\s*=\s*\\?"([^"\\]*)\\?"/i
 
   end
 end
