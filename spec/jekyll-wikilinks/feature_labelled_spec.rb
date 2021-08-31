@@ -52,18 +52,36 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
       end
 
-      context "when label includes [square brackets]" do
+      context "when label includes [square brackets]; html output" do
 
-        # labelled text preserves [square brackets]
-        it "renders the label text with [square brackets], not the doc's  filename" do
-          pending("flexible label text")
-          expect(link_w_sq_br.output).to include("label with [square brackets]")
-          expect(link_w_sq_br.output).to_not include("base-case.a")
+        context "current function:" do
+
+          it "full" do
+            expect(link_w_sq_br.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/target/blank.b/\">label with [square brackets</a>].</p>\n")
+          end
+
+          it "renders the label text with [square brackets], not the doc's  filename" do
+            expect(link_w_sq_br.output).to include("label with [square brackets")
+            rendered_filename = ">blank.b"
+            expect(link_w_sq_br.output).to_not include(rendered_filename)
+          end
+
         end
 
-        it "full output" do
-          pending("flexible label text")
-          expect(link_w_sq_br.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/doc/8f6277a1-b63a-4ac7-902d-d17e27cb950c/\">label with [square brackets]</a>.</p>\n")
+        context "desired function:" do
+
+          it "full" do
+            pending("REGEX_NOT_GREEDY still not quite right...")
+            expect(link_w_sq_br.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/target/blank.b/\">label with [square brackets]</a>.</p>\n")
+          end
+
+          it "renders the label text with [square brackets], not the doc's  filename" do
+            pending("REGEX_NOT_GREEDY still not quite right...")
+            expect(link_w_sq_br.output).to include("label with [square brackets]")
+            rendered_filename = ">blank.b"
+            expect(link_w_sq_br.output).to_not include(rendered_filename)
+          end
+
         end
 
       end

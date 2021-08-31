@@ -11,15 +11,13 @@ module Jekyll
     SUPPORTED_IMG_FORMATS = Set.new(['.png', '.jpg', '.gif', '.psd', '.svg'])
 
     #
-    # markdown wikilink syntax
-    #
-
-    ## wikilink usable char syntax requirements
+    # wikilink usable char syntax requirements
     #
     # TODO: Fix REGEX_NOT_GREEDY
     # REGEX_NOT_GREEDY = /[^(?!\]\])]+/i
     # REGEX_NOT_GREEDY = /(?!\]\]).*/i
-    REGEX_NOT_GREEDY = /[^\]]+/i
+    # REGEX_NOT_GREEDY = /[^(?:\]\])]+/i
+    REGEX_NOT_GREEDY = /(.+?)(?=\]\])/i
     #  <variables> only work with 'match' function, not with 'scan' function. :/
     #  oh well...they are there for easier debugging...
     #  valid naming conventions                                      # capture indeces for WikiLinks class (0 is 'embed')
