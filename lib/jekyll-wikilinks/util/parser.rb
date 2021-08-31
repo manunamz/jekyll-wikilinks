@@ -284,19 +284,19 @@ module Jekyll
           # single
           if bullet_type?.empty?
             link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}}
-            list_item_strs = @list_items.map { |li| /\[\[#{li[1]}\]\]\n/i }
+            list_item_strs = @list_items.map { |li| /#{REGEX_LINK_LEFT}#{li[1]}#{REGEX_LINK_RIGHT}\n/i }
             md_link_regex = /#{link_type}#{list_item_strs.join("")}/i
           # list (comma)
           elsif bullet_type? == ","
             tmp_list_items = @list_items.dup
             first_item = tmp_list_items.shift()
-            link_type = /#{@link_type}#{REGEX_LINK_TYPE}\[\[#{first_item[1]}\]\]\s*/i
-            list_item_strs = tmp_list_items.map { |li| /#{li[0]}\s*\[\[#{li[1]}\]\]\s*/i }
+            link_type = /#{@link_type}#{REGEX_LINK_TYPE}#{REGEX_LINK_LEFT}#{first_item[1]}#{REGEX_LINK_RIGHT}\s*/i
+            list_item_strs = tmp_list_items.map { |li| /#{li[0]}\s*#{REGEX_LINK_LEFT}#{li[1]}#{REGEX_LINK_RIGHT}\s*/i }
             md_link_regex = /#{link_type}#{list_item_strs.join('')}/i
           # list (md)
           elsif !bullet_type?.match(REGEX_BULLET).nil?
             link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}\n}
-            list_item_strs = @list_items.map { |li| /#{Regexp.escape(li[0])}\s\[\[#{li[1]}\]\]\n/i }
+            list_item_strs = @list_items.map { |li| /#{Regexp.escape(li[0])}\s#{REGEX_LINK_LEFT}#{li[1]}#{REGEX_LINK_RIGHT}\n/i }
             md_link_regex = /#{link_type}#{list_item_strs.join("")}/i
           else
             Jekyll.logger.error("bullet_types not uniform or invalid: #{bullet_type?}")
@@ -395,7 +395,7 @@ module Jekyll
           Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_link_regex' for details"
         end
         label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{clean_label_txt}} : %r{}
-        return %r{#{regex_embed}#{regex_link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]}
+        return %r{#{regex_embed}#{regex_link_type}#{REGEX_LINK_LEFT}#{filename}#{header}#{block}#{label_}#{REGEX_LINK_RIGHT}}
       end
 
       def describe
