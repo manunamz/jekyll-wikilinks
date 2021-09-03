@@ -4,38 +4,30 @@
 
 module Jekyll
   module WikiLinks
-    #  <variables> only work with 'match' function, not with 'scan' function. :/
+    #  <regex_variables> only work with 'match' function, not with 'scan' function. :/
     #  oh well...they are there for easier debugging...
 
-    #
-    # supported formats
-    #
+    # supported image formats
     # from: https://docs.github.com/en/github/managing-files-in-a-repository/working-with-non-code-files/rendering-and-diffing-images
     SUPPORTED_IMG_FORMATS = Set.new(['.png', '.jpg', '.gif', '.psd', '.svg'])
 
     # wikilink constants
   	REGEX_LINK_LEFT = /\[\[/
     REGEX_LINK_RIGHT = /\]\]/
-    REGEX_LINK_EMBED = /(?<embed>(\!))/                             # 0 (capture index for WikiLinks class)
+    REGEX_LINK_EMBED = /(?<embed>(\!))/
     REGEX_LINK_TYPE = /\s*::\s*/
     REGEX_LINK_HEADER = /\#/
     REGEX_LINK_BLOCK = /\#\^/
     REGEX_LINK_LABEL = /\|/
 
-    #
     # wikilink usable char requirements
-    #
-    REGEX_NOT_GREEDY = /(.+?)(?=\]\])/i
-    #  valid naming conventions                                      # capture indeces for WikiLinks class (0 is 'embed')
-    REGEX_LINK_TYPE_TXT = /(?<link-type-txt>([^\n\s\!\#\^\|\]]+))/i  # 1
-    REGEX_FILENAME = /(?<filename>([^\\\/:\#\^\|\[\]]+))/i           # 2
-    REGEX_HEADER_TXT = /(?<header-txt>([^\!\#\^\|\[\]]+))/i          # 3
-    REGEX_BLOCK_ID_TXT = /(?<block-id>([^\\\/:\!\#\^\|\[\]^\n]+))/i  # 4
-    REGEX_LABEL_TXT = /(?<label-txt>(#{REGEX_NOT_GREEDY}))/i         # 5
+    REGEX_LINK_TYPE_TXT = /(?<link-type-txt>([^\n\s\!\#\^\|\]]+))/i
+    REGEX_FILENAME = /(?<filename>([^\\\/:\#\^\|\[\]]+))/i
+    REGEX_HEADER_TXT = /(?<header-txt>([^\!\#\^\|\[\]]+))/i
+    REGEX_BLOCK_ID_TXT = /(?<block-id>([^\\\/:\!\#\^\|\[\]^\n]+))/i
+    REGEX_LABEL_TXT = /(?<label-txt>((.+?)(?=\]\])))/i
 
-    #
     # target markdown text (headers, lists, and blocks)
-    #
     ## kramdown regexes
     ### atx header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L29
     REGEX_ATX_HEADER = /^\#{1,6}[\t ]*([^ \t].*)\n/i
@@ -50,14 +42,14 @@ module Jekyll
 
     # wikilinks
     ## inline
-    REGEX_WIKI_LINKS = %r{
-      (#{REGEX_LINK_EMBED})?
-      (#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE})?
+    REGEX_WIKI_LINKS = %r{                            # capture indeces
+      (#{REGEX_LINK_EMBED})?                          # 0
+      (#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE})?     # 1
       #{REGEX_LINK_LEFT}
-        #{REGEX_FILENAME}
-        (#{REGEX_LINK_HEADER}#{REGEX_HEADER_TXT})?
-        (#{REGEX_LINK_BLOCK}#{REGEX_BLOCK_ID_TXT})?
-        (#{REGEX_LINK_LABEL}#{REGEX_LABEL_TXT})?
+        #{REGEX_FILENAME}                             # 2
+        (#{REGEX_LINK_HEADER}#{REGEX_HEADER_TXT})?    # 3
+        (#{REGEX_LINK_BLOCK}#{REGEX_BLOCK_ID_TXT})?   # 4
+        (#{REGEX_LINK_LABEL}#{REGEX_LABEL_TXT})?      # 5
       #{REGEX_LINK_RIGHT}
     }x
     ## block
@@ -66,11 +58,9 @@ module Jekyll
     REGEX_TYPED_LINK_BLOCK_LIST_COMMA = /(?:#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\s*(?:#{REGEX_LINK_LEFT}#{REGEX_FILENAME}#{REGEX_LINK_RIGHT})\s*|\G)\s*(?:,\s*#{REGEX_LINK_LEFT}#{REGEX_FILENAME}#{REGEX_LINK_RIGHT})\s*/i
     REGEX_TYPED_LINK_BLOCK_LIST_MKDN = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\n|\G(?:#{REGEX_LIST_ITEM}\n)/i
 
-    #
     # parsing for wikilinks in html
-    #
     # identify missing links in doc via .invalid-wiki-link class and nested doc-text.
-    REGEX_INVALID_WIKI_LINK = /invalid-wiki-link#{REGEX_NOT_GREEDY}\[\[(#{REGEX_NOT_GREEDY})\]\]/i
+    REGEX_INVALID_WIKI_LINK = /invalid-wiki-link(?:[^\]]+)\[\[(?<wiki-text>([^\]]+))\]\]/i
 
   end
 end
