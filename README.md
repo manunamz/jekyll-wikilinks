@@ -4,216 +4,269 @@
 
 ⚠️ Expect breaking changes and surprises until otherwise noted (likely by v0.1.0 or v1.0.0). ⚠️
 
+Jekyll-Wikilinks adds wikilinking (the ability to reference local documents via the double square bracket syntax -- [[like this]]) support to jekyll -- and more.
+
+This gem is part of the [jekyll-bonsai](https://manunamz.github.io/jekyll-bonsai/) project. 🎋
+
 ## Installation
 
-1. Add `gem 'jekyll-wikilinks'` to your site's Gemfile and run `bundle`.
-2. You may edit `_config.yml` to toggle the plugin and graph generation on/off or exclude certain jekyll types. (jekyll types: `pages`, `posts`, and `collections`. [Here](https://ben.balter.com/2015/02/20/jekyll-collections/) is a blog post about them.)
+Follow the instructions for installing a [jekyll plugin](https://jekyllrb.com/docs/plugins/installation/) for `jekyll-wikilinks`.
+
+## Configuration
 
 Defaults look like this:
 
 ```
 wikilinks:
-  enabled: true
-  exclude: []
+  attributes:
+    enabled: true
   css:
-    link:
-      exclude: []
-# TODO
+    exclude: []
+    name:
       wiki: 'wiki-link'
       web: 'web-link'
-      invalid: 'invalid-link'
-      embed: 'wiki-link-embed-link'
-    embed:
-      container: 'wiki-link-embed'
-      title: 'wiki-link-embed-title'
-      content: 'wiki-link-embed-content'
+      invalid_wiki: 'invalid-wiki-link'
+      embed_container: 'embed-container'
+      embed_title: 'embed-title'
+      embed_content: 'embed-content'
+      embed_link: 'embed-wiki-link'
+      embed_image_container: 'embed-image-container'
+      embed_image: 'embed-image'
+  enabled: true
+  exclude: []
 ```
 
-The `enabled` flags may be toggled to turn off the plugin or turn off `d3_graph_data` generation. Any jekyll type ("pages", "posts", or collection names such as "docs" or "notes") may be added to a list of `exclude`s for either wikilinks or graph generation.
-
-The css-level `exclude` defines a list of css classes that should not have the `wiki` css class applied to it.
+`attributes`: Toggles on/off attributes and block level wikilinks. If turned off the `attributes` meta data will not be added to each document and block level wikilinks will not be removed from the content of the document.
+`css_names`: Customiztable css class names.
+`css.exclude`: Defines a list of css classes that should not have the `wiki` or `web` css classes added to it.
+`enabled`: Toggle to turn off the plugin or turn off.
+`exclude`: Any jekyll type (`pages`, `posts`, or `collections` by name) may be added to a list of excluded documents to not be processed by the jekyll-wikilinks plugin.
 
 ## Syntax
-- File level links: `[[filename]]`
-  - Wikilink text matches note filenames. (e.g. [[a-note]] -> a-note.md, [[a.note]] -> a.note.md, [[a note]] -> a note.md)
-  - [[wikilink]] text is replaced with its frontmatter `title` attribute, lower-cased, when rendered.
-  Case is ignored in [[WiKi LiNKs]] when matching link text to filename.
-  - HTML: `<a class="wiki-link" href="doc_url">lower-cased title</a>`
-- Header level links: `[[filename#header]]`
-  - Internal header validation uses [`kramdown`](https://github.com/gettalong/kramdown)'s regex for header identification.
-  - HTML: `<a class="wiki-link" href="doc_url">lower-cased title > header</a>`
-- Block level links: `[[filename#^block_id]]`
-  - Make sure the ` ^block_id` in the target document has a space before the caret ` ^`.
-  - CAVEAT:
-    - Since there aren't pre-existing web standards for blocks, there are some holes in this plugin's implementation. See following bullets.
-    - `^block_id`s themselves are left untouched so there is a way visually to identify the block once on the page's document.
-    - Blocks are treated the same way as headers, which is to say the `block_id` is appended as a url fragment (e.g. `www.blog.com/wikilink/#block_id`). With this url fragment, auto-scrolling to the corresponding html element id can be enabled. You will have to manually create those html elment ids yourself for now.
-  - HTML: `<a class="wiki-link" href="doc_url">lower-cased title > ^block_id</a>`
-- Embeds: `![[filename]]`
-  - ⚠️ CAVEATS:
-    - Wikilinks inside the embedded files are ~~not~~ processed (...but I don't quite understand why -- maybe because when you call the `markdownify` liquid tag's underlying ruby function it automatically attaches this markdown-extension-like behavior...??).
-    - ⚠️ header-lvl + block-lvl embeds not yet supported
-  - HTML:
-    ```
-      <div class="wiki-link-embed">
-        <div class="wiki-link-embed-title">
-          // doc title here
-        </div>
-        <div class="wiki-link-embed-content">
-          // embed content here
-        </div>
-        <a class="wiki-link-embed-link" href="doc_url"></a>
-      </div>
-      ```
-- Embedded images: `![[image.png]]`
-  - Make sure to set `wiki-link-img` height and width css properties.
-  - Supported formats: '.png', '.jpg', '.gif', '.psd', '.svg'
-  - HTML:
-    ```
-      <p>
-        <span class="wiki-link-embed-image">
-          <img class="wiki-link-img" src="img_relative_path"/>
-        </span>
-      </p>
-      ```
-- Labelling (sometimes called 'aliasing'): `[[filename|label text]]`
-  - Works for all wikilink levels:
-    - `[[filename|label text]]`
-    - `[[filename#header|label text]]`
-    - `[[filename#^block_id|label text]]`
-  - [🐛 KNOWN-BUG](https://github.com/manunamz/jekyll-wikilinks/issues/17): Square brackets currently do not work in label text (e.g. `[[filename|this [won't] work]]`).
-  - HTML: `<a class="wiki-link" href="doc_url">label text</a>`
-- Typed wikilinks: `link_type::[[filename]]`
-  - Types should not contain whitespace. (kabob-case is recommended, but snake_case and camelCase will work too)
-  - There are two types - block and inline.
-  - **Block** level typed wikilinks (also called a document's 'attributes') are identiable by the fact that they are the only text on a single line. So, the example above would be prefixed with a newline `\n` before the wikilink. They are removed from the file entirely and are saved as metadata in each jekyll document.
-  - **Inline** level typed wikilinks are rendered in-place like other wikilinks. They also add a `link-type` css class, as well as a css class with the name of the link type.
-  - HTML: `<a class="wiki-link link-type link_type">lower-cased title</a>`
-- Embedded Typed wikilinks: `!link_type::[[filename]]`
-    - CAVEATS: ⚠️ Link type information is currently unused.
-    - HTML: Same as embed HTML format above.
+
+### Inline Untyped File Level Wikilinks
+```markdown
+[[filename]]
+```
+This link will match a markdown document anywhere in the jekyll project so long as it is named `filename.md`. Filenames must be unique, whitespace is allowed, and case is ignored.  The file's `title` frontmatter attribute is what gets rendered a the `a` tag's inner text.
+
+Resulting HTML:
+```html
+<a class="wiki-link" href="url">lower-cased frontmatter title attribute</a>
+```
+
+### Inline Typed File Level Wikilinks
+```markdown
+link_type::[[filename]]
+```
+Types should not contain whitespace. (kabob-case is recommended, but snake_case and camelCase will work too)
+
+These wikilinks rendered in-place like untyped wikilinks. They also add a `typed` css class, as well as a css class with the name of the given link type.
+
+Resulting HTML:
+```html
+<a class="wiki-link typed link_type" href="url">lower-cased frontmatter title attribute</a>
+```
+
+### Block (Typed) Wikilinks
+Also called a document's `attributes`, block wikilinks are typed wikilinks that are the only text on a single line:
+
+```
+link_type::[[filename]]
+
+Some more text.
+```
+
+Lists are also supported and may be defined by comma-separation or markdown lists:
+
+```
+link_type::[[file-1]], [[file-2]], [[file-3]]
+
+link_type::
+- [[file-1]]
+- [[file-2]]
+- [[file-3]]
+
+link_type::
++ [[file-1]]
++ [[file-2]]
++ [[file-3]]
+
+link_type::
+* [[file-1]]
+* [[file-2]]
+* [[file-3]]
+```
+
+These wikilinks are removed from the file entirely and their corresponding document urls and link types are saved in the `attributes` frontmatter variable of the current document and the `attributed` frontmatter variable of the linked documents.
+
+The removal of these wikilinkk types is useful in the scenario where creating some form of infobox that is separate from the file's main content is desired.
+
+Block wikilinks only work on the file-level and do not support labels or embedding. They may be toggled off in the configuration by setting `attributes: false`.
+
+---
+
+### Header Level Wikilinks
+```markdown
+[[filename#header]]
+```
+This link will search for a file named `filename.md` and link to its `# header` if it has one. If no such header exists, the resulting `a` tag  will be rendered with the `invalid-wiki-link` css class.
+
+Resulting HTML:
+```html
+<a class="wiki-link" href="url#header">lower-cased frontmatter title > header</a>
+```
+
+### Block Level Wikilinks
+```markdown
+[[filename#^block_id]]
+```
+
+Resulting HTML:
+```html
+<a class="wiki-link" href="url#block_id">lower-cased title > ^block_id</a>
+```
+- Make sure the ` ^block_id` in the target document has a space before the caret ` ^`.
+- CAVEAT:
+  - `^block_id`s themselves are left untouched so there is a way visually to identify the block once on the page's document.
+  - Blocks are treated the same way as headers, which is to say the `block_id` is appended as a url fragment (e.g. `www.blog.com/wikilink/#block_id`). With this url fragment, auto-scrolling to the corresponding html element id can be enabled. You will have to manually create those html elment ids yourself for now.
+
+---
+
+### Labels (sometimes called 'aliases')
+```markdown
+[[filename|label text]]
+```
+When using labels, the text that appears after the `|` will be rendered in the `a` tag's inner text instead of the document's `title` frontmatter.
+
+Labelling works for all wikilink levels (file, header, block).
+
+Resulting HTML:
+```html
+<a class="wiki-link" href="url">label text</a>
+```
+
+### Embeds
+```markdown
+![[filename]]
+```
+By prepending `!` before a wikilink, the file's contents will be embedded in the current document rather than inserting just an `a` html tag.
+
+Embeds only work for file-level wikilinks (not header or block).
+
+Resulting HTML:
+```html
+<div class="wiki-link-embed">
+  <div class="wiki-link-embed-title">
+    // doc title here
+  </div>
+  <div class="wiki-link-embed-content">
+    // embed content here
+  </div>
+  <a class="wiki-link-embed-link" href="url"></a>
+</div>
+```
+
+### Embed Images
+```markdown
+![[image.png]]
+```
+Like the embeds above, link content will be rendered in the document body, but for images. Just be sure to add the file extension. Supported formats are `.png`, `.jpg`, `.gif`, `.psd`, `.svg`.
+
+Resulting HTML:
+```html
+<p>
+  <span class="wiki-link-embed-image">
+    <img class="wiki-link-img" src="img_relative_path"/>
+  </span>
+</p>
+```
+
+An svg's content will be inserted directly into the html, rather than being linked in an `img` tag. This is useful in case you want to programmatically alter the svg post-render:
+
+Resulting HTML:
+```html
+<p>
+  <span class="wiki-link-embed-image">
+    <svg>
+      // svg file content here
+    </svg>
+  </span>
+</p>
+```
+---
 
 ### More Syntax
 
-For more note-taking-related syntaxes such as \==highlights== and \~~strikethroughs~~:
+For more note-taking-related syntaxes such as \=\=highlights== and \~\~strikethroughs~~:
 
-- For kramdown, check out their [project page](https://github.com/gettalong/kramdown/projects/1).
-  - For highlights see [this ticket](https://github.com/gettalong/kramdown/issues/559).
-  - For strikethroughs see [this ticket](https://github.com/gettalong/kramdown/issues/594)).
-- For something that is functional now, check out the [redcarpet markdown parser](https://github.com/vmg/redcarpet).
+- For kramdown, check out their [project page](https://github.com/gettalong/kramdown/projects/1) ([highlights ticket](https://github.com/gettalong/kramdown/issues/559), [strikethrough ticket](https://github.com/gettalong/kramdown/issues/594)).
+- For something that is functional now, see the [redcarpet markdown parser](https://github.com/vmg/redcarpet).
 
 
 ## MetaData
 The following metadata are stored as frontmatter variables and are accessible in liquid templates:
 
-- `attributed` (block-level typed backlinks)
-- `attributes` (block-level typed forelinks)
-- `backlinks`  (typed and untyped back links)
-- `forelinks`  (typed and untyped 'forward' links)
-- `missing`    (typed and untyped forelinks)
+- `attributed` (block backlinks)
+- `attributes` (block forelinks)
+- `backlinks`  (typed and untyped, file/header/block, back links)
+- `forelinks`  (typed and untyped, file/header/block, 'forward' links)
+- `missing`    (typed and untyped, file/header/block, forelinks that don't correspond to any document)
 
-All metadata are arrays of hashes of the form:
-
+### Block Wikilink (Attribute) Metadata
+The `attributes` and `attributed` frontmatter variables, which correspond to block wikilinks, are lists of objects with a `type` attribute for the wikilink type and a list of `urls` which are strings:
+```yaml
+-
+  type: <str>
+  urls: [<url_str>]
+-
+  ...
 ```
-[
-  {
-    type: <str>,
-    doc_url: <url_str>,
-  },
-  {
-    ...
-  }
-]
-```
-
-They may be accessed in liquid templates:
-
-```
+Example liquid:
+```html
 <!-- render as 👉 "link-type: title" -->
 
-{{ backlink.type }}: <a class="wiki-link" href="{{ backlink.doc.url }}">{{backlink.doc.title}}</a>
-```
-
-### Liquid Template Filter
-There are two types of liquid filters provided: One for jekyll document types and one for link types.
-
-Say you want to display 'post' backlinks and 'note' backlinks separately. Just filter any of the attribute or link metadata like so:
-
-```
-<!-- show post backlink titles -->
-{% assign post_backlinks = page.backlinks | doc_type: "posts" %}
-{% for backlink in post_backlinks %}
-  {{ backlink.doc.title }}
-{% endfor %}
-
-<!-- show note backlink titles -->
-{% assign note_backlinks = page.backlinks | doc_type: "notes" %}
-{% for backlink in note_backlinks %}
-  {{ backlink.doc.title }}
+{% for attr in page.attributed %}
+  {{ attr.type }}:
+  {% for url in attr.urls %}
+      {% assign linked_doc = site.documents | where: "url", attr.url | first %}
+      <a class="wiki-link" href="{{ linked_doc.url }}">{{ linked_doc.title }}</a>
+   {% endfor %}
 {% endfor %}
 ```
+### Inline Wikilink Metadata
+The `forelinks` and `backlinks` frontmatter variables, which correspond to inline wikilinks, is a list of objects with a `type` attribute for the wikilink type and a `url` string. (Untyped wikilinks will have an empty attribute: `type: ""`):
 
-The same setup works for link types:
-
+```yaml
+-
+  type: <str>
+  url: <url_str>
+-
+  ...
 ```
-<!-- show note backlink titles -->
-{% assign backlinks_authored_by_me = page.backlinks | link_type: "by_me" %}
-{% for backlink in backlinks_authored_by_me %}
-  {{ backlink.doc.title }}
+Example liquid:
+```html
+<!-- render as 👉 "link-type: title" -->
+
+{% for backlink in page.backlinks %}
+  {% assign linked_doc = site.documents | where: "url", backlink.url | first %}
+  {{ backlink.type }}: <a class="wiki-link" href="{{ linked_doc.url }}">{{ linked_doc.title }}</a>
 {% endfor %}
 ```
-
-### D3 Graph Data
-Graph data is generated and output to a `.json` file in your `/assets` directory in the following format:
-
-```
-{
-  "nodes": [
-    {
-      "id": "<some-id>",
-      "url": "<relative-url>",
-      "label": "<note's-title>",
-    },
-    ...
-  ],
-  "links": [
-    {
-      "source": "<a-node-id>",
-      "target": "<another-node-id>",
-    },
-    ...
-  ]
-}
+### Missing Metadata
+`missing` is simply a list of wikitext strings -- text that appears in brackets 👉[[wikitext_str]] -- with no corresponding markdown file:
+```yaml
+- <wikitext_str>
+- ...
 ```
 
-`links` are built from `backlinks` and `attributed`.
+## Some Other Implementations...
 
-I've created a gist [here](https://gist.github.com/manunamz/3222e73c6b7eaef3a677a26e8f177466) of a working network graph using d3 version 6. You can see in action [here](https://manunamz.github.io/jekyll-bonsai/) (just click the 🕸 in the top-left to toggle it on).
-
----
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-A note on testing -- all tests pass if they are run in certain orders. As far as I can tell, this is due to quirks in setup/teardown of tests _not_ the plugin itself. This will be addressed soon, just know if your tests fail you might just need to re-run them in a different order and they will pass.
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/manunamz/jekyll-wikilinks.
-
-## Influences
+### ...That Are Jekyll-Related
 - [A pure liquid impl](https://github.com/jhvanderschee/brackettest)
-- [use ruby classes more fully](https://github.com/benbalter/jekyll-relative-links)
-- Referenced [digital garden jekyll template](https://github.com/maximevaillancourt/digital-garden-jekyll-template).
-- [regex ref](https://github.com/kortina/vscode-markdown-notes/blob/0ac9205ea909511b708d45cbca39c880688b5969/syntaxes/notes.tmLanguage.json)
-- [converterible example](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb)
-- [github wiki](https://docs.github.com/en/communities/documenting-your-project-with-wikis/editing-wiki-content)
-## The Prior State of Wikilinks Support For Jekyll
-- They are supported by [md4c](https://github.com/mity/md4c#markdown-extensions) (see `MD_FLAG_WIKILINKS`).
-- They are not supported by [kramdown](https://github.com/gettalong/kramdown) (searched 'wikilinks' in repo).
-- They are [not supported](https://github.com/gjtorikian/commonmarker#options) by [`jekyll-commonmark`](https://github.com/jekyll/jekyll-commonmark) that I can see (don't see any reference to `MD_FLAG_WIKILINKS`).
-- There are scattered ruby/jekyll implementations around the internet: [here](https://github.com/maximevaillancourt/digital-garden-jekyll-template/blob/master/_plugins/bidirectional_links_generator.rb), [here](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb), are some examples.
-- Stackoverflow [sees lots of interest in this functionality](https://stackoverflow.com/questions/4629675/jekyll-markdown-internal-links), specifically for jekyll, but no other answers lead to a plugin like this one. (But who knows...SO deleted my answer pointing to this plugin 👻)
+- [A Jekyll Convertertible](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb)
+- [A template](https://github.com/maximevaillancourt/digital-garden-jekyll-template/blob/master/_plugins/bidirectional_links_generator.rb)
+
+### ...That Are Wiki-Related
+- [Gollum](https://github.com/gollum/gollum)
+- [Wikicloth](https://github.com/nricciar/wikicloth)
