@@ -6,6 +6,8 @@
 
 Jekyll-Wikilinks adds wikilinking (the ability to reference local documents via the double square bracket syntax -- [[like this]]) support to jekyll -- and more.
 
+This gem works in conjunction with [`jekyll-graph`](https://github.com/manunamz/jekyll-graph).
+
 This gem is part of the [jekyll-bonsai](https://manunamz.github.io/jekyll-bonsai/) project. 🎋
 
 ## Installation
