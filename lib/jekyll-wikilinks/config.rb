@@ -19,7 +19,7 @@ module Jekyll
       WIKI_KEY = "wiki"
       ## invalid
       INV_WIKI_KEY = "invalid_wiki"
-      INV_WEB_KEY = "invalid_web"
+      # INV_WEB_KEY = "invalid_web"
       ## embed
       EMBED_WRAPPER_KEY = "embed_wrapper"
       EMBED_TITLE_KEY = "embed_title"
@@ -42,7 +42,7 @@ module Jekyll
         return "wiki-link" if name_key == WIKI_KEY
         # invalid
         return "invalid-wiki-link" if name_key == INV_WIKI_KEY
-        return "invalid-web-link" if name_key == INV_WEB_KEY
+        # return "invalid-web-link" if name_key == INV_WEB_KEY
         # embeds
         return "embed-wrapper" if name_key == EMBED_WRAPPER_KEY
         return "embed-title" if name_key == EMBED_TITLE_KEY
@@ -98,7 +98,7 @@ module Jekyll
           Jekyll.logger.warn "As of 0.0.5, 'assets_rel_path' is now 'path'."
         end
         if @config.include?("d3_graph_data")
-          Jekyll.logger.warn "As of 0.0.6, 'd3_graph_data' should now be 'd3' and requires the 'jekyll-d3' plugin."
+          Jekyll.logger.warn "As of 0.0.6, 'd3_graph_data' and graph functionality have been moved to the 'jekyll-graph' plugin."
         end
       end
     end

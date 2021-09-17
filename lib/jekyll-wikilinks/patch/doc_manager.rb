@@ -13,13 +13,13 @@ module Jekyll
       CONVERTER_CLASS = Jekyll::Converters::Markdown
 
       def initialize(site)
-        return if $conf.disabled?
+        return if $wiki_conf.disabled?
 
         markdown_converter = site.find_converter_instance(CONVERTER_CLASS)
         # filter docs based on configs
         docs = []
-        docs += site.pages if !$conf.exclude?(:pages)
-        docs += site.docs_to_write.filter { |d| !$conf.exclude?(d.type) }
+        docs += site.pages if !$wiki_conf.exclude?(:pages)
+        docs += site.docs_to_write.filter { |d| !$wiki_conf.exclude?(d.type) }
         @md_docs = docs.filter { |doc| markdown_converter.matches(doc.extname) }
         if @md_docs.nil? || @md_docs.empty?
           Jekyll.logger.debug("No documents to process.")

@@ -14,7 +14,7 @@ module Jekyll
     class Generator < Jekyll::Generator
 
       def generate(site)
-        return if $conf.disabled?
+        return if $wiki_conf.disabled?
 
         @site ||= site
         @context ||= Jekyll::WikiLinks::Context.new(site)

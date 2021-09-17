@@ -8,15 +8,16 @@ require_relative "jekyll-wikilinks/version"
 # setup config
 require_relative "jekyll-wikilinks/config"
 Jekyll::Hooks.register :site, :after_init do |site|
-  # global '$conf' to ensure that all local jekyll plugins
+  # global '$wiki_conf' to ensure that all local jekyll plugins
   # are reading from the same configuration
-  $conf = Jekyll::WikiLinks::PluginConfig.new(site.config)
+  # (global var is not ideal, but is DRY)
+  $wiki_conf = Jekyll::WikiLinks::PluginConfig.new(site.config)
 end
 
 # setup docs (based on configs)
 require_relative "jekyll-wikilinks/patch/doc_manager"
 Jekyll::Hooks.register :site, :post_read do |site|
-  if !$conf.disabled?
+  if !$wiki_conf.disabled?
     site.doc_mngr = Jekyll::WikiLinks::DocManager.new(site)
   end
 end

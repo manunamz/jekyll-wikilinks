@@ -23,7 +23,7 @@ module Jekyll
 
       def parse(doc_content)
         @wikilink_blocks, @wikilink_inlines = [], [], []
-        if !$conf.disabled_attributes?
+        if !$wiki_conf.disabled_attributes?
           self.parse_block_singles(doc_content)
           self.parse_block_lists_mkdn(doc_content)
           self.parse_block_lists_comma(doc_content)
@@ -177,14 +177,14 @@ module Jekyll
       def build_html_embed(title, content, url)
         # multi-line for readability
         return [
-          "<div class=\"#{$conf.css_name("embed_wrapper")}\">",
-            "<div class=\"#{$conf.css_name("embed_title")}\">",
+          "<div class=\"#{$wiki_conf.css_name("embed_wrapper")}\">",
+            "<div class=\"#{$wiki_conf.css_name("embed_title")}\">",
               "#{title}",
             "</div>",
-            "<div class=\"#{$conf.css_name("embed_content")}\">",
+            "<div class=\"#{$wiki_conf.css_name("embed_content")}\">",
               "#{@markdown_converter.convert(content)}",
             "</div>",
-            "<a class=\"#{$conf.css_name("embed_wiki_link")}\" href=\"#{url}\"></a>",
+            "<a class=\"#{$wiki_conf.css_name("embed_wiki_link")}\" href=\"#{url}\"></a>",
           "</div>",
         ].join("\n").gsub!("\n", "")
       end
@@ -195,9 +195,9 @@ module Jekyll
           File.open(static_doc.path, "r") do |svg_img|
             svg_content = svg_img.read
           end
-          return "<p><span class=\"#{$conf.css_name("embed_image_wrapper")}\">#{svg_content}</span></p>"
+          return "<p><span class=\"#{$wiki_conf.css_name("embed_image_wrapper")}\">#{svg_content}</span></p>"
         else
-          return "<p><span class=\"#{$conf.css_name("embed_image_wrapper")}\"><img class=\"#{$conf.css_name("embed_image")}\" src=\"#{relative_url(static_doc.relative_path)}\"/></span></p>"
+          return "<p><span class=\"#{$wiki_conf.css_name("embed_image_wrapper")}\"><img class=\"#{$wiki_conf.css_name("embed_image")}\" src=\"#{relative_url(static_doc.relative_path)}\"/></span></p>"
         end
       end
 
@@ -235,11 +235,11 @@ module Jekyll
   					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
   					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
   				else
-  					return '<span class="' + $conf.css_name("invalid_wiki") + '">' + wikilink.md_link_str + '</span>'
+  					return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_link_str + '</span>'
   				end
-  				return '<a class="' + $conf.css_name("wiki") + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
+  				return '<a class="' + $wiki_conf.css_name("wiki") + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
   			else
-  				return '<span class="' + $conf.css_name("invalid_wiki") + '">' + wikilink.md_link_str + '</span>'
+  				return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_link_str + '</span>'
   			end
   		end
     end
