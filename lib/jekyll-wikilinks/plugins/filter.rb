@@ -7,6 +7,9 @@ module Jekyll
       # 'links' accepts untyped links, typed links, and attributes; fore and back.
 
       # usage: {% assign note_links = page.links | doc_type = "notes" %}
+      # TODO: if you simply filter links against specific jekyll types, this filter is completely unecessary...
+      #       // looping through backlinks:
+      #       {% assign note_links = site.notes | where: "url", backlink.url | first %}
       def doc_type(links, doc_type)
         Jekyll.logger.error("'links' should not be nil") if links.nil?
         return "No doc type given" if doc_type.empty?
