@@ -270,7 +270,8 @@ Example liquid:
 
 ### ...That Are Jekyll-Related
 - [A pure liquid impl](https://github.com/jhvanderschee/brackettest)
-- [A Jekyll Convertertible](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb)
+- [A Jekyll Converter](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb)
+- [Another Jekyll Converter](https://github.com/doitian/wikilink-converter)
 - [A template](https://github.com/maximevaillancourt/digital-garden-jekyll-template/blob/master/_plugins/bidirectional_links_generator.rb)
 
 ### ...That Are Wiki-Related
