@@ -37,9 +37,13 @@ wikilinks:
 ```
 
 `attributes`: Toggles on/off attributes and block level wikilinks. If turned off the `attributes` meta data will not be added to each document and block level wikilinks will not be removed from the content of the document.
+
 `css_names`: Customiztable css class names.
+
 `css.exclude`: Defines a list of css classes that should not have the `wiki` or `web` css classes added to it.
+
 `enabled`: Toggle to turn off the plugin or turn off.
+
 `exclude`: Any jekyll type (`pages`, `posts`, or `collections` by name) may be added to a list of excluded documents to not be processed by the jekyll-wikilinks plugin.
 
 ## Syntax
