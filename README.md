@@ -38,9 +38,11 @@ wikilinks:
 
 `attributes`: Toggles on/off attributes and block level wikilinks. If turned off the `attributes` meta data will not be added to each document and block level wikilinks will not be removed from the content of the document.
 `css_names`: Customiztable css class names.
-`css.exclude`: Defines a list of css classes that should not have the `wiki` or `web` css classes added to it.
+`css.exclude`: Defines a list of css classes that should not have the `wiki` or `web` css classes added to it.*
 `enabled`: Toggle to turn off the plugin or turn off.
 `exclude`: Any jekyll type (`pages`, `posts`, or `collections` by name) may be added to a list of excluded documents to not be processed by the jekyll-wikilinks plugin.
+
+* This is useful when there are other internal links that should not have the `web-link` css class added to it. For example, `kramdown` adds `footenote` and `reversefootnote` css classes to `a` elements that are footnotes. Since they are links internal to the site, they won't have `wiki-link`s added to them, but it is likely undesirable to have `web-link` added to these elements. This makes them good candidates to exclude from the plugin's css processing altogether and style those classes separately.
 
 ## Syntax
 
