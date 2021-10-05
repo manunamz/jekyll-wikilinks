@@ -44,7 +44,7 @@ module Jekyll
               filename,
             )
             @wikilink_blocks << typed_link_block_wikilink
-            doc_content.gsub!(typed_link_block_wikilink.md_regex, "")
+            doc_content.gsub!(typed_link_block_wikilink.md_regex, "\n")
           end
         end
       end
@@ -75,7 +75,7 @@ module Jekyll
               # process previous wikilink_list
               if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
                 @wikilink_blocks << processing_wikilink_list
-                doc_content.gsub!(processing_wikilink_list.md_regex, "")
+                doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
               end
               processing_link_type = link_type
               processing_wikilink_list = WikiLinkBlock.new(processing_link_type, bullet_type, link_filename_1)
@@ -88,7 +88,7 @@ module Jekyll
           # process previous wikilink_list
           if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
             @wikilink_blocks << processing_wikilink_list
-            doc_content.gsub!(processing_wikilink_list.md_regex, "")
+            doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
           end
         end
       end
@@ -131,7 +131,7 @@ module Jekyll
               # process previous wikilink_list
               if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
                 @wikilink_blocks << processing_wikilink_list
-                doc_content.gsub!(processing_wikilink_list.md_regex, "")
+                doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
               end
               processing_link_type = link_type
               processing_wikilink_list = WikiLinkBlock.new(processing_link_type)
@@ -143,7 +143,7 @@ module Jekyll
           # process previous wikilink_list
           if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
             @wikilink_blocks << processing_wikilink_list
-            doc_content.gsub!(processing_wikilink_list.md_regex, "")
+            doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
           end
         end
       end
@@ -164,6 +164,7 @@ module Jekyll
         end
         # replace text
         return if @wikilink_inlines.nil?
+        self.sort_typed_first
         @wikilink_inlines.each do |wikilink|
           doc_content.gsub!(
             wikilink.md_link_regex,
@@ -242,6 +243,21 @@ module Jekyll
   				return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_link_str + '</span>'
   			end
   		end
+
+      # helpers
+
+      def sort_typed_first
+        # sorting inline wikilinks is necessary so when wikilinks are replaced,
+        # longer strings are replaced first so as not to accidentally overwrite 
+        # substrings
+        # (this is especially likely if there is a matching wikilink that 
+        #  appears as both untyped and typed in a document)
+        temp = @wikilink_inlines.dup
+        @wikilink_inlines.clear()
+        typed_wikilinks = temp.select { |wl| wl.typed? }
+        untyped_wikilinks = temp.select { |wl| !wl.typed? }
+        @wikilink_inlines = typed_wikilinks.concat(untyped_wikilinks)
+      end
     end
 
     # validation
