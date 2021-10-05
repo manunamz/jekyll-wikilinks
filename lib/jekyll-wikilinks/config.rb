@@ -15,6 +15,7 @@ module Jekyll
       NAME_KEY = "name"
       # names
       ## valid
+      TYPED_KEY = "typed"
       WEB_KEY = "web"
       WIKI_KEY = "wiki"
       ## invalid
@@ -38,6 +39,7 @@ module Jekyll
 
       def css_name(name_key)
         return option_css_name(name_key) if option_css_name(name_key)
+        return "typed" if name_key == TYPED_KEY
         # valid
         return "wiki-link" if name_key == WIKI_KEY
         # invalid

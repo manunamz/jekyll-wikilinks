@@ -23,6 +23,7 @@ wikilinks:
   css:
     exclude: []
     name:
+      typed: 'typed'
       wiki: 'wiki-link'
       web: 'web-link'
       invalid_wiki: 'invalid-wiki-link'
