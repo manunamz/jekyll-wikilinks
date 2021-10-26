@@ -106,9 +106,15 @@ link_type::
 
 These wikilinks are removed from the file entirely and their corresponding document urls and link types are saved in the `attributes` frontmatter variable of the current document and the `attributed` frontmatter variable of the linked documents.
 
-The removal of these wikilinkk types is useful in the scenario where creating some form of infobox that is separate from the file's main content is desired.
+The removal of these wikilink types is useful in the scenario where creating some form of infobox that is separate from the file's main content is desired.
 
-Block wikilinks only work on the file-level and do not support labels or embedding. They may be toggled off in the configuration by setting `attributes: false`.
+Block wikilinks only work on the file-level and do not support labels or embedding. They may be toggled off in the configuration by setting: 
+
+```
+wikilinks:
+  attributes: 
+    enabled: false
+```
 
 ---
 
