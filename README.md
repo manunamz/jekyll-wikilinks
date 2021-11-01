@@ -6,6 +6,8 @@
 
 Jekyll-Wikilinks adds wikilinking (the ability to reference local documents via the double square bracket syntax -- [[like this]]) support to jekyll -- and more.
 
+This gem works in conjunction with [`jekyll-graph`](https://github.com/manunamz/jekyll-graph).
+
 This gem is part of the [jekyll-bonsai](https://manunamz.github.io/jekyll-bonsai/) project. 🎋
 
 ## Installation
@@ -38,9 +40,13 @@ wikilinks:
 ```
 
 `attributes`: Toggles on/off attributes and block level wikilinks. If turned off the `attributes` meta data will not be added to each document and block level wikilinks will not be removed from the content of the document.
+
 `css_names`: Customiztable css class names.
-`css.exclude`: Defines a list of css classes that should not have the `wiki` or `web` css classes added to it.*
+
+`css.exclude`: Defines a list of css classes that should not have the `wiki` or `web` css classes added to it.
+
 `enabled`: Toggle to turn off the plugin or turn off.
+
 `exclude`: Any jekyll type (`pages`, `posts`, or `collections` by name) may be added to a list of excluded documents to not be processed by the jekyll-wikilinks plugin.
 
 * This is useful when there are other internal links that should not have the `web-link` css class added to it. For example, `kramdown` adds `footenote` and `reversefootnote` css classes to `a` elements that are footnotes. Since they are links internal to the site, they won't have `wiki-link`s added to them, but it is likely undesirable to have `web-link` added to these elements. This makes them good candidates to exclude from the plugin's css processing altogether and style those classes separately.
@@ -103,9 +109,15 @@ link_type::
 
 These wikilinks are removed from the file entirely and their corresponding document urls and link types are saved in the `attributes` frontmatter variable of the current document and the `attributed` frontmatter variable of the linked documents.
 
-The removal of these wikilinkk types is useful in the scenario where creating some form of infobox that is separate from the file's main content is desired.
+The removal of these wikilink types is useful in the scenario where creating some form of infobox that is separate from the file's main content is desired.
 
-Block wikilinks only work on the file-level and do not support labels or embedding. They may be toggled off in the configuration by setting `attributes: false`.
+Block wikilinks only work on the file-level and do not support labels or embedding. They may be toggled off in the configuration by setting: 
+
+```
+wikilinks:
+  attributes: 
+    enabled: false
+```
 
 ---
 
@@ -267,7 +279,8 @@ Example liquid:
 
 ### ...That Are Jekyll-Related
 - [A pure liquid impl](https://github.com/jhvanderschee/brackettest)
-- [A Jekyll Convertertible](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb)
+- [A Jekyll Converter](https://github.com/metala/jekyll-wikilinks-plugin/blob/master/wikilinks.rb)
+- [Another Jekyll Converter](https://github.com/doitian/wikilink-converter)
 - [A template](https://github.com/maximevaillancourt/digital-garden-jekyll-template/blob/master/_plugins/bidirectional_links_generator.rb)
 
 ### ...That Are Wiki-Related
