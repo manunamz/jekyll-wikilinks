@@ -1,3 +1,9 @@
+## [0.0.7] 2021-11-01
+### Added
+- "typed" css class can now be configured.
+### Fixed
+- Order inline wikilinks such that the replacement of untyped wikilinks doesn't clobber typed wikilinks.
+
 ## [0.0.6] 2021-09-17
 ### Added
 - `missing` frontmatter metadata attribute.
