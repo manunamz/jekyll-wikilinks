@@ -275,6 +275,44 @@ Example liquid:
 - ...
 ```
 
+## Liquid Filters
+
+There are two types of liquid filters provided: One for jekyll document types and one for link (relationship) types.
+
+Say you want to filter by jekyll document type. If you want to display 'post' backlinks and 'note' backlinks separately, just filter the backlinks metadata like so:
+
+```html
+<!-- show post backlink titles -->
+{% assign post_backlinks = page.backlinks | doc_type: "posts" %}
+{% for backlink in post_backlinks %}
+  {% assign post = site.posts | where: "url", backlink | first %}
+  {{ post.title }}
+{% endfor %}
+
+<!-- show note backlink titles -->
+{% assign note_backlinks = page.backlinks | doc_type: "notes" %}
+{% for backlink in note_backlinks %}
+  {% assign note = site.notes | where: "url", backlink | first %}
+  {{ note.title }}
+{% endfor %}
+```
+
+Say you want to filter by link (relationship) types. If you have markdown like the following:
+
+```markdown
+author::[[gardener]]
+```
+
+Then you could filter by the `author` type like so:
+
+```html
+{% assign author_links = page.links | rel_type: "author" %}
+{% for link in author_links %}
+  {% assign post = site.posts | where: "url", backlink | first %}
+  {{ post.title }}
+{% endfor %}
+```
+
 ## Some Other Implementations...
 
 ### ...That Are Jekyll-Related
