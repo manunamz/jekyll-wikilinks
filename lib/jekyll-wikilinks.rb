@@ -22,11 +22,11 @@ Jekyll::Hooks.register :site, :post_read do |site|
   end
 end
 
-# convert
-require_relative "jekyll-wikilinks/plugins/converter"
-
 # generate
 require_relative "jekyll-wikilinks/plugins/generator"
+
+# convert
+require_relative "jekyll-wikilinks/plugins/converter"
 
 # convert fores
 # Jekyll::Hooks.register :documents, :pre_convert do |doc|
