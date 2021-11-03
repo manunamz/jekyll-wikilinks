@@ -155,7 +155,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(link_missing_doc.output).to include("[[missing.doc]]")
         end
 
-
         # it "handles header url fragments; full output" do
         #   expect(link_header_missing_doc.output).to eq("<p>This doc contains an invalid link with an invalid header <span class=\"invalid-wiki-link\">[[long-doc#Zero]]</span>.</p>\n")
         # end
@@ -163,6 +162,12 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       end
 
       context "metadata:" do
+
+        it "'missing' added to current document (wiki-text string)" do
+          expect(link_missing_doc.data['missing']).to be_a(Array)
+          expect(link_missing_doc.data['missing'][0]).to be_a(String)
+          expect(link_missing_doc.data['missing'][0]).to eq("missing.doc")
+        end
 
         it "'attributed' not added to document" do
           expect(link_missing_doc.data['attributed']).to eq([])

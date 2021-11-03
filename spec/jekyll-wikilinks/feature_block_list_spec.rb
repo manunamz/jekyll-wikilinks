@@ -18,6 +18,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:link_md_dash_w_whitespace)     { find_by_title(site.collections["block_list"].docs, "Block List Link Markdown Dash With Whitespace") }
   let(:link_md_star)                  { find_by_title(site.collections["block_list"].docs, "Block List Link Markdown Star") }
   let(:link_md_plus)                  { find_by_title(site.collections["block_list"].docs, "Block List Link Markdown Plus") }
+  let(:link_comma_missing_doc)              { find_by_title(site.collections["block_list"].docs, "Block List Link Comma Missing Doc") }
   # targets
   let(:blank_a)                       { find_by_title(site.collections["target"].docs, "Blank A") }
   let(:blank_b)                       { find_by_title(site.collections["target"].docs, "Blank B") }
@@ -133,6 +134,61 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
         end
 
+      end
+
+      context "when target doc does not exist" do
+
+        context "html output" do
+  
+          it "full" do
+            expect(link_comma_missing_doc.output).to eq("<p>This doc contains a wikilink to <span class=\"invalid-wiki-link\">inline-typed::[[missing.doc]]</span>.</p>\n")
+          end
+  
+          it "injects a span element with descriptive title" do
+            expect(link_comma_missing_doc.output).to include("<span ")
+            expect(link_comma_missing_doc.output).to include("</span>")
+          end
+  
+          it "assigns 'invalid-wiki-link' class to span element" do
+            expect(link_comma_missing_doc.output).to include("class=\"invalid-wiki-link\"")
+          end
+  
+          it "leaves original angle brackets and text untouched" do
+            expect(link_comma_missing_doc.output).to include("[[missing.doc]]")
+          end
+  
+          # it "handles header url fragments; full output" do
+          #   expect(link_header_missing_doc.output).to eq("<p>This doc contains an invalid link with an invalid header <span class=\"invalid-wiki-link\">[[long-doc#Zero]]</span>.</p>\n")
+          # end
+  
+        end
+  
+        context "metadata:" do
+  
+          it "'missing' added to current document (wiki-text string)" do
+            expect(link_comma_missing_doc.data['missing']).to be_a(Array)
+            expect(link_comma_missing_doc.data['missing'][0]).to be_a(String)
+            expect(link_comma_missing_doc.data['missing'][0]).to eq("missing.doc")
+          end
+  
+          it "'attributed' not added to document" do
+            expect(link_comma_missing_doc.data['attributed']).to eq([])
+          end
+  
+          it "'attributes' not added to document" do
+            expect(link_comma_missing_doc.data['attributes']).to eq([])
+          end
+  
+          it "'backlinks' not added to document" do
+            expect(link_comma_missing_doc.data['backlinks']).to eq([])
+          end
+  
+          it "'forelinks' not added to document" do
+            expect(link_comma_missing_doc.data['forelinks']).to eq([])
+          end
+  
+        end
+  
       end
 
     end
