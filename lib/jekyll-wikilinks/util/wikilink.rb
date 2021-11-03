@@ -10,7 +10,8 @@ module Jekyll
       attr_accessor :link_type, :list_items
 
       # parameters ordered by appearance in regex
-      def initialize(link_type, bullet_type=nil, filename=nil)
+      def initialize(doc_mngr, link_type, bullet_type=nil, filename=nil)
+        @doc_mngr ||= doc_mngr
         @link_type ||= link_type
         @list_items = [] # li[0] = bullet_type; li[1] = filename
         @list_items << [ bullet_type, filename ] if !bullet_type.nil? && !filename.nil?
@@ -90,7 +91,8 @@ module Jekyll
       BLOCK_ID = "block_id"
 
       # parameters ordered by appearance in regex
-      def initialize(embed, link_type, filename, header_txt, block_id, label_txt)
+      def initialize(doc_mngr, embed, link_type, filename, header_txt, block_id, label_txt)
+        @doc_mngr ||= doc_mngr
         @embed ||= embed
         @link_type ||= link_type
         @filename ||= filename

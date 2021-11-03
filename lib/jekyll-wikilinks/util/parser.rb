@@ -40,6 +40,7 @@ module Jekyll
             link_type = wl_match[0]
             filename = wl_match[1]
             typed_link_block_wikilink = WikiLinkBlock.new(
+              @doc_manager,
               link_type,
               bullet_type,
               filename,
@@ -79,7 +80,7 @@ module Jekyll
                 doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
               end
               processing_link_type = link_type
-              processing_wikilink_list = WikiLinkBlock.new(processing_link_type, bullet_type, link_filename_1)
+              processing_wikilink_list = WikiLinkBlock.new(@doc_manager, processing_link_type, bullet_type, link_filename_1)
               processing_wikilink_list.add_item(bullet_type, link_filename_2) if !link_filename_2.nil?
             else
               Jekyll.logger.error("'processing_wikilink_list' was nil") if processing_wikilink_list.nil?
@@ -135,7 +136,7 @@ module Jekyll
                 doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
               end
               processing_link_type = link_type
-              processing_wikilink_list = WikiLinkBlock.new(processing_link_type)
+              processing_wikilink_list = WikiLinkBlock.new(@doc_manager, processing_link_type)
             else
               Jekyll.logger.error("'processing_wikilink_list' was nil") if processing_wikilink_list.nil?
               processing_wikilink_list.add_item(bullet_type, link_filename)
@@ -154,6 +155,7 @@ module Jekyll
         if !wikilink_matches.nil? && wikilink_matches.size != 0
           wikilink_matches.each do |wl_match|
             @wikilink_inlines << WikiLinkInline.new(
+              @doc_manager,
               wl_match[0],
               wl_match[1],
               wl_match[2],
