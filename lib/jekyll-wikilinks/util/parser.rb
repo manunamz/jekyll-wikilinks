@@ -1,4 +1,5 @@
 require_relative "regex"
+require_relative "wikilink"
 
 module Jekyll
   module WikiLinks
@@ -167,7 +168,7 @@ module Jekyll
         self.sort_typed_first
         @wikilink_inlines.each do |wikilink|
           doc_content.gsub!(
-            wikilink.md_link_regex,
+            wikilink.md_regex,
             self.build_html(wikilink)
           )
         end
@@ -236,11 +237,11 @@ module Jekyll
   					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
   					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
   				else
-  					return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_link_str + '</span>'
+  					return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_str + '</span>'
   				end
   				return '<a class="' + $wiki_conf.css_name("wiki") + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
   			else
-  				return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_link_str + '</span>'
+  				return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_str + '</span>'
   			end
   		end
 
@@ -262,202 +263,21 @@ module Jekyll
 
     # validation
 
-    def has_target_attr?(attribute)
-      attribute.list_item.each do |li|
-        return false if @doc_manager.get_doc_by_fname(li[1]).nil?
-      end
-      return true
-    end
+    # def has_target_attr?(attribute)
+    #   attribute.list_item.each do |li|
+    #     return false if @doc_manager.get_doc_by_fname(li[1]).nil?
+    #   end
+    #   return true
+    # end
 
-    def has_target_wl?(wikilink)
-      level = wikilink.describe['level']
-      linked_doc = @doc_manager.get_doc_by_fname(wikilink.filename)
-      return false if linked_doc.nil?
-      return false if level == "header" && !DocManager.doc_has_header?(linked_doc, wikilink.header_txt)
-      return false if level == "block" && !DocManager.doc_has_block_id?(linked_doc, wikilink.block_id)
-      return true
-    end
-
-    # wikilinks
-
-    class WikiLinkBlock
-      attr_accessor :link_type, :list_items
-
-      # parameters ordered by appearance in regex
-      def initialize(link_type, bullet_type=nil, filename=nil)
-        @link_type ||= link_type
-        @list_items = [] # li[0] = bullet_type; li[1] = filename
-        @list_items << [ bullet_type, filename ] if !bullet_type.nil? && !filename.nil?
-      end
-
-      def add_item(bullet_type, filename)
-        return if bullet_type.nil? || bullet_type.empty? || filename.nil? || filename.empty?
-        @list_items << [ bullet_type, filename ]
-      end
-
-      def md_regex
-        if typed? && has_items?
-          # single
-          if bullet_type?.empty?
-            link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}}
-            list_item_strs = @list_items.map { |li| /#{REGEX_LINK_LEFT}#{li[1]}#{REGEX_LINK_RIGHT}\n/i }
-            md_link_regex = /#{link_type}#{list_item_strs.join("")}/i
-          # list (comma)
-          elsif bullet_type? == ","
-            tmp_list_items = @list_items.dup
-            first_item = tmp_list_items.shift()
-            link_type = /#{@link_type}#{REGEX_LINK_TYPE}#{REGEX_LINK_LEFT}#{first_item[1]}#{REGEX_LINK_RIGHT}\s*/i
-            list_item_strs = tmp_list_items.map { |li| /#{li[0]}\s*#{REGEX_LINK_LEFT}#{li[1]}#{REGEX_LINK_RIGHT}\s*/i }
-            md_link_regex = /#{link_type}#{list_item_strs.join('')}/i
-          # list (md)
-          elsif !bullet_type?.match(REGEX_BULLET).nil?
-            link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}\n}
-            list_item_strs = @list_items.map { |li| /#{Regexp.escape(li[0])}\s#{REGEX_LINK_LEFT}#{li[1]}#{REGEX_LINK_RIGHT}\n/i }
-            md_link_regex = /#{link_type}#{list_item_strs.join("")}/i
-          else
-            Jekyll.logger.error("bullet_types not uniform or invalid: #{bullet_type?}")
-          end
-          return md_link_regex
-        else
-          Jekyll.logger.error("WikiLinkBlockList.md_regex error")
-        end
-      end
-
-      def md_str
-        if typed? && has_items?
-          if bullet_type? == ","
-            link_type = "#{@link_type}::"
-            list_item_strs = @list_items.map { |li| "\[\[#{li[1]}\]\]#{li[0]}" }
-            md_link_str = (link_type + list_item_strs.join('')).delete_suffix(",")
-          elsif "+*-".include?(bullet_type?)
-            link_type = "#{@link_type}::\n"
-            list_item_strs = @list_items.map { |li| li[0] + " \[\[#{li[1]}\]\]\n" }
-            md_link_str = link_type + list_item_strs.join('')
-          else
-            Jekyll.logger.error("Not a valid bullet_type: #{bullet_type?}")
-          end
-          return md_link_str
-        else
-          Jekyll.logger.error("WikiLinkBlockList.md_str error")
-        end
-      end
-
-      def bullet_type?
-        bullets = @list_items.map { |li| li[0] }
-        return bullets.uniq.first if bullets.uniq.size == 1
-      end
-
-      def has_items?
-        return !@list_items.nil? && !@list_items.empty?
-      end
-
-      def typed?
-        return !@link_type.nil? && !@link_type.empty?
-      end
-    end
-
-    # the wikilink class knows everything about the original markdown syntax and its semantic meaning
-    class WikiLinkInline
-      attr_accessor :embed, :link_type, :filename, :header_txt, :block_id, :label_txt
-
-      FILENAME = "filename"
-      HEADER_TXT = "header_txt"
-      BLOCK_ID = "block_id"
-
-      # parameters ordered by appearance in regex
-      def initialize(embed, link_type, filename, header_txt, block_id, label_txt)
-        @embed ||= embed
-        @link_type ||= link_type
-        @filename ||= filename
-        @header_txt ||= header_txt
-        @block_id ||= block_id
-        @label_txt ||= label_txt
-      end
-
-      # labels are really flexible, so we need to handle them with a bit more care
-      def clean_label_txt
-        return @label_txt.sub("[", "\\[").sub("]", "\\]")
-      end
-
-      # TODO: remove this once parsing is migrated to nokogiri...?
-      def md_link_str
-        embed = embedded? ? "!" : ""
-        link_type = typed? ? "#{@link_type}::" : ""
-        filename = described?(FILENAME) ? @filename : ""
-        if described?(HEADER_TXT)
-          header = "\##{@header_txt}"
-          block = ""
-        elsif described?(BLOCK_ID)
-          header = ""
-          block = "\#\^#{@block_id}"
-        elsif !described?(FILENAME)
-          Jekyll.logger.error "Invalid link level in 'md_link_str'. See WikiLink's 'md_link_str' for details"
-        end
-        label_ = labelled? ? "\|#{@label_txt}" : ""
-        return "#{embed}#{link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]"
-      end
-
-      def md_link_regex
-        regex_embed = embedded? ? REGEX_LINK_EMBED : %r{}
-        regex_link_type = typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
-        filename = described?(FILENAME) ? @filename : ""
-        if described?(HEADER_TXT)
-          header = %r{#{REGEX_LINK_HEADER}#{@header_txt}}
-          block = %r{}
-        elsif described?(BLOCK_ID)
-          header = %r{}
-          block = %r{#{REGEX_LINK_BLOCK}#{@block_id}}
-        elsif !described?(FILENAME)
-          Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_link_regex' for details"
-        end
-        label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{clean_label_txt}} : %r{}
-        return %r{#{regex_embed}#{regex_link_type}#{REGEX_LINK_LEFT}#{filename}#{header}#{block}#{label_}#{REGEX_LINK_RIGHT}}
-      end
-
-      def describe
-        return {
-          'level' => level,
-          'labelled' => labelled?,
-          'embedded' => embedded?,
-          'typed_link' => typed?,
-        }
-      end
-
-      def labelled?
-        return !@label_txt.nil? && !@label_txt.empty?
-      end
-
-      def typed?
-        return !@link_type.nil? && !@link_type.empty?
-      end
-
-      def embedded?
-        return !@embed.nil? && @embed == "!"
-      end
-
-      def is_img?
-        # github supported image formats: https://docs.github.com/en/github/managing-files-in-a-repository/working-with-non-code-files/rendering-and-diffing-images
-        return SUPPORTED_IMG_FORMATS.any?{ |ext| ext == File.extname(@filename).downcase }
-      end
-
-      def is_img_svg?
-        return File.extname(@filename).downcase == ".svg"
-      end
-
-      def described?(chunk)
-        return (!@filename.nil? && !@filename.empty?) if chunk == FILENAME
-        return (!@header_txt.nil? && !@header_txt.empty?) if chunk == HEADER_TXT
-        return (!@block_id.nil? && !@block_id.empty?) if chunk == BLOCK_ID
-        Jekyll.logger.error "There is no link level '#{chunk}' in WikiLink Struct"
-      end
-
-      def level
-        return "file" if described?(FILENAME) && !described?(HEADER_TXT) && !described?(BLOCK_ID)
-        return "header" if described?(FILENAME) && described?(HEADER_TXT) && !described?(BLOCK_ID)
-        return "block" if described?(FILENAME) && !described?(HEADER_TXT) && described?(BLOCK_ID)
-        return "invalid"
-      end
-    end
+    # def has_target_wl?(wikilink)
+    #   level = wikilink.describe['level']
+    #   linked_doc = @doc_manager.get_doc_by_fname(wikilink.filename)
+    #   return false if linked_doc.nil?
+    #   return false if level == "header" && !DocManager.doc_has_header?(linked_doc, wikilink.header_txt)
+    #   return false if level == "block" && !DocManager.doc_has_block_id?(linked_doc, wikilink.block_id)
+    #   return true
+    # end
 
   end
 end
