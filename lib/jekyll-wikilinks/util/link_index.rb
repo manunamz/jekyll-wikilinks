@@ -43,18 +43,11 @@ module Jekyll
         end
         # forelinks - inlines
         wikilink_inlines.each do |wlil|
-          link_doc = md_docs.detect { |d| File.basename(d.basename, File.extname(d.basename)) == wlil.filename }
-          if !link_doc.nil?
-            @index[doc.url].forelinks << {
-              'type' => wlil.link_type,
-              'url' => link_doc.url,
-            }
+          if wlil.is_valid?
+            @index[doc.url].forelinks << wlil.index_data
+          else
+            @index[doc.url].missing << wlil.md_str
           end
-        end
-        # ...process missing links
-        doc.content.scan(REGEX_INVALID_WIKI_LINK).each do |m|
-          ltext = m[0]
-          @index[doc.url].missing << ltext
         end
       end
 

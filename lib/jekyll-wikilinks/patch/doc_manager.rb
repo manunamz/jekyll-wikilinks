@@ -34,6 +34,14 @@ module Jekyll
         return @md_docs
       end
 
+      def file_exists?(filename)
+        Jekyll.logger.error "Invalid 'filename'" if filename.nil? || filename.empty?
+        Jekyll.logger.error "'md_docs' empty" if @md_docs.size == 0
+        docs = @md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
+        return false if docs.nil? || docs.empty? || docs.size > 1
+        return true
+      end
+
       def get_doc_by_fname(filename)
         return nil if filename.nil? || @md_docs.size == 0
         docs = @md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }

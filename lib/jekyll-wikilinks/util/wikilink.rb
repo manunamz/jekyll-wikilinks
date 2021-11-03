@@ -141,6 +141,16 @@ module Jekyll
         return %r{#{regex_embed}#{regex_link_type}#{REGEX_LINK_LEFT}#{filename}#{header}#{block}#{label_}#{REGEX_LINK_RIGHT}}
       end
 
+      def index_data
+        linked_doc = @doc_mngr.get_doc_by_fname(@filename)
+        return {
+          'type' => @link_type,
+          'url' => linked_doc.url,
+        }
+      end
+
+      # descriptor methods
+
       def describe
         return {
           'level' => level,
@@ -183,6 +193,11 @@ module Jekyll
         return "header" if described?(FILENAME) && described?(HEADER_TXT) && !described?(BLOCK_ID)
         return "block" if described?(FILENAME) && !described?(HEADER_TXT) && described?(BLOCK_ID)
         return "invalid"
+      end
+
+      # validation methods
+      def is_valid?
+        return @doc_mngr.file_exists?(@filename)
       end
     end
 
