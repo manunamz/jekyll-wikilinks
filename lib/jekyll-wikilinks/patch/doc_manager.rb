@@ -62,6 +62,8 @@ module Jekyll
         return docs[0]
       end
 
+      # validators
+
       def self.doc_has_header?(doc, header)
         return nil if header.nil?
         # leading + trailing whitespace is ignored when matching headers
