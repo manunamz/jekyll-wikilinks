@@ -207,11 +207,8 @@ module Jekyll
 
   		def build_html(wikilink)
         # image processing
-        if wikilink.is_img?
-  			  linked_static_doc = @doc_manager.get_image_by_fname(wikilink.filename)
-          if wikilink.embedded? && wikilink.is_img?
-            return build_html_img_embed(linked_static_doc, is_svg=wikilink.is_img_svg?)
-          end
+        if wikilink.embedded? && wikilink.is_img?
+          return build_html_img_embed(wikilink.linked_img, is_svg=wikilink.is_img_svg?)
         end
         # markdown file processing
         if wikilink.is_valid?

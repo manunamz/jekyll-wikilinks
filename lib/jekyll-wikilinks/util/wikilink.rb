@@ -210,6 +210,11 @@ module Jekyll
       def linked_doc
         return @doc_mngr.get_doc_by_fname(@filename)
       end
+
+      def linked_img
+        return @doc_mngr.get_image_by_fname(@filename) if self.is_img?
+        return nil
+      end
     end
 
   end
