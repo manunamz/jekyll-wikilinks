@@ -6,7 +6,6 @@ require_relative "../patch/doc_manager"
 require_relative "../patch/site"
 require_relative "../util/link_index"
 require_relative "../util/parser"
-require_relative "converter"
 
 module Jekyll
   module WikiLinks
@@ -26,7 +25,7 @@ module Jekyll
         @site.doc_mngr.all.each do |doc|
           filename = File.basename(doc.basename, File.extname(doc.basename))
           @parser.parse(filename, doc.content)
-          @site.link_index.populate_forward(doc, @parser.wikilink_blocks, @parser.wikilink_inlines, @site.doc_mngr.all)
+          @site.link_index.populate(doc, @parser.wikilink_blocks, @parser.wikilink_inlines)
         end
         # wait until all docs are processed before assigning backward facing metadata,
         # this ensures all attributed/backlinks are collected for assignment

@@ -22,7 +22,7 @@ module Jekyll
         doc.data['missing']    = @index[doc.url].missing.uniq
       end
 
-      def populate_forward(doc, wikilink_blocks, wikilink_inlines, md_docs)
+      def populate(doc, wikilink_blocks, wikilink_inlines)
         # blocks
         wikilink_blocks.each do |wlbl|
           if wlbl.is_valid?

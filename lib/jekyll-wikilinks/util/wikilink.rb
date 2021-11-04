@@ -138,7 +138,6 @@ module Jekyll
 
       # validation methods
 
-
       # the block level wikilink is only valid if all list item documents exist
       def is_valid?
         @list_items.each do |li|
@@ -270,6 +269,7 @@ module Jekyll
         return File.extname(@filename).downcase == ".svg"
       end
 
+      # this method helps to make the 'WikiLinkInline.level' code read like a clean truth table.
       def described?(chunk)
         return (!@filename.nil? && !@filename.empty?) if chunk == FILENAME
         return (!@header_txt.nil? && !@header_txt.empty?) if chunk == HEADER_TXT
