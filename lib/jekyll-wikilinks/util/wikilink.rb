@@ -10,17 +10,21 @@ module Jekyll
       attr_accessor :link_type, :list_items
 
       # parameters ordered by appearance in regex
-      def initialize(doc_mngr, link_type, bullet_type=nil, filename=nil)
+      def initialize(doc_mngr, context_filename, link_type, bullet_type=nil, filename=nil)
         @doc_mngr ||= doc_mngr
+        @context_filename ||= context_filename
         @link_type ||= link_type
         @list_items = [] # li[0] = bullet_type; li[1] = filename
         @list_items << [ bullet_type, filename ] if !bullet_type.nil? && !filename.nil?
       end
 
       def add_item(bullet_type, filename)
-        return if bullet_type.nil? || bullet_type.empty? || filename.nil? || filename.empty?
+        Jekyll.logger.error "'bullet_type' required" if bullet_type.nil? || bullet_type.empty?
+        Jekyll.logger.error "'filename' required" if filename.nil? || filename.empty?
         @list_items << [ bullet_type, filename ]
       end
+
+      # data
 
       def md_regex
         if typed? && has_items?
@@ -69,6 +73,50 @@ module Jekyll
         end
       end
 
+      def urls
+        urls = []
+        @list_items.each do |bullet_type, filename|
+          doc = @doc_mngr.get_doc_by_fname(filename)
+          urls << doc.url if !doc.nil?
+        end
+        return urls
+      end
+
+      # 'fm' -> frontmatter
+
+      def context_fm_data
+        return {
+          'type' => @link_type,
+          'urls' => [self.context_doc.url],
+        }
+      end
+
+      def linked_fm_data
+        return {
+          'type' => @link_type,
+          'urls' => self.urls,
+        }
+      end
+
+      def context_doc
+        return @doc_mngr.get_doc_by_fname(@context_filename)
+      end
+
+      def linked_docs
+        docs = [] 
+        @list_items.each do |li|
+          doc = @doc_mngr.get_doc_by_fname(li[1])
+          docs << doc if !doc.nil?
+        end
+        return docs
+      end
+
+      def linked_urls
+        return @list_items.select { |i| @doc_mngr.get_doc_by_fname(i[1]).url }
+      end
+
+      # descriptor methods
+
       def bullet_type?
         bullets = @list_items.map { |li| li[0] }
         return bullets.uniq.first if bullets.uniq.size == 1
@@ -80,6 +128,13 @@ module Jekyll
 
       def typed?
         return !@link_type.nil? && !@link_type.empty?
+      end
+
+      # validation methods
+
+      # the block level wikilink is only valid if all list item documents exist
+      def is_valid?
+        return @list_items.select { |li| @doc_mngr.file_exists?(li[1]) }.all?
       end
     end
 
@@ -102,12 +157,12 @@ module Jekyll
         @label_txt ||= label_txt
       end
 
-      # useful descriptors
-
       # escape square brackets if they appear in label text
       def label_txt
         return @label_txt.sub("[", "\\[").sub("]", "\\]")
       end
+
+      # data
 
       # TODO: remove this once parsing is migrated to nokogiri...?
       def md_str
@@ -146,6 +201,13 @@ module Jekyll
 
       # 'fm' -> frontmatter
 
+      def context_fm_data
+        return {
+          'type' => @link_type,
+          'url' => self.context_doc.url,
+        }
+      end
+
       def linked_fm_data
         return {
           'type' => @link_type,
@@ -153,11 +215,17 @@ module Jekyll
         }
       end
 
-      def context_fm_data
-        return {
-          'type' => @link_type,
-          'url' => self.context_doc.url,
-        }
+      def context_doc
+        return @doc_mngr.get_doc_by_fname(@context_filename)
+      end
+
+      def linked_doc
+        return @doc_mngr.get_doc_by_fname(@filename)
+      end
+
+      def linked_img
+        return @doc_mngr.get_image_by_fname(@filename) if self.is_img?
+        return nil
       end
 
       # descriptor methods
@@ -213,21 +281,6 @@ module Jekyll
         return false if (self.level == "header") && !@doc_mngr.doc_has_header?(self.linked_doc, @header_txt)
         return false if (self.level == "block") && !@doc_mngr.doc_has_block_id?(self.linked_doc, @block_id)
         return true
-      end
-
-      # relevant data
-
-      def context_doc
-        return @doc_mngr.get_doc_by_fname(@context_filename)
-      end
-
-      def linked_doc
-        return @doc_mngr.get_doc_by_fname(@filename)
-      end
-
-      def linked_img
-        return @doc_mngr.get_image_by_fname(@filename) if self.is_img?
-        return nil
       end
     end
 

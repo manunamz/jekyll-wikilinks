@@ -15,9 +15,10 @@ module Jekyll
 
       def initialize(site)
         @context ||= Jekyll::WikiLinks::Context.new(site)
+        # do not use @dm in parser -- it is only meant to be passed down into wikilink classes. 
         @doc_manager ||= site.doc_mngr
         @markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
-        @wikilink_blocks, @wikilink_inlines = [], [], []
+        @wikilink_blocks, @wikilink_inlines = [], []
       end
 
       # parsing
@@ -25,14 +26,14 @@ module Jekyll
       def parse(doc_filename, doc_content)
         @wikilink_blocks, @wikilink_inlines = [], []
         if !$wiki_conf.disabled_attributes?
-          self.parse_block_singles(doc_content)
-          self.parse_block_lists_mkdn(doc_content)
-          self.parse_block_lists_comma(doc_content)
+          self.parse_block_singles(doc_filename, doc_content)
+          self.parse_block_lists_mkdn(doc_filename, doc_content)
+          self.parse_block_lists_comma(doc_filename, doc_content)
         end
         self.parse_inlines(doc_filename, doc_content)
       end
 
-      def parse_block_singles(doc_content)
+      def parse_block_singles(doc_filename, doc_content)
         bullet_type = ""
         typed_link_block_matches = doc_content.scan(REGEX_TYPED_LINK_BLOCK)
         if !typed_link_block_matches.nil? && typed_link_block_matches.size != 0
@@ -41,6 +42,7 @@ module Jekyll
             filename = wl_match[1]
             typed_link_block_wikilink = WikiLinkBlock.new(
               @doc_manager,
+              doc_filename,
               link_type,
               bullet_type,
               filename,
@@ -51,7 +53,7 @@ module Jekyll
         end
       end
 
-      def parse_block_lists_comma(doc_content)
+      def parse_block_lists_comma(doc_filename, doc_content)
         processing_link_type = nil
         processing_wikilink_list = nil
         bullet_type = ","
@@ -80,7 +82,7 @@ module Jekyll
                 doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
               end
               processing_link_type = link_type
-              processing_wikilink_list = WikiLinkBlock.new(@doc_manager, processing_link_type, bullet_type, link_filename_1)
+              processing_wikilink_list = WikiLinkBlock.new(@doc_manager, doc_filename, processing_link_type, bullet_type, link_filename_1)
               processing_wikilink_list.add_item(bullet_type, link_filename_2) if !link_filename_2.nil?
             else
               Jekyll.logger.error("'processing_wikilink_list' was nil") if processing_wikilink_list.nil?
@@ -95,7 +97,7 @@ module Jekyll
         end
       end
 
-      def parse_block_lists_mkdn(doc_content)
+      def parse_block_lists_mkdn(doc_filename, doc_content)
         processing_link_type = nil
         processing_wikilink_list = nil
         bullet_type = nil
@@ -136,7 +138,7 @@ module Jekyll
                 doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
               end
               processing_link_type = link_type
-              processing_wikilink_list = WikiLinkBlock.new(@doc_manager, processing_link_type)
+              processing_wikilink_list = WikiLinkBlock.new(@doc_manager, doc_filename, processing_link_type)
             else
               Jekyll.logger.error("'processing_wikilink_list' was nil") if processing_wikilink_list.nil?
               processing_wikilink_list.add_item(bullet_type, link_filename)

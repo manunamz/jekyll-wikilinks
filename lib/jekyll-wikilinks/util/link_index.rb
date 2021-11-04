@@ -23,22 +23,31 @@ module Jekyll
       end
 
       def populate_forward(doc, wikilink_blocks, wikilink_inlines, md_docs)
-        # attributes - blocks
+        # blocks
         wikilink_blocks.each do |wlbl|
-          urls = []
-          wlbl.list_items.each do |bullet_type, filename|
-            attr_doc = md_docs.detect { |d| File.basename(d.basename, File.extname(d.basename)) == filename }
-            if !attr_doc.nil?
-              urls << attr_doc.url
+          if wlbl.is_valid?
+            # attributes
+            target_attr = @index[doc.url].attributes.detect { |atr| atr['type'] == wlbl.link_type }
+            ## create
+            if target_attr.nil?
+              @index[doc.url].attributes << wlbl.linked_fm_data
+            ## append
+            else
+              target_attr['urls'] += wlbl.urls
             end
-          end
-          if !urls.nil? && !urls.empty?
-            @index[doc.url].attributes << {
-              'type' => wlbl.link_type,
-              'urls' => urls,
-            }
+            # attributed
+            wlbl.linked_docs.each do |linked_doc|
+              target_attr = @index[linked_doc.url].attributed.detect { |atr| atr['type'] == wlbl.link_type }
+              ## create
+              if target_attr.nil?
+                @index[linked_doc.url].attributed << wlbl.context_fm_data
+              ## append
+              else
+                target_attr['urls'] << doc.url
+              end
+            end
           else
-            Jekyll.logger.warn("No documents found for urls: #{urls}")
+            @index[doc.url].missing << wlbl.md_str
           end
         end
         # inlines
@@ -56,33 +65,10 @@ module Jekyll
         end
       end
 
-      def populate_backward(doc, md_docs)
-        md_docs.each do |doc_to_link|
-          # attributed
-          @index[doc_to_link.url].attributes.each do |al|
-            urls = al['urls'].map { |url| self.remove_baseurl(url) }
-            if urls.include?(doc.url)
-              target_attr = @index[doc.url].attributed.detect { |atr| atr['type'] == al['type']}
-              # add
-              if !target_attr.nil?
-                target_attr['urls'] << doc_to_link.url
-              # create new
-              else
-                urls = @index[doc.url].attributed.detect { |a| a['type'] == al['type'] }
-                @index[doc.url].attributed << {
-                  'type' => al['type'],
-                  'urls' => [ doc_to_link.url ],
-                }
-              end
-            end
-          end
-        end
-      end
-
-      def remove_baseurl(url)
-        return url.gsub(@baseurl, '') if !@baseurl.nil?
-        return url
-      end
+      # def remove_baseurl(url)
+      #   return url.gsub(@baseurl, '') if !@baseurl.nil?
+      #   return url
+      # end
 
       class DocLinks
         attr_accessor :attributes, :attributed, :backlinks, :forelinks, :missing

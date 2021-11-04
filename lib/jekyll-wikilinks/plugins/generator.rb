@@ -31,7 +31,6 @@ module Jekyll
         # wait until all docs are processed before assigning backward facing metadata,
         # this ensures all attributed/backlinks are collected for assignment
         @site.doc_mngr.all.each do |doc|
-          @site.link_index.populate_backward(doc, @site.doc_mngr.all)
           @site.link_index.assign_metadata(doc)
         end
       end
