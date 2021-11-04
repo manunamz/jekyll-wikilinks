@@ -103,8 +103,8 @@ module Jekyll
 
       # useful descriptors
 
-      # labels are really flexible, so we need to handle them with a bit more care
-      def clean_label_txt
+      # escape square brackets if they appear in label text
+      def label_txt
         return @label_txt.sub("[", "\\[").sub("]", "\\]")
       end
 
@@ -139,7 +139,7 @@ module Jekyll
         elsif !described?(FILENAME)
           Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_regex' for details"
         end
-        label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{clean_label_txt}} : %r{}
+        label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{label_txt}} : %r{}
         return %r{#{regex_embed}#{regex_link_type}#{REGEX_LINK_LEFT}#{filename}#{header}#{block}#{label_}#{REGEX_LINK_RIGHT}}
       end
 
@@ -196,16 +196,19 @@ module Jekyll
         return "invalid"
       end
 
-      def linked_doc
-        return @doc_mngr.get_doc_by_fname(@filename)
-      end
-
       # validation methods
+
       def is_valid?
         return false if !@doc_mngr.file_exists?(@filename)
         return false if (self.level == "header") && !@doc_mngr.doc_has_header?(self.linked_doc, @header_txt)
         return false if (self.level == "block") && !@doc_mngr.doc_has_block_id?(self.linked_doc, @block_id)
         return true
+      end
+
+      # relevant data
+
+      def linked_doc
+        return @doc_mngr.get_doc_by_fname(@filename)
       end
     end
 

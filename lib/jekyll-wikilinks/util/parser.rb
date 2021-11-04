@@ -206,41 +206,39 @@ module Jekyll
       end
 
   		def build_html(wikilink)
+        # image processing
         if wikilink.is_img?
   			  linked_static_doc = @doc_manager.get_image_by_fname(wikilink.filename)
           if wikilink.embedded? && wikilink.is_img?
             return build_html_img_embed(linked_static_doc, is_svg=wikilink.is_img_svg?)
           end
         end
-        linked_doc = @doc_manager.get_doc_by_fname(wikilink.filename)
+        # markdown file processing
         if wikilink.is_valid?
+          linked_doc = wikilink.linked_doc
           link_type = wikilink.typed? ? " #{$wiki_conf.css_name("typed")} #{wikilink.link_type}" : ""
-
-  				# label
-  				wikilink_inner_txt = wikilink.clean_label_txt if wikilink.labelled?
-
-  				lnk_doc_rel_url = relative_url(linked_doc.url)
+  				inner_txt = wikilink.label_txt if wikilink.labelled?
           # TODO not sure about downcase
-  				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
+          lnk_doc_rel_url = relative_url(linked_doc.url)
 
   				if (wikilink.level == "file")
-  					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?
+  					inner_txt = "#{linked_doc['title'].downcase}" if inner_txt.nil?
             return build_html_embed(
               linked_doc['title'],
-              @doc_manager.get_doc_content(wikilink.filename),
+              linked_doc.content,
               lnk_doc_rel_url
             ) if wikilink.embedded?
   				elsif (wikilink.level == "header")
             # from: https://github.com/jekyll/jekyll/blob/6855200ebda6c0e33f487da69e4e02ec3d8286b7/Rakefile#L74
   					lnk_doc_rel_url += "\#" + Jekyll::Utils.slugify(wikilink.header_txt)
-  					wikilink_inner_txt = "#{fname_inner_txt} > #{wikilink.header_txt}" if wikilink_inner_txt.nil?
+  					inner_txt = "#{linked_doc['title'].downcase} > #{wikilink.header_txt}" if inner_txt.nil?
   				elsif (wikilink.level == "block")
   					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
-  					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
+  					inner_txt = "#{linked_doc['title'].downcase} > ^#{wikilink.block_id}" if inner_txt.nil?
   				else
             Jekyll.logger.error "Invalid wikilink level"
   				end
-          return '<a class="' + $wiki_conf.css_name("wiki") + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
+          return '<a class="' + $wiki_conf.css_name("wiki") + link_type + '" href="' + lnk_doc_rel_url + '">' + inner_txt + '</a>'
         else
           return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_str + '</span>'
         end
