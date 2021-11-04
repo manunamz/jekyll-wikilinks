@@ -57,10 +57,5 @@ module Jekyll
     # TODO: keep an eye on this -- using REGEX_FILENAME in two places
     REGEX_TYPED_LINK_BLOCK_LIST_COMMA = /(?:#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\s*(?:#{REGEX_LINK_LEFT}#{REGEX_FILENAME}#{REGEX_LINK_RIGHT})\s*|\G)\s*(?:,\s*#{REGEX_LINK_LEFT}#{REGEX_FILENAME}#{REGEX_LINK_RIGHT})\s*/i
     REGEX_TYPED_LINK_BLOCK_LIST_MKDN = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\n|\G(?:#{REGEX_LIST_ITEM}\n)/i
-
-    # parsing for wikilinks in html
-    # identify missing links in doc via .invalid-wiki-link class and nested doc-text.
-    REGEX_INVALID_WIKI_LINK = /invalid-wiki-link(?:[^\]]+)\[\[(?<wiki-text>([^\]]+))\]\]/i
-
   end
 end
