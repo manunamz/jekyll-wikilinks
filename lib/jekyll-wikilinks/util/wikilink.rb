@@ -264,7 +264,7 @@ module Jekyll
         return (!@filename.nil? && !@filename.empty?) if chunk == FILENAME
         return (!@header_txt.nil? && !@header_txt.empty?) if chunk == HEADER_TXT
         return (!@block_id.nil? && !@block_id.empty?) if chunk == BLOCK_ID
-        Jekyll.logger.error "There is no link level '#{chunk}' in WikiLink Struct"
+        Jekyll.logger.error "There is no link level '#{chunk}' in the WikiLink Class"
       end
 
       def level
