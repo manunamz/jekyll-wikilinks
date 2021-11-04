@@ -41,12 +41,17 @@ module Jekyll
             Jekyll.logger.warn("No documents found for urls: #{urls}")
           end
         end
-        # forelinks - inlines
+        # inlines
         wikilink_inlines.each do |wlil|
-          if wlil.is_valid?
-            @index[doc.url].forelinks << wlil.index_data
-          else
-            @index[doc.url].missing << wlil.md_str
+          if !wlil.is_img?
+            if wlil.is_valid?
+              # forelink
+              @index[doc.url].forelinks << wlil.linked_fm_data
+              # backlink
+              @index[wlil.linked_doc.url].backlinks << wlil.context_fm_data
+            else
+              @index[doc.url].missing << wlil.md_str
+            end
           end
         end
       end
@@ -69,15 +74,6 @@ module Jekyll
                   'urls' => [ doc_to_link.url ],
                 }
               end
-            end
-          end
-          # backlinks
-          @index[doc_to_link.url].forelinks.each do |l|
-            if self.remove_baseurl(l['url']) == doc.url
-              @index[doc.url].backlinks << {
-                'type' => l['type'],
-                'url' => doc_to_link.url,
-              }
             end
           end
         end

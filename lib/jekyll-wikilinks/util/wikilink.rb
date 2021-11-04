@@ -84,15 +84,16 @@ module Jekyll
     end
 
     class WikiLinkInline
-      attr_accessor :embed, :link_type, :filename, :header_txt, :block_id, :label_txt
+      attr_accessor :context_filename, :embed, :link_type, :filename, :header_txt, :block_id, :label_txt
 
       FILENAME = "filename"
       HEADER_TXT = "header_txt"
       BLOCK_ID = "block_id"
 
       # parameters ordered by appearance in regex
-      def initialize(doc_mngr, embed, link_type, filename, header_txt, block_id, label_txt)
+      def initialize(doc_mngr, context_filename, embed, link_type, filename, header_txt, block_id, label_txt)
         @doc_mngr ||= doc_mngr
+        @context_filename ||= context_filename
         @embed ||= embed
         @link_type ||= link_type
         @filename ||= filename
@@ -143,10 +144,19 @@ module Jekyll
         return %r{#{regex_embed}#{regex_link_type}#{REGEX_LINK_LEFT}#{filename}#{header}#{block}#{label_}#{REGEX_LINK_RIGHT}}
       end
 
-      def index_data
+      # 'fm' -> frontmatter
+
+      def linked_fm_data
         return {
           'type' => @link_type,
           'url' => self.linked_doc.url,
+        }
+      end
+
+      def context_fm_data
+        return {
+          'type' => @link_type,
+          'url' => self.context_doc.url,
         }
       end
 
@@ -206,6 +216,10 @@ module Jekyll
       end
 
       # relevant data
+
+      def context_doc
+        return @doc_mngr.get_doc_by_fname(@context_filename)
+      end
 
       def linked_doc
         return @doc_mngr.get_doc_by_fname(@filename)

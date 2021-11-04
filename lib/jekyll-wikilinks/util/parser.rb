@@ -22,14 +22,14 @@ module Jekyll
 
       # parsing
 
-      def parse(doc_content)
-        @wikilink_blocks, @wikilink_inlines = [], [], []
+      def parse(doc_filename, doc_content)
+        @wikilink_blocks, @wikilink_inlines = [], []
         if !$wiki_conf.disabled_attributes?
           self.parse_block_singles(doc_content)
           self.parse_block_lists_mkdn(doc_content)
           self.parse_block_lists_comma(doc_content)
         end
-        self.parse_inlines(doc_content)
+        self.parse_inlines(doc_filename, doc_content)
       end
 
       def parse_block_singles(doc_content)
@@ -150,12 +150,13 @@ module Jekyll
         end
       end
 
-      def parse_inlines(doc_content)
+      def parse_inlines(doc_filename, doc_content)
         wikilink_matches = doc_content.scan(REGEX_WIKI_LINKS)
         if !wikilink_matches.nil? && wikilink_matches.size != 0
           wikilink_matches.each do |wl_match|
             @wikilink_inlines << WikiLinkInline.new(
               @doc_manager,
+              doc_filename,
               wl_match[0],
               wl_match[1],
               wl_match[2],
