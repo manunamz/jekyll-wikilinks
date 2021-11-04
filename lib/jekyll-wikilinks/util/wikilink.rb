@@ -101,6 +101,8 @@ module Jekyll
         @label_txt ||= label_txt
       end
 
+      # useful descriptors
+
       # labels are really flexible, so we need to handle them with a bit more care
       def clean_label_txt
         return @label_txt.sub("[", "\\[").sub("]", "\\]")
@@ -142,23 +144,22 @@ module Jekyll
       end
 
       def index_data
-        linked_doc = @doc_mngr.get_doc_by_fname(@filename)
         return {
           'type' => @link_type,
-          'url' => linked_doc.url,
+          'url' => self.linked_doc.url,
         }
       end
 
       # descriptor methods
 
-      def describe
-        return {
-          'level' => level,
-          'labelled' => labelled?,
-          'embedded' => embedded?,
-          'typed_link' => typed?,
-        }
-      end
+      # def describe
+      #   return {
+      #     'level' => level,
+      #     'labelled' => labelled?,
+      #     'embedded' => embedded?,
+      #     'typed_link' => typed?,
+      #   }
+      # end
 
       def labelled?
         return !@label_txt.nil? && !@label_txt.empty?
@@ -195,9 +196,16 @@ module Jekyll
         return "invalid"
       end
 
+      def linked_doc
+        return @doc_mngr.get_doc_by_fname(@filename)
+      end
+
       # validation methods
       def is_valid?
-        return @doc_mngr.file_exists?(@filename)
+        return false if !@doc_mngr.file_exists?(@filename)
+        return false if (self.level == "header") && !@doc_mngr.doc_has_header?(self.linked_doc, @header_txt)
+        return false if (self.level == "block") && !@doc_mngr.doc_has_block_id?(self.linked_doc, @block_id)
+        return true
       end
     end
 

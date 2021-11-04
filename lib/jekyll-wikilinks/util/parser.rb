@@ -213,7 +213,7 @@ module Jekyll
           end
         end
         linked_doc = @doc_manager.get_doc_by_fname(wikilink.filename)
-  			if !linked_doc.nil?
+        if wikilink.is_valid?
           link_type = wikilink.typed? ? " #{$wiki_conf.css_name("typed")} #{wikilink.link_type}" : ""
 
   				# label
@@ -223,28 +223,27 @@ module Jekyll
           # TODO not sure about downcase
   				fname_inner_txt = linked_doc['title'].downcase if wikilink_inner_txt.nil?
 
-          link_lvl = wikilink.describe['level']
-  				if (link_lvl == "file")
+  				if (wikilink.level == "file")
   					wikilink_inner_txt = "#{fname_inner_txt}" if wikilink_inner_txt.nil?
             return build_html_embed(
               linked_doc['title'],
               @doc_manager.get_doc_content(wikilink.filename),
               lnk_doc_rel_url
             ) if wikilink.embedded?
-  				elsif (link_lvl == "header" && DocManager.doc_has_header?(linked_doc, wikilink.header_txt))
+  				elsif (wikilink.level == "header")
             # from: https://github.com/jekyll/jekyll/blob/6855200ebda6c0e33f487da69e4e02ec3d8286b7/Rakefile#L74
   					lnk_doc_rel_url += "\#" + Jekyll::Utils.slugify(wikilink.header_txt)
   					wikilink_inner_txt = "#{fname_inner_txt} > #{wikilink.header_txt}" if wikilink_inner_txt.nil?
-  				elsif (link_lvl == "block" && DocManager.doc_has_block_id?(linked_doc, wikilink.block_id))
+  				elsif (wikilink.level == "block")
   					lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
   					wikilink_inner_txt = "#{fname_inner_txt} > ^#{wikilink.block_id}" if wikilink_inner_txt.nil?
   				else
-  					return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_str + '</span>'
+            Jekyll.logger.error "Invalid wikilink level"
   				end
-  				return '<a class="' + $wiki_conf.css_name("wiki") + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
-  			else
-  				return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_str + '</span>'
-  			end
+          return '<a class="' + $wiki_conf.css_name("wiki") + link_type + '" href="' + lnk_doc_rel_url + '">' + wikilink_inner_txt + '</a>'
+        else
+          return '<span class="' + $wiki_conf.css_name("invalid_wiki") + '">' + wikilink.md_str + '</span>'
+        end
   		end
 
       # helpers

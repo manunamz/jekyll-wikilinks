@@ -72,7 +72,7 @@ module Jekyll
 
       # validators
 
-      def self.doc_has_header?(doc, header)
+      def doc_has_header?(doc, header)
         return nil if header.nil?
         # leading + trailing whitespace is ignored when matching headers
         header_results = doc.content.scan(REGEX_ATX_HEADER).flatten.map { |htxt| htxt.strip }
@@ -80,7 +80,7 @@ module Jekyll
         return header_results.include?(header.strip) || setext_header_results.include?(header.strip)
       end
 
-      def self.doc_has_block_id?(doc, block_id)
+      def doc_has_block_id?(doc, block_id)
         return nil if block_id.nil?
         # leading + trailing whitespace is ignored when matching blocks
         block_id_results = doc.content.scan(REGEX_BLOCK).flatten.map { |bid| bid.strip }
