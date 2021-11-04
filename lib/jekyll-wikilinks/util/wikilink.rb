@@ -29,7 +29,7 @@ module Jekyll
       def md_regex
         if typed? && has_items?
           # single
-          if bullet_type?.empty?
+          if is_single?
             link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}}
             list_item_strs = @list_items.map { |li| /#{REGEX_LINK_LEFT}#{li[1]}#{REGEX_LINK_RIGHT}\n/i }
             md_regex = /#{link_type}#{list_item_strs.join("")}/i
@@ -56,7 +56,9 @@ module Jekyll
 
       def md_str
         if typed? && has_items?
-          if bullet_type? == ","
+          if is_single?
+            md_str = "#{@link_type}::\[\[#{@list_items[0][1]}\]\]#{@list_items[0][0]}\n"
+          elsif bullet_type? == ","
             link_type = "#{@link_type}::"
             list_item_strs = @list_items.map { |li| "\[\[#{li[1]}\]\]#{li[0]}" }
             md_str = (link_type + list_item_strs.join('')).delete_suffix(",")
@@ -126,15 +128,23 @@ module Jekyll
         return !@list_items.nil? && !@list_items.empty?
       end
 
+      def is_single?
+        return @list_items.size == 1 && bullet_type?.empty?
+      end
+
       def typed?
         return !@link_type.nil? && !@link_type.empty?
       end
 
       # validation methods
 
+
       # the block level wikilink is only valid if all list item documents exist
       def is_valid?
-        return @list_items.select { |li| @doc_mngr.file_exists?(li[1]) }.all?
+        @list_items.each do |li|
+          return false if !@doc_mngr.file_exists?(li[1])
+        end
+        return true
       end
     end
 
