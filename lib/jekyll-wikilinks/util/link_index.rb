@@ -10,7 +10,7 @@ module Jekyll
         @baseurl = site.baseurl
         @index = {}
         site.doc_mngr.all.each do |doc|
-          @index[doc.url] = LinksInfo.new()
+          @index[doc.url] = DocLinks.new()
         end
       end
 
@@ -24,9 +24,9 @@ module Jekyll
 
       def populate_forward(doc, wikilink_blocks, wikilink_inlines, md_docs)
         # attributes - blocks
-        wikilink_blocks.each do |tlbl|
+        wikilink_blocks.each do |wlbl|
           urls = []
-          tlbl.list_items.each do |bullet_type, filename|
+          wlbl.list_items.each do |bullet_type, filename|
             attr_doc = md_docs.detect { |d| File.basename(d.basename, File.extname(d.basename)) == filename }
             if !attr_doc.nil?
               urls << attr_doc.url
@@ -34,7 +34,7 @@ module Jekyll
           end
           if !urls.nil? && !urls.empty?
             @index[doc.url].attributes << {
-              'type' => tlbl.link_type,
+              'type' => wlbl.link_type,
               'urls' => urls,
             }
           else
@@ -84,7 +84,7 @@ module Jekyll
         return url
       end
 
-      class LinksInfo
+      class DocLinks
         attr_accessor :attributes, :attributed, :backlinks, :forelinks, :missing
 
         def initialize
@@ -92,7 +92,7 @@ module Jekyll
           @attributes = [] # block typed forelinks;            { 'type' => str, 'urls' => [ str ] }
           @backlinks  = [] # inline typed and basic backlinks; { 'type' => str, 'url'  => str }
           @forelinks  = [] # inline typed and basic forelinks; { 'type' => str, 'url'  => str }
-          @missing    = [] # missing forelinks;                [ str ]
+          @missing    = [] # missing forelinks;                (see wikilink's 'fm_data' and 'linked_fm_data' attrs)
         end
       end
     end
