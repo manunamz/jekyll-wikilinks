@@ -62,10 +62,9 @@ module Jekyll
       end
 
       def get_doc_content(filename)
-        Jekyll.logger.error "Must provide a 'filename'" if filename.nil? || filename.empty?
-        docs = @md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
-        return docs[0].content if docs.size == 1
-        return nil
+        doc = self.get_doc_by_fname(filename)
+        return nil if docs.nil?
+        return doc.content
       end
 
       def get_image_by_fname(filename)
