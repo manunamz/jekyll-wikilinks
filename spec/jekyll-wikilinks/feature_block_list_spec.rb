@@ -141,20 +141,24 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         context "html output" do
   
           it "full" do
-            expect(link_comma_missing_doc.output).to eq("<p>This doc contains a wikilink to <span class=\"invalid-wiki-link\">inline-typed::[[missing.doc]]</span>.</p>\n")
+            expect(link_comma_missing_doc.output).to eq("<p>This doc contains a wikilink to a block list…</p>\n\n<p>…link.</p>\n")
           end
   
-          it "injects a span element with descriptive title" do
-            expect(link_comma_missing_doc.output).to include("<span ")
-            expect(link_comma_missing_doc.output).to include("</span>")
+          it "full output contains '…'" do
+            expect(link_comma_missing_doc.output).to include("…")
           end
   
-          it "assigns 'invalid-wiki-link' class to span element" do
-            expect(link_comma_missing_doc.output).to include("class=\"invalid-wiki-link\"")
+          it "does not inject a span element with descriptive title" do
+            expect(link_comma_missing_doc.output).to_not include("<span ")
+            expect(link_comma_missing_doc.output).to_not include("</span>")
           end
   
-          it "leaves original angle brackets and text untouched" do
-            expect(link_comma_missing_doc.output).to include("[[missing.doc]]")
+          it "does not assign 'invalid-wiki-link' class to span element" do
+            expect(link_comma_missing_doc.output).to_not include("class=\"invalid-wiki-link\"")
+          end
+  
+          it "removes original angle brackets and wikitext" do
+            expect(link_comma_missing_doc.output).to_not include("block-list::[[blank.a]],[[missing.doc]]")
           end
   
           # it "handles header url fragments; full output" do
@@ -168,7 +172,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           it "'missing' added to current document (wiki-text string)" do
             expect(link_comma_missing_doc.data['missing']).to be_a(Array)
             expect(link_comma_missing_doc.data['missing'][0]).to be_a(String)
-            expect(link_comma_missing_doc.data['missing'][0]).to eq("missing.doc")
+            expect(link_comma_missing_doc.data['missing'][0]).to eq("block-list::[[blank.a]],[[missing.doc]]")
           end
   
           it "'attributed' not added to document" do
