@@ -5,39 +5,37 @@ test text:
 
 # vanilla
 
-[[wikilink]]
+[[wikilink]].
 
-[[wikilink#header]]
+[[wikilink#header]].
 
-[[wikilink#^block_id]]
+[[wikilink#^block_id]].
 
 # typed
 
-link_type::[[wikilink]]
+link_type::[[wikilink]].
 
-link_type::[[wikilink#header]]
+link_type::[[wikilink#header]].
 
-link_type::[[wikilink#^block_id]]
-
-what if the link_type::[[wikilink]] is inline?
+link_type::[[wikilink#^block_id]].
 
 # labelled
 
-[[wikilink|label txt]]
+[[wikilink|label txt]].
 
-[[wikilink#header|label txt]]
+[[wikilink#header|label txt]].
 
-[[wikilink#^block_id|label txt]]
+[[wikilink#^block_id|label txt]].
 
 # labelled w bracket
 
-[[wikilink|[bracketted] label txt]]
+[[wikilink|[bracketted] label txt]].
 
-[[wikilink|bracketted label [txt]]]
+[[wikilink|bracketted label [txt]]].
 
-[[wikilink#header|[bracketted] label txt]]
+[[wikilink#header|[bracketted] label txt]].
 
-[[wikilink#^block_id|[bracketted] label txt]]
+[[wikilink#^block_id|[bracketted] label txt]].
 
 # embedded
 
@@ -59,24 +57,71 @@ what if the !type::[[wikilink]] is inline?
 
 # typed labelled
 
-link_type::[[wikilink|label txt]]
+link_type::[[wikilink|label txt]].
 
-link_type::[[wikilink#header|label txt]]
+link_type::[[wikilink#header|label txt]].
 
-link_type::[[wikilink#^block_id|label txt]]
-
-what if the link_type::[[wikilink|label txt]] is inline?
+link_type::[[wikilink#^block_id|label txt]].
 
 # stacked header-block
 
-[[wikilink#header#^block]]
+[[wikilink#header#^block]].
+
+# block (single) wikilink
+
+block::[[wikilink]]
+only single newline required
+# block (list) wikilink
+
+block::[[one]],[[two]]
+only single newline required
+block::[[one]],[[two]],[[three]]
+
+block :: [[one]], [[two]]
+
+block :: [[one]], [[two]], [[three]]
+
+block::
+- [[one]]
+only single newline required
+block::
+* [[one]]
+* [[two]]
+
+block::
++ [[one]]
++ [[two]]
++ [[three]]
+
+block ::
+- [[one]]
+- [[two]]
+- [[three]]
+- [[four]]
+
+block ::
+* [[one]]
+* [[two]]
+* [[three]]
+* [[four]]
+* [[five]]
+
+block ::
++ [[one]]
++ [[two]]
++ [[three]]
++ [[four]]
++ [[five]]
++ [[six]]
+
+---
 
 # known invalids
 
 # stacked headers
 
-[[wikilink#header#another-header]]
+[[wikilink#header#another-header]].
 
 # header range
 
-[[wikilink#header#another:#header]]
+[[wikilink#header#another:#header]].

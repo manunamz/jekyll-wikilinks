@@ -20,7 +20,9 @@ module Jekyll
     REGEX_LINK_BLOCK = /\#\^/
     REGEX_LINK_LABEL = /\|/
 
-    # wikilink usable char requirements
+    # wikitext usable char requirements
+    REGEX_FILENAME_CHARS = /[^\\\/:\#\^\|\[\]]+/i
+
     REGEX_LINK_TYPE_TXT = /(?<link-type-txt>([^\n\s\!\#\^\|\]]+))/i
     REGEX_FILENAME = /(?<filename>([^\\\/:\#\^\|\[\]]+))/i
     REGEX_HEADER_TXT = /(?<header-txt>([^\!\#\^\|\[\]]+))/i
@@ -35,12 +37,11 @@ module Jekyll
     REGEX_SETEXT_HEADER = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
     ## list item: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/list.rb#L49
     REGEX_BULLET = /(?<bullet>[+*-])/i
-    # REGEX_LIST_ITEM = /(^ {0,3}[+*-])([\t| ].*?\n)/i
-    REGEX_LIST_ITEM = /(^ {0,3}#{REGEX_BULLET})(\s(?:#{REGEX_LINK_LEFT}#{REGEX_FILENAME}#{REGEX_LINK_RIGHT}))/i
-    ## new-markdown-style
+    ## markdown-style block-reference
     REGEX_BLOCK = /.*\s\^#{REGEX_BLOCK_ID_TXT}/i
 
     # wikilinks
+
     ## inline
     REGEX_WIKI_LINKS = %r{                            # capture indeces
       (#{REGEX_LINK_EMBED})?                          # 0
@@ -52,10 +53,16 @@ module Jekyll
         (#{REGEX_LINK_LABEL}#{REGEX_LABEL_TXT})?      # 5
       #{REGEX_LINK_RIGHT}
     }x
+
     ## block
-    REGEX_TYPED_LINK_BLOCK = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}#{REGEX_LINK_LEFT}#{REGEX_FILENAME}#{REGEX_LINK_RIGHT}\n/i
-    # TODO: keep an eye on this -- using REGEX_FILENAME in two places
-    REGEX_TYPED_LINK_BLOCK_LIST_COMMA = /(?:#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\s*(?:#{REGEX_LINK_LEFT}#{REGEX_FILENAME}#{REGEX_LINK_RIGHT})\s*|\G)\s*(?:,\s*#{REGEX_LINK_LEFT}#{REGEX_FILENAME}#{REGEX_LINK_RIGHT})\s*/i
-    REGEX_TYPED_LINK_BLOCK_LIST_MKDN = /#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}\n|\G(?:#{REGEX_LIST_ITEM}\n)/i
+    ### single
+    REGEX_SINGLE = /#{REGEX_LINK_LEFT.source}#{REGEX_FILENAME_CHARS.source}#{REGEX_LINK_RIGHT.source}/i
+    ### list
+      # (comma is responsible for catching the single case)
+    REGEX_LIST_COMMA = /((?:\s*#{REGEX_SINGLE.source}\s*)(?:,\s*#{REGEX_SINGLE.source}\s*)*)/i
+    REGEX_LIST_MKDN = /((?<=\n)\s{0,3}#{REGEX_BULLET.source}\s#{REGEX_SINGLE.source}\s*)+/i # (see REGEX_LIST_ITEM)
+    ### process
+    REGEX_BLOCK_TYPES = /((?<!\n)(?:#{REGEX_LIST_COMMA.source})|#{REGEX_LIST_MKDN.source})/i
+    REGEX_WIKI_LINK_BLOCKS = /(?:^\s{0,3}#{REGEX_LINK_TYPE_TXT.source}#{REGEX_LINK_TYPE.source}|\G)(?<items>#{REGEX_BLOCK_TYPES.source})\n/i
   end
 end

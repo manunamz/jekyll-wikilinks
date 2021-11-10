@@ -86,7 +86,7 @@ link_type::[[filename]]
 Some more text.
 ```
 
-Lists are also supported and may be defined by comma-separation or markdown lists:
+Lists are also supported and may be defined by comma-separation or markdown lists (make sure bullet type matches for all items; e.g. all items use +'s, -'s or *'s):
 
 ```
 link_type::[[file-1]], [[file-2]], [[file-3]]
@@ -186,7 +186,7 @@ Resulting HTML:
 ```markdown
 ![[image.png]]
 ```
-Like the embeds above, link content will be rendered in the document body, but for images. Just be sure to add the file extension. Supported formats are `.png`, `.jpg`, `.gif`, `.psd`, `.svg`.
+Like the embeds above, link content will be rendered in the document body, but for images. Just be sure to add the file extension. Supported formats are `.png`, `.jpg`, `.gif`, `.psd`, `.svg`. Image wikilinks are not included in metadata.
 
 Resulting HTML:
 ```html

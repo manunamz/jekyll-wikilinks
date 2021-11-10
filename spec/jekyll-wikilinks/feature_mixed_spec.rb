@@ -35,7 +35,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       context "html output" do
 
         it "full" do
-          expect(links.output).to eq("<p>Here’s an untyped link <a class=\"wiki-link\" href=\"/target/blank.c/\">blank c</a>.</p>\n\n<p>Then an <a class=\"wiki-link typed inline-typed\" href=\"/target/blank.c/\">blank c</a>.</p>\n\n<p>Then a</p>\n\n<p>Then an invalid <span class=\"invalid-wiki-link\">[[blank.not.c]]</span>.</p>\n\n<p>Then an <span class=\"invalid-wiki-link\">invalid-typed::<span class=\"invalid-wiki-link\">[[blank.not.c]]</span></span>.</p>\n")
+          expect(links.output).to eq("<p>Here’s an untyped link <a class=\"wiki-link\" href=\"/target/blank.c/\">blank c</a>.</p>\n\n<p>Then an <a class=\"wiki-link typed inline-typed\" href=\"/target/blank.c/\">blank c</a>.</p>\n\n<p>Then an invalid <span class=\"invalid-wiki-link\">[[blank.not.c]]</span>.</p>\n\n<p>Then an <span class=\"invalid-wiki-link\">invalid-typed::<span class=\"invalid-wiki-link\">[[blank.not.c]]</span></span>.</p>\n")
           expect(blank_c.output).to eq("\n")
         end
 

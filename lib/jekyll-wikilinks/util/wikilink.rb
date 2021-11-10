@@ -7,46 +7,40 @@ module Jekyll
     # wikilink classes know everything about the original markdown syntax and its semantic meaning
 
     class WikiLinkBlock
-      attr_accessor :link_type, :list_items
+      attr_accessor :link_type, :filenames
 
       # parameters ordered by appearance in regex
-      def initialize(doc_mngr, context_filename, link_type, bullet_type=nil, filename=nil)
+      def initialize(doc_mngr, context_filename, link_type, bullet_type=nil)
         @doc_mngr ||= doc_mngr
         @context_filename ||= context_filename
         @link_type ||= link_type
-        @list_items = [] # li[0] = bullet_type; li[1] = filename
-        @list_items << [ bullet_type, filename ] if !bullet_type.nil? && !filename.nil?
+        @bullet_type ||= bullet_type
+        @filenames = []
       end
 
-      def add_item(bullet_type, filename)
-        Jekyll.logger.error "'bullet_type' required" if bullet_type.nil? || bullet_type.empty?
+      def add_item(filename)
         Jekyll.logger.error "'filename' required" if filename.nil? || filename.empty?
-        @list_items << [ bullet_type, filename ]
+        @filenames << filename
       end
 
       # data
 
       def md_regex
-        if typed? && has_items?
-          # single
-          if is_single?
-            link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}}
-            list_item_strs = @list_items.map { |li| /#{REGEX_LINK_LEFT}#{li[1]}#{REGEX_LINK_RIGHT}\n/i }
-            md_regex = /#{link_type}#{list_item_strs.join("")}/i
-          # list (comma)
-          elsif bullet_type? == ","
-            tmp_list_items = @list_items.dup
-            first_item = tmp_list_items.shift()
-            link_type = /#{@link_type}#{REGEX_LINK_TYPE}#{REGEX_LINK_LEFT}#{first_item[1]}#{REGEX_LINK_RIGHT}\s*/i
-            list_item_strs = tmp_list_items.map { |li| /#{li[0]}\s*#{REGEX_LINK_LEFT}#{li[1]}#{REGEX_LINK_RIGHT}\s*/i }
-            md_regex = /#{link_type}#{list_item_strs.join('')}/i
-          # list (md)
-          elsif !bullet_type?.match(REGEX_BULLET).nil?
-            link_type = %r{#{@link_type}#{REGEX_LINK_TYPE}\n}
-            list_item_strs = @list_items.map { |li| /#{Regexp.escape(li[0])}\s#{REGEX_LINK_LEFT}#{li[1]}#{REGEX_LINK_RIGHT}\n/i }
-            md_regex = /#{link_type}#{list_item_strs.join("")}/i
+        if typed? && has_filenames? 
+          # comma (including singles)
+          if @bullet_type.nil?
+            link_type = /#{@link_type}#{REGEX_LINK_TYPE}/i
+            tmp_filenames = @filenames.dup
+            first_filename = /\s*#{REGEX_LINK_LEFT}#{tmp_filenames.shift()}#{REGEX_LINK_RIGHT}\s*/i
+            filename_strs = tmp_filenames.map { |f| /,\s*#{REGEX_LINK_LEFT}#{f}#{REGEX_LINK_RIGHT}\s*/i }
+            md_regex = /#{link_type}#{first_filename}#{filename_strs.join('')}\n/i
+          # mkdn
+          elsif !@bullet_type.match(REGEX_BULLET).nil?
+            link_type = /#{@link_type}#{REGEX_LINK_TYPE}\n/i
+            filename_strs = @filenames.map { |f| /\s{0,3}#{Regexp.escape(@bullet_type)}\s#{REGEX_LINK_LEFT}#{f}#{REGEX_LINK_RIGHT}\n/i }
+            md_regex = /#{link_type}#{filename_strs.join("")}/i
           else
-            Jekyll.logger.error("bullet_types not uniform or invalid: #{bullet_type?}")
+            Jekyll.logger.error("'bullet_type' invalid: #{@bullet_type}")
           end
           return md_regex
         else
@@ -55,19 +49,19 @@ module Jekyll
       end
 
       def md_str
-        if typed? && has_items?
-          if is_single?
-            md_str = "#{@link_type}::\[\[#{@list_items[0][1]}\]\]#{@list_items[0][0]}\n"
-          elsif bullet_type? == ","
+        if typed? && has_filenames?
+          # comma (including singles)
+          if @bullet_type.nil?
             link_type = "#{@link_type}::"
-            list_item_strs = @list_items.map { |li| "\[\[#{li[1]}\]\]#{li[0]}" }
-            md_str = (link_type + list_item_strs.join('')).delete_suffix(",")
-          elsif "+*-".include?(bullet_type?)
+            filename_strs = @filenames.map { |f| "\[\[#{f}\]\]," }
+            md_str = (link_type + filename_strs.join('')).delete_suffix(",")
+          # mkdn
+          elsif !@bullet_type.match(REGEX_BULLET).nil?
             link_type = "#{@link_type}::\n"
-            list_item_strs = @list_items.map { |li| li[0] + " \[\[#{li[1]}\]\]\n" }
-            md_str = link_type + list_item_strs.join('')
+            filename_strs = @filenames.map { |f| li[0] + " \[\[#{li[1]}\]\]\n" }
+            md_str = link_type + filename_strs.join('')
           else
-            Jekyll.logger.error("Not a valid bullet_type: #{bullet_type?}")
+            Jekyll.logger.error("'bullet_type' invalid: #{@bullet_type}")
           end
           return md_str
         else
@@ -76,14 +70,15 @@ module Jekyll
       end
 
       def urls
+        # return @filenames.map { |f| @doc_mngr.get_doc_by_fname(f) }
         urls = []
-        @list_items.each do |bullet_type, filename|
-          doc = @doc_mngr.get_doc_by_fname(filename)
+        @filenames.each do |f|
+          doc = @doc_mngr.get_doc_by_fname(f)
           urls << doc.url if !doc.nil?
         end
         return urls
       end
-
+      
       # 'fm' -> frontmatter
 
       def context_fm_data
@@ -106,30 +101,17 @@ module Jekyll
 
       def linked_docs
         docs = [] 
-        @list_items.each do |li|
-          doc = @doc_mngr.get_doc_by_fname(li[1])
+        @filenames.each do |f|
+          doc = @doc_mngr.get_doc_by_fname(f)
           docs << doc if !doc.nil?
         end
         return docs
       end
 
-      def linked_urls
-        return @list_items.select { |i| @doc_mngr.get_doc_by_fname(i[1]).url }
-      end
-
       # descriptor methods
 
-      def bullet_type?
-        bullets = @list_items.map { |li| li[0] }
-        return bullets.uniq.first if bullets.uniq.size == 1
-      end
-
-      def has_items?
-        return !@list_items.nil? && !@list_items.empty?
-      end
-
-      def is_single?
-        return @list_items.size == 1 && bullet_type?.empty?
+      def has_filenames?
+        return !@filenames.nil? && !@filenames.empty?
       end
 
       def typed?
@@ -140,8 +122,9 @@ module Jekyll
 
       # the block level wikilink is only valid if all list item documents exist
       def is_valid?
-        @list_items.each do |li|
-          return false if !@doc_mngr.file_exists?(li[1])
+        return false if @filenames.size == 0
+        @filenames.each do |f|
+          return false if !@doc_mngr.file_exists?(f)
         end
         return true
       end
@@ -173,24 +156,6 @@ module Jekyll
 
       # data
 
-      # TODO: remove this once parsing is migrated to nokogiri...?
-      def md_str
-        embed = embedded? ? "!" : ""
-        link_type = typed? ? "#{@link_type}::" : ""
-        filename = described?(FILENAME) ? @filename : ""
-        if described?(HEADER_TXT)
-          header = "\##{@header_txt}"
-          block = ""
-        elsif described?(BLOCK_ID)
-          header = ""
-          block = "\#\^#{@block_id}"
-        elsif !described?(FILENAME)
-          Jekyll.logger.error "Invalid link level in 'md_str'. See WikiLink's 'md_str' for details"
-        end
-        label_ = labelled? ? "\|#{@label_txt}" : ""
-        return "#{embed}#{link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]"
-      end
-
       def md_regex
         regex_embed = embedded? ? REGEX_LINK_EMBED : %r{}
         regex_link_type = typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
@@ -206,6 +171,23 @@ module Jekyll
         end
         label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{label_txt}} : %r{}
         return %r{#{regex_embed}#{regex_link_type}#{REGEX_LINK_LEFT}#{filename}#{header}#{block}#{label_}#{REGEX_LINK_RIGHT}}
+      end
+
+      def md_str
+        embed = embedded? ? "!" : ""
+        link_type = typed? ? "#{@link_type}::" : ""
+        filename = described?(FILENAME) ? @filename : ""
+        if described?(HEADER_TXT)
+          header = "\##{@header_txt}"
+          block = ""
+        elsif described?(BLOCK_ID)
+          header = ""
+          block = "\#\^#{@block_id}"
+        elsif !described?(FILENAME)
+          Jekyll.logger.error "Invalid link level in 'md_str'. See WikiLink's 'md_str' for details"
+        end
+        label_ = labelled? ? "\|#{@label_txt}" : ""
+        return "#{embed}#{link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]"
       end
 
       # 'fm' -> frontmatter

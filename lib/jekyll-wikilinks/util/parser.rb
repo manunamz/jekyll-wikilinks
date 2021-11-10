@@ -26,136 +26,41 @@ module Jekyll
       def parse(doc_filename, doc_content)
         @wikilink_blocks, @wikilink_inlines = [], []
         if !$wiki_conf.disabled_attributes?
-          self.parse_block_singles(doc_filename, doc_content)
-          self.parse_block_lists_mkdn(doc_filename, doc_content)
-          self.parse_block_lists_comma(doc_filename, doc_content)
+          self.parse_blocks(doc_filename, doc_content)
         end
         self.parse_inlines(doc_filename, doc_content)
       end
 
-      def parse_block_singles(doc_filename, doc_content)
-        bullet_type = ""
-        typed_link_block_matches = doc_content.scan(REGEX_TYPED_LINK_BLOCK)
-        if !typed_link_block_matches.nil? && typed_link_block_matches.size != 0
-          typed_link_block_matches.each do |wl_match|
-            link_type = wl_match[0]
-            filename = wl_match[1]
-            typed_link_block_wikilink = WikiLinkBlock.new(
+      def parse_blocks(doc_filename, doc_content)
+        block_matches = doc_content.scan(REGEX_WIKI_LINK_BLOCKS)
+        if !block_matches.nil? && block_matches.size != 0
+          block_matches.each do |wl_match|
+            # init block wikilink
+            wikilink_block = WikiLinkBlock.new(
               @doc_manager,
               doc_filename,
-              link_type,
-              bullet_type,
-              filename,
+              wl_match[0], # link_type
+              wl_match[2], # bullet_type
             )
-            @wikilink_blocks << typed_link_block_wikilink
-            doc_content.gsub!(typed_link_block_wikilink.md_regex, "\n")
-          end
-        end
-      end
-
-      def parse_block_lists_comma(doc_filename, doc_content)
-        processing_link_type = nil
-        processing_wikilink_list = nil
-        bullet_type = ","
-        typed_link_block_list_item_matches = doc_content.scan(REGEX_TYPED_LINK_BLOCK_LIST_COMMA)
-        if !typed_link_block_list_item_matches.nil? && typed_link_block_list_item_matches.size != 0
-          # Match 1
-          #   link-type-txt	link-type
-          #   filename	link
-          #   3.	alink
-          # Match 2
-          #   link-type-txt
-          #   filename
-          #   3.	blink
-          # Match 3
-          #   link-type-txt
-          #   filename
-          #   3.	clink
-          typed_link_block_list_item_matches.each do |wl_match|
-            link_type = wl_match[0]
-            link_filename_1 = wl_match[1]
-            link_filename_2 = wl_match[2]
-            if !link_type.nil?
-              # process previous wikilink_list
-              if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
-                @wikilink_blocks << processing_wikilink_list
-                doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
+            # extract + add filenames
+            items = wl_match[1]
+            filename_matches = items.scan(/#{REGEX_LINK_LEFT}#{REGEX_FILENAME}#{REGEX_LINK_RIGHT}/i)
+            filename_matches.each do |match|
+              match.each do |fname|
+                wikilink_block.add_item(fname)
               end
-              processing_link_type = link_type
-              processing_wikilink_list = WikiLinkBlock.new(@doc_manager, doc_filename, processing_link_type, bullet_type, link_filename_1)
-              processing_wikilink_list.add_item(bullet_type, link_filename_2) if !link_filename_2.nil?
-            else
-              Jekyll.logger.error("'processing_wikilink_list' was nil") if processing_wikilink_list.nil?
-              processing_wikilink_list.add_item(bullet_type, link_filename_2)
             end
-          end
-          # process previous wikilink_list
-          if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
-            @wikilink_blocks << processing_wikilink_list
-            doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
-          end
-        end
-      end
-
-      def parse_block_lists_mkdn(doc_filename, doc_content)
-        processing_link_type = nil
-        processing_wikilink_list = nil
-        bullet_type = nil
-        typed_link_block_list_item_matches = doc_content.scan(REGEX_TYPED_LINK_BLOCK_LIST_MKDN)
-        if !typed_link_block_list_item_matches.nil? && typed_link_block_list_item_matches.size != 0
-          # Match 1
-          #   link-type-txt	more-types
-          #   bullet
-          #   filename
-          # Match 2
-          #   link-type-txt
-          #   bullet	*
-          #   filename	alink
-          # Match 3
-          #   link-type-txt
-          #   bullet	*
-          #   filename	blink
-          # Match 4
-          #   link-type-txt	more-types
-          #   bullet
-          #   filename
-          # Match 5
-          #   link-type-txt
-          #   bullet	+
-          #   filename	alink
-          # Match 6
-          #   link-type-txt
-          #   bullet	+
-          #   filename	blink
-          typed_link_block_list_item_matches.each do |wl_match|
-            link_type = wl_match[0]
-            bullet_type = wl_match[1]
-            link_filename = wl_match[2]
-            if !link_type.nil?
-              # process previous wikilink_list
-              if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
-                @wikilink_blocks << processing_wikilink_list
-                doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
-              end
-              processing_link_type = link_type
-              processing_wikilink_list = WikiLinkBlock.new(@doc_manager, doc_filename, processing_link_type)
-            else
-              Jekyll.logger.error("'processing_wikilink_list' was nil") if processing_wikilink_list.nil?
-              processing_wikilink_list.add_item(bullet_type, link_filename)
-            end
-          end
-          # process previous wikilink_list
-          if !processing_wikilink_list.nil? && processing_wikilink_list.has_items?
-            @wikilink_blocks << processing_wikilink_list
-            doc_content.gsub!(processing_wikilink_list.md_regex, "\n")
+            # replace text
+            doc_content.gsub!(wikilink_block.md_regex, "\n")
+            @wikilink_blocks << wikilink_block
           end
         end
       end
 
       def parse_inlines(doc_filename, doc_content)
-        wikilink_matches = doc_content.scan(REGEX_WIKI_LINKS)
-        if !wikilink_matches.nil? && wikilink_matches.size != 0
-          wikilink_matches.each do |wl_match|
+        inline_matches = doc_content.scan(REGEX_WIKI_LINKS)
+        if !inline_matches.nil? && inline_matches.size != 0
+          inline_matches.each do |wl_match|
             @wikilink_inlines << WikiLinkInline.new(
               @doc_manager,
               doc_filename,
