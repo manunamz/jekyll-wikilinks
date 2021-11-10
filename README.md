@@ -226,7 +226,8 @@ The following metadata are stored as frontmatter variables and are accessible in
 - `attributes` (block forelinks)
 - `backlinks`  (typed and untyped, file/header/block, back links)
 - `forelinks`  (typed and untyped, file/header/block, 'forward' links)
-- `missing`    (typed and untyped, file/header/block, forelinks that don't correspond to any document)
+
+Linked images are excluded from metadata.
 
 ### Block Wikilink (Attribute) Metadata
 The `attributes` and `attributed` frontmatter variables, which correspond to block wikilinks, are lists of objects with a `type` attribute for the wikilink type and a list of `urls` which are strings:
@@ -268,13 +269,6 @@ Example liquid:
   {{ backlink.type }}: <a class="wiki-link" href="{{ linked_doc.url }}">{{ linked_doc.title }}</a>
 {% endfor %}
 ```
-### Missing Metadata
-`missing` is simply a list of wikitext strings -- text that appears in brackets 👉[[wikitext_str]] -- with no corresponding markdown file:
-```yaml
-- <wikitext_str>
-- ...
-```
-
 ## Liquid Filters
 
 There are two types of liquid filters provided: One for jekyll document types and one for link (relationship) types.
