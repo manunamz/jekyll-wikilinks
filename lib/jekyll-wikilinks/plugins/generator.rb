@@ -30,7 +30,10 @@ module Jekyll
         # wait until all docs are processed before assigning backward facing metadata,
         # this ensures all attributed/backlinks are collected for assignment
         @site.doc_mngr.all.each do |doc|
+          # populate frontmatter metadata from (wiki)link index
           @site.link_index.assign_metadata(doc)
+          # add 'web-link' css class to non-wiki-links
+          doc.content = @parser.add_web_css(doc.content)
         end
       end
 

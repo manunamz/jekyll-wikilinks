@@ -68,6 +68,10 @@ module Jekyll
         return option(EXCLUDE_KEY).include?(type.to_s)
       end
 
+      def excluded_css_names
+        return self.option_css(EXCLUDE_KEY)
+      end
+
       # options
 
       def option(key)

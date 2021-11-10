@@ -1,3 +1,4 @@
+require "nokogiri"
 require_relative "regex"
 require_relative "wikilink"
 
@@ -20,6 +21,26 @@ module Jekyll
         @markdown_converter ||= site.find_converter_instance(CONVERTER_CLASS)
         @wikilink_blocks, @wikilink_inlines = [], []
       end
+
+      # weblinks
+      ## add 'web-link' css class to links that aren't
+      ## - wikilinks
+      ## - contain an excluded css class
+      def add_web_css(content)
+        excluded_classes = $wiki_conf.excluded_css_names
+        if excluded_classes.nil? || excluded_classes.empty?
+          css_def = "a:not(.#{$wiki_conf.css_name("wiki")}):not(.#{$wiki_conf.css_name("embed_wiki_link")})"
+        else
+          css_def = "a:not(.#{$wiki_conf.css_name("wiki")}):not(.#{$wiki_conf.css_name("embed_wiki_link")}):not(.#{excluded_classes.join("):not(.")})"
+        end
+        parsed_content = Nokogiri::HTML::fragment(content)
+        parsed_content.css(css_def).each do |link|
+          link.add_class('web-link')
+        end
+        content = parsed_content.to_html
+      end
+
+      # wikilinks
 
       # parsing
 
