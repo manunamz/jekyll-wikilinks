@@ -39,20 +39,20 @@ module Jekyll
 
       def css_name(name_key)
         return option_css_name(name_key) if option_css_name(name_key)
-        return "typed" if name_key == TYPED_KEY
+        return "typed"                   if name_key == TYPED_KEY
         # valid
-        return "wiki-link" if name_key == WIKI_KEY
+        return "wiki-link"               if name_key == WIKI_KEY
         # invalid
-        return "invalid-wiki-link" if name_key == INV_WIKI_KEY
+        return "invalid-wiki-link"       if name_key == INV_WIKI_KEY
         # return "invalid-web-link" if name_key == INV_WEB_KEY
         # embeds
-        return "embed-wrapper" if name_key == EMBED_WRAPPER_KEY
-        return "embed-title" if name_key == EMBED_TITLE_KEY
-        return "embed-content" if name_key == EMBED_CONTENT_KEY
-        return "embed-wiki-link" if name_key == EMBED_LINK_KEY
+        return "embed-wrapper"           if name_key == EMBED_WRAPPER_KEY
+        return "embed-title"             if name_key == EMBED_TITLE_KEY
+        return "embed-content"           if name_key == EMBED_CONTENT_KEY
+        return "embed-wiki-link"         if name_key == EMBED_LINK_KEY
         # img
-        return "embed-image-wrapper" if name_key == EMBED_IMG_WRAPPER_KEY
-        return "embed-image" if name_key == EMBED_IMG_KEY
+        return "embed-image-wrapper"     if name_key == EMBED_IMG_WRAPPER_KEY
+        return "embed-image"             if name_key == EMBED_IMG_KEY
       end
 
       def disabled?
