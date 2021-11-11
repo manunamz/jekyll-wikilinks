@@ -25,7 +25,7 @@ module Jekyll
     REGEX_FILENAME_CHARS  = /[^\\\/:\#\^\|\[\]]+/i
     REGEX_HEADER_CHARS    = /[^\!\#\^\|\[\]]+/i
     REGEX_BLOCK_ID_CHARS  = /[^\\\/:\!\#\^\|\[\]^\n]+/i
-    REGEX_LABEL_CHARS     = /(.+?)(?=\]\])/i
+    REGEX_LABEL_CHARS     = /(.+?)(?=\]{2}[^\]])/i
 
     # capture groups
     REGEX_LINK_TYPE_TXT   = /(?<link-type-txt>#{REGEX_LINK_TYPE_CHARS})/i

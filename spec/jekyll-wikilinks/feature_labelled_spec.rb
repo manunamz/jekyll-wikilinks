@@ -54,34 +54,14 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
       context "when label includes [square brackets]; html output" do
 
-        context "current function:" do
-
-          it "full" do
-            expect(link_w_sq_br.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/target/blank.b/\">label with [square brackets</a>].</p>\n")
-          end
-
-          it "renders the label text with [square brackets], not the doc's  filename" do
-            expect(link_w_sq_br.output).to include("label with [square brackets")
-            rendered_filename = ">blank.b"
-            expect(link_w_sq_br.output).to_not include(rendered_filename)
-          end
-
+        it "full" do
+          expect(link_w_sq_br.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/target/blank.b/\">label with [square brackets]</a>.</p>\n")
         end
 
-        context "desired function:" do
-
-          it "full" do
-            pending("REGEX_NOT_GREEDY still not quite right...")
-            expect(link_w_sq_br.output).to eq("<p>This doc uses a <a class=\"wiki-link\" href=\"/target/blank.b/\">label with [square brackets]</a>.</p>\n")
-          end
-
-          it "renders the label text with [square brackets], not the doc's  filename" do
-            pending("REGEX_NOT_GREEDY still not quite right...")
-            expect(link_w_sq_br.output).to include("label with [square brackets]")
-            rendered_filename = ">blank.b"
-            expect(link_w_sq_br.output).to_not include(rendered_filename)
-          end
-
+        it "renders the label text with [square brackets], not the doc's  filename" do
+          expect(link_w_sq_br.output).to include("label with [square brackets]")
+          rendered_filename = ">blank.b"
+          expect(link_w_sq_br.output).to_not include(rendered_filename)
         end
 
       end
@@ -163,6 +143,8 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
         context "^block" do
 
+          pending("TODO")
+          
         end
 
       end
@@ -171,7 +153,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
   end
 
-  context "LABELLED UNTYPED [[wikilinks]]" do
+  context "LABELLED TYPED [[wikilinks]]" do
 
     context "when target doc exists" do
 
