@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require "jekyll-wikilinks"
-require "spec_helper"
-require "shared_context"
 
 RSpec.describe(Jekyll::WikiLinks::Generator) do
   include_context "shared jekyll configs"
