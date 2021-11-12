@@ -39,7 +39,7 @@ module Jekyll
     ### atx header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L29
     REGEX_ATX_HEADER      = /^\#{1,6}[\t ]*([^ \t].*)\n/i
     ### setext header: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/header.rb#L17
-    REGEX_SETEXT_HEADER   = /^ {0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
+    REGEX_SETEXT_HEADER   = /^\s{0,3}([^ \t].*)\n[-=][-=]*[ \t\r\f\v]*\n/i
     ## list item: https://github.com/gettalong/kramdown/blob/master/lib/kramdown/parser/kramdown/list.rb#L49
     REGEX_BULLET          = /(?<bullet>[+*-])/i
     ## markdown-style block-reference
