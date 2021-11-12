@@ -163,6 +163,12 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
       context "metadata:" do
 
+        it "'missing' added to current document (wiki-text string)" do
+          expect(link_missing_doc.data['missing']).to be_a(Array)
+          expect(link_missing_doc.data['missing'][0]).to be_a(String)
+          expect(link_missing_doc.data['missing'][0]).to eq("[[missing.doc]]")
+        end
+
         it "'attributed' not added to document" do
           expect(link_missing_doc.data['attributed']).to eq([])
         end

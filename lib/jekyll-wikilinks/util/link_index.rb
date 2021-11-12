@@ -19,14 +19,13 @@ module Jekyll
         doc.data['attributes'] = @index[doc.url].attributes.uniq
         doc.data['backlinks']  = @index[doc.url].backlinks.uniq
         doc.data['forelinks']  = @index[doc.url].forelinks.uniq
+        doc.data['missing']    = @index[doc.url].missing.uniq
       end
 
       def populate(doc, wikilink_blocks, wikilink_inlines)
         # blocks
         wikilink_blocks.each do |wlbl|
-          if !wlbl.is_valid?
-            Jekyll.logger.warn "Invalid wikilink: #{wlbl.inspect}"
-          else
+          if wlbl.is_valid?
             # attributes
             target_attr = @index[doc.url].attributes.detect { |atr| atr['type'] == wlbl.link_type }
             ## create
@@ -47,18 +46,20 @@ module Jekyll
                 target_attr['urls'] << doc.url
               end
             end
+          else
+            @index[doc.url].missing << wlbl.md_str
           end
         end
         # inlines
         wikilink_inlines.each do |wlil|
           if !wlil.is_img?
-            if !wlil.is_valid?
-              Jekyll.logger.warn "Invalid wikilink: #{wlil.inspect}"
-            else
+            if wlil.is_valid?
               # forelink
               @index[doc.url].forelinks << wlil.linked_fm_data
               # backlink
               @index[wlil.linked_doc.url].backlinks << wlil.context_fm_data
+            else
+              @index[doc.url].missing << wlil.md_str
             end
           end
         end
