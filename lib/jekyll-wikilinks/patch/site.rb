@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "jekyll"
 
-# appending to built-in jekyll site object to pass data to jekyll-d3
+# appending to built-in jekyll site object to pass data to jekyll-graph
 
 module Jekyll
 

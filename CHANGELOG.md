@@ -3,6 +3,7 @@
 - Fix square brackets in label text (e.g. labels with three right square brackets in a row [[now|[work]]]). (Fixes [issue #23](https://github.com/manunamz/jekyll-wikilinks/issues/23)).
 ### Changed
 - Refactored block wikilink regex and handling to be cleaner.
+
 ## [0.0.7] 2021-11-01
 ### Added
 - "typed" css class can now be configured.
