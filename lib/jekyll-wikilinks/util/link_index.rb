@@ -47,7 +47,9 @@ module Jekyll
               end
             end
           else
-            @index[doc.url].missing << wlbl.md_str
+            wlbl.filenames.each do |fn|
+              @index[doc.url].missing << fn
+            end
           end
         end
         # inlines
@@ -59,7 +61,7 @@ module Jekyll
               # backlink
               @index[wlil.linked_doc.url].backlinks << wlil.context_fm_data
             else
-              @index[doc.url].missing << wlil.md_str
+              @index[doc.url].missing << wlil.filename
             end
           end
         end
