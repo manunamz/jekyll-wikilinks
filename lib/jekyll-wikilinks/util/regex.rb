@@ -48,7 +48,7 @@ module Jekyll
     # wikilinks
 
     ## inline
-    REGEX_WIKI_LINKS = %r{                            # capture indeces
+    REGEX_WIKI_LINK_INLINES = %r{                     # capture indeces
       (#{REGEX_LINK_EMBED})?                          # 0
       (#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE})?     # 1
       #{REGEX_LINK_LEFT}

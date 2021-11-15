@@ -79,7 +79,7 @@ module Jekyll
       end
 
       def parse_inlines(doc_filename, doc_content)
-        inline_matches = doc_content.scan(REGEX_WIKI_LINKS)
+        inline_matches = doc_content.scan(REGEX_WIKI_LINK_INLINES)
         if !inline_matches.nil? && inline_matches.size != 0
           inline_matches.each do |wl_match|
             @wikilink_inlines << WikiLinkInline.new(
