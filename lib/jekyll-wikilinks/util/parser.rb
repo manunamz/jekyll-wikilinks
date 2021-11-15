@@ -146,7 +146,7 @@ module Jekyll
           lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
           inner_txt = "#{linked_doc['title'].downcase} > ^#{wikilink.block_id}" if inner_txt.nil?
         else
-          Jekyll.logger.error "Invalid wikilink level"
+          Jekyll.logger.error("Jekyll-Wikilinks: Invalid wikilink level")
         end
         return '<a class="' + $wiki_conf.css_name("wiki") + link_type_txt + '" href="' + lnk_doc_rel_url + '">' + inner_txt + '</a>'
   		end

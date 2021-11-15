@@ -32,7 +32,7 @@ module Jekyll
       def initialize(config)
         @config ||= config
         self.old_config_warn()
-        Jekyll.logger.debug "Excluded jekyll types: ", option(EXCLUDE_KEY) unless disabled?
+        Jekyll.logger.debug("Jekyll-Wikilinks: Excluded jekyll types: #{option(EXCLUDE_KEY)}") unless disabled?
       end
 
       # util
@@ -98,13 +98,13 @@ module Jekyll
 
       def old_config_warn()
         if @config.include?("wikilinks_collection")
-          Jekyll.logger.warn "As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details."
+          Jekyll.logger.warn("Jekyll-Wikilinks: As of 0.0.3, 'wikilinks_collection' is no longer used for configs. jekyll-wikilinks will scan all markdown files by default. Check README for details.")
         end
         if option_exist?("assets_rel_path")
-          Jekyll.logger.warn "As of 0.0.5, 'assets_rel_path' is now 'path'."
+          Jekyll.logger.warn("Jekyll-Wikilinks: As of 0.0.5, 'assets_rel_path' is now 'path'.")
         end
         if @config.include?("d3_graph_data")
-          Jekyll.logger.warn "As of 0.0.6, 'd3_graph_data' and graph functionality have been moved to the 'jekyll-graph' plugin."
+          Jekyll.logger.warn("Jekyll-Wikilinks: As of 0.0.6, 'd3_graph_data' and graph functionality have been moved to the 'jekyll-graph' plugin.")
         end
       end
     end

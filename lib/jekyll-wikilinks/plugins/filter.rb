@@ -9,8 +9,8 @@ module Jekyll
 
       # usage: {% assign note_links = page.links | doc_type: "notes" %}
       def doc_type(links, doc_type)
-        Jekyll.logger.error("'links' should not be nil") if links.nil?
-        return "No doc type given" if doc_type.empty?
+        Jekyll.logger.error("Jekyll-Wikilinks: 'links' invalid") if links.nil?
+        Jekyll.logger.error("Jekyll-Wikilinks: 'doc_type' invalid") if doc_type.nil? || doc_type.empty?
         return [] if links.empty?
 
         site = @context.registers[:site]
@@ -30,7 +30,7 @@ module Jekyll
               end
             end
           else
-            Jekyll.logge.error("In 'doc_type' filter, 'links' do not have 'url' or 'urls'")
+            Jekyll.logge.error("Jekyll-Wikilinks: In 'doc_type' filter, 'links' do not have 'url' or 'urls'")
           end
         end
         return links.uniq
@@ -38,8 +38,8 @@ module Jekyll
 
       # usage: {% assign author_links = page.links | rel_type: "author" %}
       def rel_type(links, link_type)
-        Jekyll.logger.error("'links' should not be nil") if links.nil?
-        return "No link type given" if link_type.empty?
+        Jekyll.logger.error("Jekyll-Wikilinks: 'links' invalid") if links.nil?
+        Jekyll.logger.error("Jekyll-Wikilinks: 'link_type' invalid") if link_type.nil?
         return [] if links.empty?
 
         site = @context.registers[:site]
@@ -59,7 +59,7 @@ module Jekyll
               end
             end
           else
-            Jekyll.logge.error("In 'rel_type' filter, 'links' do not have 'url' or 'urls'")
+            Jekyll.logge.error("Jekyll-Wikilinks: In 'rel_type' filter, 'links' do not have 'url' or 'urls'")
           end
         end
         return links.uniq

@@ -19,7 +19,7 @@ module Jekyll
       end
 
       def add_item(filename)
-        Jekyll.logger.error "'filename' required" if filename.nil? || filename.empty?
+        Jekyll.logger.error("Jekyll-Wikilinks: 'filename' required") if filename.nil? || filename.empty?
         @filenames << filename
       end
 
@@ -27,7 +27,7 @@ module Jekyll
 
       def md_regex
         if !is_typed? || !has_filenames? 
-          Jekyll.logger.error("WikiLinkBlock.md_regex error -- type: #{@link_type}, fnames: #{@filenames.inspect}, for: #{@context_filename}")
+          Jekyll.logger.error("Jekyll-Wikilinks: WikiLinkBlock.md_regex error -- type: #{@link_type}, fnames: #{@filenames.inspect}, for: #{@context_filename}")
         end
         # comma (including singles)
         if @bullet_type.nil?
@@ -42,14 +42,14 @@ module Jekyll
           filename_strs = @filenames.map { |f| /\s{0,3}#{Regexp.escape(@bullet_type)}\s#{REGEX_LINK_LEFT}#{f}#{REGEX_LINK_RIGHT}\n/i }
           md_regex = /#{link_type}#{filename_strs.join("")}/i
         else
-          Jekyll.logger.error("WikiLinkBlock.bullet_type error: #{@bullet_type}")
+          Jekyll.logger.error("Jekyll-Wikilinks: WikiLinkBlock.bullet_type error: #{@bullet_type}")
         end
         return md_regex
       end
 
       def md_str
         if !is_typed? || !has_filenames?
-          Jekyll.logger.error("WikiLinkBlockList.md_str error -- type: #{@link_type}, fnames: #{@filenames.inspect}, for: #{@context_filename}")
+          Jekyll.logger.error("Jekyll-Wikilinks: WikiLinkBlockList.md_str error -- type: #{@link_type}, fnames: #{@filenames.inspect}, for: #{@context_filename}")
         end
         # comma (including singles)
         if @bullet_type.nil?
@@ -62,7 +62,7 @@ module Jekyll
           filename_strs = @filenames.map { |f| li[0] + " \[\[#{li[1]}\]\]\n" }
           md_str = link_type + filename_strs.join('')
         else
-          Jekyll.logger.error("'bullet_type' invalid: #{@bullet_type}")
+          Jekyll.logger.error("Jekyll-Wikilinks: 'bullet_type' invalid: #{@bullet_type}")
         end
         return md_str
       end
@@ -165,7 +165,7 @@ module Jekyll
           header = %r{}
           block = %r{#{REGEX_LINK_BLOCK}#{@block_id}}
         elsif !described?(FILENAME)
-          Jekyll.logger.error "WikiLinkInline.md_regex error"
+          Jekyll.logger.error("Jekyll-Wikilinks: WikiLinkInline.md_regex error")
         end
         label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{label_txt}} : %r{}
         return %r{#{regex_embed}#{regex_link_type}#{REGEX_LINK_LEFT}#{filename}#{header}#{block}#{label_}#{REGEX_LINK_RIGHT}}
@@ -182,7 +182,7 @@ module Jekyll
           header = ""
           block = "\#\^#{@block_id}"
         elsif !described?(FILENAME)
-          Jekyll.logger.error "WikiLinkInline.md_str error"
+          Jekyll.logger.error("Jekyll-Wikilinks: WikiLinkInline.md_str error")
         end
         label_ = labelled? ? "\|#{@label_txt}" : ""
         return "#{embed}#{link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]"
@@ -254,7 +254,7 @@ module Jekyll
         return (!@filename.nil? && !@filename.empty?) if chunk == FILENAME
         return (!@header_txt.nil? && !@header_txt.empty?) if chunk == HEADER_TXT
         return (!@block_id.nil? && !@block_id.empty?) if chunk == BLOCK_ID
-        Jekyll.logger.error "There is no link level '#{chunk}' in the WikiLink Class"
+        Jekyll.logger.error("Jekyll-Wikilinks: There is no link level '#{chunk}' in the WikiLink Class")
       end
 
       def level
