@@ -26,47 +26,45 @@ module Jekyll
       # data
 
       def md_regex
-        if is_typed? && has_filenames? 
-          # comma (including singles)
-          if @bullet_type.nil?
-            link_type = /#{@link_type}#{REGEX_LINK_TYPE}/i
-            tmp_filenames = @filenames.dup
-            first_filename = /\s*#{REGEX_LINK_LEFT}#{tmp_filenames.shift()}#{REGEX_LINK_RIGHT}\s*/i
-            filename_strs = tmp_filenames.map { |f| /,\s*#{REGEX_LINK_LEFT}#{f}#{REGEX_LINK_RIGHT}\s*/i }
-            md_regex = /#{link_type}#{first_filename}#{filename_strs.join('')}\n/i
-          # mkdn
-          elsif !@bullet_type.match(REGEX_BULLET).nil?
-            link_type = /#{@link_type}#{REGEX_LINK_TYPE}\n/i
-            filename_strs = @filenames.map { |f| /\s{0,3}#{Regexp.escape(@bullet_type)}\s#{REGEX_LINK_LEFT}#{f}#{REGEX_LINK_RIGHT}\n/i }
-            md_regex = /#{link_type}#{filename_strs.join("")}/i
-          else
-            Jekyll.logger.error("WikiLinkBlock.bullet_type error: #{@bullet_type}")
-          end
-          return md_regex
-        else
+        if !is_typed? || !has_filenames? 
           Jekyll.logger.error("WikiLinkBlock.md_regex error -- type: #{@link_type}, fnames: #{@filenames.inspect}, for: #{@context_filename}")
         end
+        # comma (including singles)
+        if @bullet_type.nil?
+          link_type = /#{@link_type}#{REGEX_LINK_TYPE}/i
+          tmp_filenames = @filenames.dup
+          first_filename = /\s*#{REGEX_LINK_LEFT}#{tmp_filenames.shift()}#{REGEX_LINK_RIGHT}\s*/i
+          filename_strs = tmp_filenames.map { |f| /,\s*#{REGEX_LINK_LEFT}#{f}#{REGEX_LINK_RIGHT}\s*/i }
+          md_regex = /#{link_type}#{first_filename}#{filename_strs.join('')}\n/i
+        # mkdn
+        elsif !@bullet_type.match(REGEX_BULLET).nil?
+          link_type = /#{@link_type}#{REGEX_LINK_TYPE}\n/i
+          filename_strs = @filenames.map { |f| /\s{0,3}#{Regexp.escape(@bullet_type)}\s#{REGEX_LINK_LEFT}#{f}#{REGEX_LINK_RIGHT}\n/i }
+          md_regex = /#{link_type}#{filename_strs.join("")}/i
+        else
+          Jekyll.logger.error("WikiLinkBlock.bullet_type error: #{@bullet_type}")
+        end
+        return md_regex
       end
 
       def md_str
-        if is_typed? && has_filenames?
-          # comma (including singles)
-          if @bullet_type.nil?
-            link_type = "#{@link_type}::"
-            filename_strs = @filenames.map { |f| "\[\[#{f}\]\]," }
-            md_str = (link_type + filename_strs.join('')).delete_suffix(",")
-          # mkdn
-          elsif !@bullet_type.match(REGEX_BULLET).nil?
-            link_type = "#{@link_type}::\n"
-            filename_strs = @filenames.map { |f| li[0] + " \[\[#{li[1]}\]\]\n" }
-            md_str = link_type + filename_strs.join('')
-          else
-            Jekyll.logger.error("'bullet_type' invalid: #{@bullet_type}")
-          end
-          return md_str
-        else
-          Jekyll.logger.error("WikiLinkBlockList.md_str error")
+        if !is_typed? || !has_filenames?
+          Jekyll.logger.error("WikiLinkBlockList.md_str error -- type: #{@link_type}, fnames: #{@filenames.inspect}, for: #{@context_filename}")
         end
+        # comma (including singles)
+        if @bullet_type.nil?
+          link_type = "#{@link_type}::"
+          filename_strs = @filenames.map { |f| "\[\[#{f}\]\]," }
+          md_str = (link_type + filename_strs.join('')).delete_suffix(",")
+        # mkdn
+        elsif !@bullet_type.match(REGEX_BULLET).nil?
+          link_type = "#{@link_type}::\n"
+          filename_strs = @filenames.map { |f| li[0] + " \[\[#{li[1]}\]\]\n" }
+          md_str = link_type + filename_strs.join('')
+        else
+          Jekyll.logger.error("'bullet_type' invalid: #{@bullet_type}")
+        end
+        return md_str
       end
 
       def urls
