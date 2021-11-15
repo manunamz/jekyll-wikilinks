@@ -19,6 +19,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:link_post)                     { find_by_title(site.collections["untyped"].docs, "Untyped Link Post") }
   let(:link_nested_in_html)           { find_by_title(site.collections["untyped"].docs, "Nested In HTML") }
   let(:link_w_whitespace)             { find_by_title(site.collections["untyped"].docs, "Untyped Link Whitespace In Filename") }
+  let(:link_w_comma_abof)             { find_by_title(site.collections["untyped"].docs, "Untyped Link With Comma At Beginning Of File") }
   # targets
   let(:blank_a)                       { find_by_title(site.collections["target"].docs, "Blank A") }
   let(:blank_b)                       { find_by_title(site.collections["target"].docs, "Blank B") }
@@ -128,6 +129,14 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
             expect(blank_a.data['forelinks']).to eq([])
           end
 
+        end
+
+      end
+
+      context "with link at the beginning of file with commas" do
+        # this test is here to ensure block wikilinks don't accidentally pick this up
+        it "is processed successfully (not as a block)" do 
+          expect(link_w_comma_abof.output).to eq("<p><a class=\"wiki-link\" href=\"/target/blank.a/\">blank a</a>,<a class=\"wiki-link\" href=\"/target/blank.b/\">blank b</a></p>\n")
         end
 
       end

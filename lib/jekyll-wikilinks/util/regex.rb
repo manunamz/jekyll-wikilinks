@@ -68,6 +68,6 @@ module Jekyll
     REGEX_LIST_MKDN        = /((?<=\n)\s{0,3}#{REGEX_BULLET}\s#{REGEX_SINGLE}\s*)+/i # (see REGEX_LIST_ITEM)
     ### process
     REGEX_BLOCK_TYPES      = /((?<!\n)(?:#{REGEX_LIST_COMMA})|#{REGEX_LIST_MKDN})/i
-    REGEX_WIKI_LINK_BLOCKS = /(?:^\s{0,3}#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}|\G)(?<items>#{REGEX_BLOCK_TYPES})\n/i
+    REGEX_WIKI_LINK_BLOCKS = /^\s{0,3}#{REGEX_LINK_TYPE_TXT}#{REGEX_LINK_TYPE}(?:\s*|\G)(?<items>#{REGEX_BLOCK_TYPES})\n/i
   end
 end

@@ -18,7 +18,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:link_md_dash_w_whitespace)     { find_by_title(site.collections["block_list"].docs, "Block List Link Markdown Dash With Whitespace") }
   let(:link_md_star)                  { find_by_title(site.collections["block_list"].docs, "Block List Link Markdown Star") }
   let(:link_md_plus)                  { find_by_title(site.collections["block_list"].docs, "Block List Link Markdown Plus") }
-  let(:link_comma_missing_doc)              { find_by_title(site.collections["block_list"].docs, "Block List Link Comma Missing Doc") }
+  let(:link_comma_missing_doc)        { find_by_title(site.collections["block_list"].docs, "Block List Link Comma Missing Doc") }
   # targets
   let(:blank_a)                       { find_by_title(site.collections["target"].docs, "Blank A") }
   let(:blank_b)                       { find_by_title(site.collections["target"].docs, "Blank B") }

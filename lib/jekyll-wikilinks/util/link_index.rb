@@ -78,7 +78,7 @@ module Jekyll
           @attributes = [] # block typed forelinks;            { 'type' => str, 'urls' => [ str ] }
           @backlinks  = [] # inline typed and basic backlinks; { 'type' => str, 'url'  => str }
           @forelinks  = [] # inline typed and basic forelinks; { 'type' => str, 'url'  => str }
-          @missing    = [] # missing forelinks;                (see wikilink's 'fm_data' and 'linked_fm_data' attrs)
+          @missing    = [] # missing forelinks + attributes;   ( built from (missing) filenames )
         end
       end
     end
