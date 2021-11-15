@@ -144,7 +144,7 @@ module Jekyll
         end
         # markdown file processing
         linked_doc = wikilink.linked_doc
-        link_type_txt = wikilink.typed? ? " #{$wiki_conf.css_name("typed")} #{wikilink.link_type}" : ""
+        link_type_txt = wikilink.is_typed? ? " #{$wiki_conf.css_name("typed")} #{wikilink.link_type}" : ""
         
         inner_txt = wikilink.label_txt if wikilink.labelled?
         lnk_doc_rel_url = relative_url(linked_doc.url)
@@ -179,29 +179,11 @@ module Jekyll
         #  appears as both untyped and typed in a document)
         temp = @wikilink_inlines.dup
         @wikilink_inlines.clear()
-        typed_wikilinks = temp.select { |wl| wl.typed? }
-        untyped_wikilinks = temp.select { |wl| !wl.typed? }
+        typed_wikilinks = temp.select { |wl| wl.is_typed? }
+        untyped_wikilinks = temp.select { |wl| !wl.is_typed? }
         @wikilink_inlines = typed_wikilinks.concat(untyped_wikilinks)
       end
     end
-
-    # validation
-
-    # def has_target_attr?(attribute)
-    #   attribute.list_item.each do |li|
-    #     return false if @doc_manager.get_doc_by_fname(li[1]).nil?
-    #   end
-    #   return true
-    # end
-
-    # def has_target_wl?(wikilink)
-    #   level = wikilink.describe['level']
-    #   linked_doc = @doc_manager.get_doc_by_fname(wikilink.filename)
-    #   return false if linked_doc.nil?
-    #   return false if level == "header" && !DocManager.doc_has_header?(linked_doc, wikilink.header_txt)
-    #   return false if level == "block" && !DocManager.doc_has_block_id?(linked_doc, wikilink.block_id)
-    #   return true
-    # end
 
   end
 end

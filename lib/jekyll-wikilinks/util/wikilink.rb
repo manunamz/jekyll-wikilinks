@@ -26,7 +26,7 @@ module Jekyll
       # data
 
       def md_regex
-        if typed? && has_filenames? 
+        if is_typed? && has_filenames? 
           # comma (including singles)
           if @bullet_type.nil?
             link_type = /#{@link_type}#{REGEX_LINK_TYPE}/i
@@ -49,7 +49,7 @@ module Jekyll
       end
 
       def md_str
-        if typed? && has_filenames?
+        if is_typed? && has_filenames?
           # comma (including singles)
           if @bullet_type.nil?
             link_type = "#{@link_type}::"
@@ -114,15 +114,15 @@ module Jekyll
         return !@filenames.nil? && !@filenames.empty?
       end
 
-      def typed?
+      def is_typed?
         return !@link_type.nil? && !@link_type.empty?
       end
 
       # validation methods
 
-      # the block level wikilink is only valid if all list item documents exist
       def is_valid?
-        return false if @filenames.size == 0
+        return false if !is_typed?
+        return false if !has_filenames?
         @filenames.each do |f|
           return false if !@doc_mngr.file_exists?(f)
         end
@@ -158,7 +158,7 @@ module Jekyll
 
       def md_regex
         regex_embed = embedded? ? REGEX_LINK_EMBED : %r{}
-        regex_link_type = typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
+        regex_link_type = is_typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
         filename = described?(FILENAME) ? @filename : ""
         if described?(HEADER_TXT)
           header = %r{#{REGEX_LINK_HEADER}#{@header_txt}}
@@ -175,7 +175,7 @@ module Jekyll
 
       def md_str
         embed = embedded? ? "!" : ""
-        link_type = typed? ? "#{@link_type}::" : ""
+        link_type = is_typed? ? "#{@link_type}::" : ""
         filename = described?(FILENAME) ? @filename : ""
         if described?(HEADER_TXT)
           header = "\##{@header_txt}"
@@ -226,7 +226,7 @@ module Jekyll
       #     'level' => level,
       #     'labelled' => labelled?,
       #     'embedded' => embedded?,
-      #     'typed_link' => typed?,
+      #     'typed_link' => is_typed?,
       #   }
       # end
 
@@ -234,7 +234,7 @@ module Jekyll
         return !@label_txt.nil? && !@label_txt.empty?
       end
 
-      def typed?
+      def is_typed?
         return !@link_type.nil? && !@link_type.empty?
       end
 
