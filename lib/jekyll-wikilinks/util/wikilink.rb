@@ -40,11 +40,11 @@ module Jekyll
             filename_strs = @filenames.map { |f| /\s{0,3}#{Regexp.escape(@bullet_type)}\s#{REGEX_LINK_LEFT}#{f}#{REGEX_LINK_RIGHT}\n/i }
             md_regex = /#{link_type}#{filename_strs.join("")}/i
           else
-            Jekyll.logger.error("'bullet_type' invalid: #{@bullet_type}")
+            Jekyll.logger.error("WikiLinkBlock.bullet_type error: #{@bullet_type}")
           end
           return md_regex
         else
-          Jekyll.logger.error("WikiLinkBlockList.md_regex error")
+          Jekyll.logger.error("WikiLinkBlock.md_regex error -- type: #{@link_type}, fnames: #{@filenames.inspect}, for: #{@context_filename}")
         end
       end
 
@@ -167,7 +167,7 @@ module Jekyll
           header = %r{}
           block = %r{#{REGEX_LINK_BLOCK}#{@block_id}}
         elsif !described?(FILENAME)
-          Jekyll.logger.error "Invalid link level in regex. See WikiLink's 'md_regex' for details"
+          Jekyll.logger.error "WikiLinkInline.md_regex error"
         end
         label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{label_txt}} : %r{}
         return %r{#{regex_embed}#{regex_link_type}#{REGEX_LINK_LEFT}#{filename}#{header}#{block}#{label_}#{REGEX_LINK_RIGHT}}
@@ -184,7 +184,7 @@ module Jekyll
           header = ""
           block = "\#\^#{@block_id}"
         elsif !described?(FILENAME)
-          Jekyll.logger.error "Invalid link level in 'md_str'. See WikiLink's 'md_str' for details"
+          Jekyll.logger.error "WikiLinkInline.md_str error"
         end
         label_ = labelled? ? "\|#{@label_txt}" : ""
         return "#{embed}#{link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]"
