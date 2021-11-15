@@ -62,8 +62,7 @@ module Jekyll
     ## block
     ### single
     REGEX_SINGLE           = /#{REGEX_LINK_LEFT}#{REGEX_FILENAME_CHARS}#{REGEX_LINK_RIGHT}/i
-    ### list
-      # (comma is responsible for catching the single case)
+    ### list (comma is responsible for catching the single case)
     REGEX_LIST_COMMA       = /((?:\s*#{REGEX_SINGLE}\s*)(?:,\s*#{REGEX_SINGLE}\s*)*)/i
     REGEX_LIST_MKDN        = /((?<=\n)\s{0,3}#{REGEX_BULLET}\s#{REGEX_SINGLE}\s*)+/i # (see REGEX_LIST_ITEM)
     ### process
