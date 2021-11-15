@@ -101,7 +101,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
       context "when ![[embed]] is an image"
 
         it "embeds png in 'img' tag; full output" do
-          expect(link_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"embed-image-wrapper\"><img class=\"embed-image\" src=\"/assets/image.png\" /></span></p>\n")
+          expect(link_img.output).to eq("<p>The following link should be embedded:</p>\n\n<p><span class=\"embed-image-wrapper\"><img class=\"embed-image\" src=\"/assets/image.png\"></span></p>\n")
         end
 
         it "embeds svg file contents directly (instead of nesting in an <img> tag)" do

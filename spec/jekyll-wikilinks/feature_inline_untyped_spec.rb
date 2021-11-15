@@ -28,7 +28,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:lvl_block)                     { find_by_title(site.collections["target"].docs, "Level Block") }
   let(:lvl_header)                    { find_by_title(site.collections["target"].docs, "Level Header") }
   let(:w_whitespace_in_filename)      { find_by_title(site.collections["target"].docs, "Whitespace In Filename") }
-  let(:w_web_link)                    { find_by_title(site.collections["target"].docs, "Web Link") }
 
   # makes markdown tests work
   subject { described_class.new(site.config) }
@@ -244,18 +243,6 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           expect(link_w_whitespace.output).to eq("<p>Link to <a class=\"wiki-link\" href=\"/target/w.whitespace%20in%20filename/\">whitespace in filename</a>.</p>\n")
         end
 
-      end
-
-    end
-
-    context "web links (non-wiki-links)" do
-
-      it "have a 'web-link' css class added to their 'a' element" do
-        expect(w_web_link.content).to include("web-link")
-      end
-
-      it "full output" do
-        expect(w_web_link.content).to eq("<p>A <a href=\"www.example.com\" class=\"web-link\">web link</a>.</p>\n")
       end
 
     end

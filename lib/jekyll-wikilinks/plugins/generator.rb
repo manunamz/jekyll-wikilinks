@@ -32,8 +32,6 @@ module Jekyll
         @site.doc_mngr.all.each do |doc|
           # populate frontmatter metadata from (wiki)link index
           @site.link_index.assign_metadata(doc)
-          # add 'web-link' css class to non-wiki-links
-          doc.content = @parser.add_web_css(doc.content)
         end
       end
 

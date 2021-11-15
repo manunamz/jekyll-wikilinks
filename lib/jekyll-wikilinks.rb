@@ -20,8 +20,11 @@ Jekyll::Hooks.register :site, :post_read do |site|
   end
 end
 
-# plugin
+# parse wikilinks / generate metadata
 require_relative "jekyll-wikilinks/plugins/generator"
+
+# convert weblinks
+require_relative "jekyll-wikilinks/plugins/converter"
 
 # hook up liquid filters
 require_relative "jekyll-wikilinks/plugins/filter"
