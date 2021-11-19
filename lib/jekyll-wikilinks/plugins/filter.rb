@@ -17,20 +17,20 @@ module Jekyll
         links.each do |l|
           # links
           if l.keys.include?('url')
-            doc = site.documents.select{ |d| d.url == l['url'] && d.type.to_s == doc_type.to_s }
-            if !doc.nil? && doc.size != 1
+            docs = site.documents.select{ |d| d.url == l['url'] && d.type.to_s == doc_type.to_s }
+            if !docs.nil? && docs.size != 1
               links.delete(l)
             end
           # attributes
           elsif l.keys.include?('urls')
             l['urls'].each do |lurl|
-              doc = site.documents.select{ |d| d.url == lurl && d.type.to_s == doc_type.to_s }
-              if !doc.nil? && doc.size != 1
+              docs = site.documents.select{ |d| d.url == lurl && d.type.to_s == doc_type.to_s }
+              if !docs.nil? && docs.size != 1
                 links['urls'].delete(lurl)
               end
             end
           else
-            Jekyll.logge.error("Jekyll-Wikilinks: In 'doc_type' filter, 'links' do not have 'url' or 'urls'")
+            Jekyll.logger.error("Jekyll-Wikilinks: In 'doc_type' filter, 'links' do not have 'url' or 'urls'")
           end
         end
         return links.uniq
