@@ -14,26 +14,28 @@ module Jekyll
         return [] if links.empty?
 
         site = @context.registers[:site]
+
+        links_of_type = []
         links.each do |l|
           # links
           if l.keys.include?('url')
             docs = site.documents.select{ |d| d.url == l['url'] && d.type.to_s == doc_type.to_s }
-            if !docs.nil? && docs.size != 1
-              links.delete(l)
+            if !docs.nil? && docs.size == 1
+              links_of_type << l
             end
           # attributes
           elsif l.keys.include?('urls')
             l['urls'].each do |lurl|
               docs = site.documents.select{ |d| d.url == lurl && d.type.to_s == doc_type.to_s }
-              if !docs.nil? && docs.size != 1
-                links['urls'].delete(lurl)
+              if !docs.nil? && docs.size == 1
+                links_of_type << l
               end
             end
           else
             Jekyll.logger.error("Jekyll-Wikilinks: In 'doc_type' filter, 'links' do not have 'url' or 'urls'")
           end
         end
-        return links.uniq
+        return links_of_type
       end
 
       # usage: {% assign author_links = page.links | rel_type: "author" %}
@@ -43,26 +45,28 @@ module Jekyll
         return [] if links.empty?
 
         site = @context.registers[:site]
+
+        links_of_type = []
         links.each do |l|
           if l.keys.include?('url')
             if l['type'].to_s == link_type.to_s
               docs = site.documents.select{ |d| d.url == l['url'] }
               if !doc.nil? && doc.size != 1
-                links.delete(l)
+                links_of_type << l
               end
             end
           elsif l.keys.include?('urls')
             l['urls'].each do |lurl|
               docs = site.documents.select{ |d| d.url == lurl }
               if !doc.nil? && doc.size != 1
-                links['urls'].delete(lurl)
+                links_of_type << lurl
               end
             end
           else
             Jekyll.logge.error("Jekyll-Wikilinks: In 'rel_type' filter, 'links' do not have 'url' or 'urls'")
           end
         end
-        return links.uniq
+        return links_of_type
       end
 
     end
