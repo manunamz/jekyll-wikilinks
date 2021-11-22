@@ -18,7 +18,7 @@ Follow the instructions for installing a [jekyll plugin](https://jekyllrb.com/do
 
 Defaults look like this:
 
-```
+```yaml
 wikilinks:
   attributes:
     enabled: true
