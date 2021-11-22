@@ -254,11 +254,11 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
         context "html output" do
 
           it "full" do
-            expect(link_lvl_header.output).to eq("<p>This doc contains a link to a header <a class=\"wiki-link\" href=\"/target/lvl.header/#a-header\">level header &gt; A Header</a>.</p>\n")
+            expect(link_lvl_header.output).to eq("<p>This doc contains a link to a header <a class=\"wiki-link\" href=\"/target/lvl.header/#a-header\">level header &gt; a header</a>.</p>\n")
           end
 
           it "header url fragments contain doc's filename and header text" do
-            expect(link_lvl_header.output).to include("level header &gt; A Header")
+            expect(link_lvl_header.output).to include("level header &gt; a header")
           end
 
           it "header sluggified and is fragment in url" do

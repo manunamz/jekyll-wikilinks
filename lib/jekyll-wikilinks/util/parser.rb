@@ -141,7 +141,7 @@ module Jekyll
         elsif (wikilink.level == "header")
           # from: https://github.com/jekyll/jekyll/blob/6855200ebda6c0e33f487da69e4e02ec3d8286b7/Rakefile#L74
           lnk_doc_rel_url += "\#" + Jekyll::Utils.slugify(wikilink.header_txt)
-          inner_txt = "#{linked_doc['title'].downcase} > #{wikilink.header_txt}" if inner_txt.nil?
+          inner_txt = "#{linked_doc['title'].downcase} > #{wikilink.header_txt.downcase}" if inner_txt.nil?
         elsif (wikilink.level == "block")
           lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
           inner_txt = "#{linked_doc['title'].downcase} > ^#{wikilink.block_id}" if inner_txt.nil?
