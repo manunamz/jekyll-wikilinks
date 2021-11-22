@@ -35,7 +35,7 @@ module Jekyll
             Jekyll.logger.error("Jekyll-Wikilinks: In 'doc_type' filter, 'links' do not have 'url' or 'urls'")
           end
         end
-        return links_of_type
+        return links_of_type.uniq
       end
 
       # usage: {% assign author_links = page.links | rel_type: "author" %}
@@ -66,7 +66,7 @@ module Jekyll
             Jekyll.logge.error("Jekyll-Wikilinks: In 'rel_type' filter, 'links' do not have 'url' or 'urls'")
           end
         end
-        return links_of_type
+        return links_of_type.uniq
       end
 
     end
