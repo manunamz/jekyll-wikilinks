@@ -22,8 +22,6 @@ module Jekyll
         @wikilink_blocks, @wikilink_inlines = [], []
       end
 
-      # wikilinks
-
       # parsing
 
       def parse(doc_filename, doc_content)
