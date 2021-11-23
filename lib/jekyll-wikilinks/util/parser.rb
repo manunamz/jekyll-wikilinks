@@ -141,7 +141,7 @@ module Jekyll
           lnk_doc_rel_url += "\#" + Jekyll::Utils.slugify(wikilink.header_txt)
           inner_txt = "#{linked_doc['title'].downcase} > #{wikilink.header_txt.downcase}" if inner_txt.nil?
         elsif (wikilink.level == "block")
-          lnk_doc_rel_url += "\#" + wikilink.block_id.downcase
+          lnk_doc_rel_url += "\#" + wikilink.block_id
           inner_txt = "#{linked_doc['title'].downcase} > ^#{wikilink.block_id}" if inner_txt.nil?
         else
           Jekyll.logger.error("Jekyll-Wikilinks: Invalid wikilink level")
