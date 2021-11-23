@@ -12,7 +12,8 @@ module Jekyll
     # the following methods are specifically to address two things:
     #  1. ruby's 'find' / 'detect' function does not throw errors if 
     #     there are multiple matches. fail fast, i want to know if there
-    #     are duplicates.
+    #     are duplicates. 
+    #     (not using sets because i don't want to clobber existing documents)
     #  2. handle all jekyll documents in one place. i don't want to
     #     have to filter all documents for target markdown documents 
     #     every time i need to check if a file exists.
@@ -88,9 +89,9 @@ module Jekyll
       def doc_has_header?(doc, header)
         Jekyll.logger.error("Jekyll-Wikilinks: Must provide a 'header'") if header.nil? || header.empty?
         # leading + trailing whitespace is ignored when matching headers
-        header_results = doc.content.scan(REGEX_ATX_HEADER).flatten.map { |htxt| htxt.strip }
-        setext_header_results = doc.content.scan(REGEX_SETEXT_HEADER).flatten.map { |htxt| htxt.strip }
-        return header_results.include?(header.strip) || setext_header_results.include?(header.strip)
+        header_results = doc.content.scan(REGEX_ATX_HEADER).flatten.map { |htxt| htxt.downcase.strip }
+        setext_header_results = doc.content.scan(REGEX_SETEXT_HEADER).flatten.map { |htxt| htxt.downcase.strip }
+        return header_results.include?(header.downcase.strip) || setext_header_results.include?(header.downcase.strip)
       end
 
       def doc_has_block_id?(doc, block_id)

@@ -20,6 +20,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
   let(:link_nested_in_html)           { find_by_title(site.collections["untyped"].docs, "Nested In HTML") }
   let(:link_w_whitespace)             { find_by_title(site.collections["untyped"].docs, "Untyped Link Whitespace In Filename") }
   let(:link_w_comma_abof)             { find_by_title(site.collections["untyped"].docs, "Untyped Link With Comma At Beginning Of File") }
+  let(:link_lvl_header_casei)         { find_by_title(site.collections["untyped"].docs, "Untyped Link Header Case Insensitive") }
   # targets
   let(:blank_a)                       { find_by_title(site.collections["target"].docs, "Blank A") }
   let(:blank_b)                       { find_by_title(site.collections["target"].docs, "Blank B") }
@@ -285,7 +286,10 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
           end
 
           it "'backlinks' added to linked document" do
-            expect(lvl_header.data['backlinks']).to eq([{"type"=>nil, "url"=>"/untyped/link.lvl.header/"}])
+            expect(lvl_header.data['backlinks']).to eq([
+              {"type"=>nil, "url"=>"/untyped/link.lvl.header.case-insensitive/"},
+              {"type"=>nil, "url"=>"/untyped/link.lvl.header/"}
+            ])
           end
 
           it "'forelinks' added to original document" do
@@ -294,6 +298,14 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
 
           it "'forelinks' not added to linked document" do
             expect(lvl_header.data['forelinks']).to eq([])
+          end
+
+        end
+
+        context "should be case insensitive" do
+          
+          it "should find process header regardless of case differences" do
+            expect(link_lvl_header_casei.output).to eq("<p>This doc contains a link to a header <a class=\"wiki-link\" href=\"/target/lvl.header/#a-header\">level header &gt; a header</a>.</p>\n")
           end
 
         end
