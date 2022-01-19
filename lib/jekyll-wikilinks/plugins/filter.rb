@@ -38,8 +38,8 @@ module Jekyll
         return links_of_type.uniq
       end
 
-      # usage: {% assign author_links = page.links | rel_type: "author" %}
-      def rel_type(links, link_type)
+      # usage: {% assign author_links = page.links | link_type: "author" %}
+      def link_type(links, link_type)
         Jekyll.logger.error("Jekyll-Wikilinks: 'links' invalid") if links.nil?
         Jekyll.logger.error("Jekyll-Wikilinks: 'link_type' invalid") if link_type.nil?
         return [] if links.empty?
@@ -68,7 +68,7 @@ module Jekyll
                 links_of_type << l
               end
             else
-              Jekyll.logge.error("Jekyll-Wikilinks: In 'rel_type' filter, 'links' do not have 'url' or 'urls'")
+              Jekyll.logge.error("Jekyll-Wikilinks: In 'link_type' filter, 'links' do not have 'url' or 'urls'")
             end
           end
         end

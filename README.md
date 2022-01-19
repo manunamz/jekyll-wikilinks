@@ -306,9 +306,9 @@ author::[[gardener]]
 Then you could filter by the `author` type like so:
 
 ```html
-{% assign author_links = page.links | rel_type: "author" %}
+{% assign author_links = page.links | link_type: "author" %}
 {% for link in author_links %}
-  {% assign post = site.posts | where: "url", backlink | first %}
+  {% assign post = site.posts | where: "url", link.url | first %}
   {{ post.title }}
 {% endfor %}
 ```
