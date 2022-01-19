@@ -58,7 +58,7 @@ module Jekyll
           elsif l.keys.include?('urls')
             l['urls'].each do |lurl|
               docs = site.documents.select{ |d| d.url == lurl }
-              if !doc.nil? && doc.size != 1
+              if !docs.nil? && docs.size != 1
                 links_of_type << lurl
               end
             end
