@@ -48,22 +48,28 @@ module Jekyll
 
         links_of_type = []
         links.each do |l|
-          if l.keys.include?('url')
-            if l['type'].to_s == link_type.to_s
+          if l['type'].to_s == link_type.to_s
+            # links
+            if l.keys.include?('url')
               docs = site.documents.select{ |d| d.url == l['url'] }
-              if !doc.nil? && doc.size != 1
+              if !doc.nil? && docs.size != 1
                 links_of_type << l
               end
-            end
-          elsif l.keys.include?('urls')
-            l['urls'].each do |lurl|
-              docs = site.documents.select{ |d| d.url == lurl }
-              if !docs.nil? && docs.size != 1
-                links_of_type << lurl
+            # attributes
+            elsif l.keys.include?('urls')
+              all_docs_exist = true
+              l['urls'].each do |lurl|
+                docs = site.documents.select{ |d| d.url == lurl }
+                if !docs.nil? && docs.size != 1
+                  all_docs_exist = false
+                end
               end
+              if all_docs_exist
+                links_of_type << l
+              end
+            else
+              Jekyll.logge.error("Jekyll-Wikilinks: In 'rel_type' filter, 'links' do not have 'url' or 'urls'")
             end
-          else
-            Jekyll.logge.error("Jekyll-Wikilinks: In 'rel_type' filter, 'links' do not have 'url' or 'urls'")
           end
         end
         return links_of_type.uniq
