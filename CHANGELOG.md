@@ -1,3 +1,8 @@
+## [0.0.9] - 2022-01-20
+### Fixed
+- Liquid filter (also see below).
+### Changed
+- 'rel_type' -> 'link_type' liquid filter.
 ## [0.0.8] - 2021-11-23
 ### Fixed
 - Fix square brackets in label text (e.g. labels with three right square brackets in a row [[now|[work]]]). (Fixes [issue #23](https://github.com/manunamz/jekyll-wikilinks/issues/23)).
