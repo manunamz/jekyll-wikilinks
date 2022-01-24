@@ -23,46 +23,56 @@ module Jekyll
       end
 
       def populate(doc, wikilink_blocks, wikilink_inlines)
-        # blocks
+        #        #
+        # blocks #
+        #        #
         wikilink_blocks.each do |wlbl|
           if wlbl.is_valid?
+            #
             # attributes
+            #
             target_attr = @index[doc.url].attributes.detect { |atr| atr['type'] == wlbl.link_type }
-            ## create
+            # create
             if target_attr.nil?
               @index[doc.url].attributes << wlbl.linked_fm_data
-            ## append
+            # append
             else
-              target_attr['urls'] += wlbl.urls
+              target_attr['urls'] += wlbl.urls 
             end
+            ## append missing docs
+            @index[doc.url].missing += wlbl.missing_doc_filenames 
+            #
             # attributed
+            #
             wlbl.linked_docs.each do |linked_doc|
               target_attr = @index[linked_doc.url].attributed.detect { |atr| atr['type'] == wlbl.link_type }
-              ## create
+              # create
               if target_attr.nil?
                 @index[linked_doc.url].attributed << wlbl.context_fm_data
-              ## append
+              # append
               else
                 target_attr['urls'] << doc.url
               end
             end
           else
-            wlbl.filenames.each do |fn|
-              @index[doc.url].missing << fn
-            end
+            #
+            # invalid || empty
+            #
+            @index[doc.url].missing += wlbl.missing_doc_filenames
           end
         end
-        # inlines
+        #         #
+        # inlines #
+        #         #
         wikilink_inlines.each do |wlil|
-          if !wlil.is_img?
-            if wlil.is_valid?
-              # forelink
-              @index[doc.url].forelinks << wlil.linked_fm_data
-              # backlink
-              @index[wlil.linked_doc.url].backlinks << wlil.context_fm_data
-            else
-              @index[doc.url].missing << wlil.filename
-            end
+          return if wlil.is_img?
+          if wlil.is_valid?
+            # forelink
+            @index[doc.url].forelinks << wlil.linked_fm_data
+            # backlink
+            @index[wlil.linked_doc.url].backlinks << wlil.context_fm_data
+          else
+            @index[doc.url].missing << wlil.filename
           end
         end
       end

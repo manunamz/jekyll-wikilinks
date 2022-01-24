@@ -68,7 +68,7 @@ module Jekyll
       end
 
       def urls
-        # return @filenames.map { |f| @doc_mngr.get_doc_by_fname(f) }
+        # return @filenames.map { |f| @doc_mngr.get_doc_by_fname(f).url }.compact()
         urls = []
         @filenames.each do |f|
           doc = @doc_mngr.get_doc_by_fname(f)
@@ -87,9 +87,10 @@ module Jekyll
       end
 
       def linked_fm_data
+        valid_urls = self.urls.select{ |url| @doc_mngr.get_doc_by_url(url) }
         return {
           'type' => @link_type,
-          'urls' => self.urls,
+          'urls' => valid_urls,
         }
       end
 
@@ -106,6 +107,15 @@ module Jekyll
         return docs
       end
 
+      def missing_doc_filenames
+        missing_doc_fnames = [] 
+        @filenames.each do |f|
+          doc = @doc_mngr.get_doc_by_fname(f)
+          missing_doc_fnames << f if doc.nil?
+        end
+        return missing_doc_fnames
+      end
+
       # descriptor methods
 
       def has_filenames?
@@ -119,11 +129,8 @@ module Jekyll
       # validation methods
 
       def is_valid?
-        return false if !is_typed?
-        return false if !has_filenames?
-        @filenames.each do |f|
-          return false if !@doc_mngr.file_exists?(f)
-        end
+        all_filenames_missing = linked_docs.empty?
+        return false if !is_typed? || !has_filenames? || all_filenames_missing
         return true
       end
     end

@@ -1,8 +1,8 @@
 ---
-title: Block List Link Comma Missing Doc
+title: Block List Link Comma Missing Docs
 ---
 This doc contains a wikilink to a block list...
 
-block-list::[[blank.a]],[[missing.doc]]
+block-list::[[missing.doc]],[[another.missing.doc]]
 
 ...link.
