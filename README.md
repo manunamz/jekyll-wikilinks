@@ -269,9 +269,9 @@ Example liquid:
 {% endfor %}
 ```
 ### Missing Metadata
-`missing` is simply a list of wikitext strings -- text that appears in brackets 👉[[wikitext_str]] -- with no corresponding markdown file:
+`missing` is simply a list of filenames. filenames for both block level and inline level wikilinks are collected:
 ```yaml
-- <wikitext_str>
+- <filename_str>
 - ...
 ```
 
