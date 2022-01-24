@@ -404,6 +404,7 @@ RSpec.describe(Jekyll::WikiLinks::Generator) do
          "/block_list/link.md.star/"
          ]
        },
+       # todo: 'block-list-partial' -> 'block-list'
        {"type"=>"block-list-partial", "urls"=>["/block_list/link.partial/"]},
      ])
     expect(blank_b.data['attributed']).to eq([
