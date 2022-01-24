@@ -1,3 +1,4 @@
+## [0.0.11]
 ## [0.0.10] - 2022-01-24
 ### Changed
 - Block Wikilinks now allow for partial lists; missing files are stored in the 'missing' attribute.
