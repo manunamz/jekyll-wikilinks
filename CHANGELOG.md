@@ -1,4 +1,8 @@
-## [0.0.11]
+## [0.0.11] - 2022-01-27
+### Added
+- Wikilink text can now contain an absolute file path to the desired file.
+### Fixed
+- Fixed internal title references in parser.
 ## [0.0.10] - 2022-01-24
 ### Changed
 - Block Wikilinks now allow for partial lists; missing files are stored in the 'missing' attribute.
