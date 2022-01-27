@@ -4,6 +4,7 @@ require_relative "../util/regex"
 module Jekyll
   module WikiLinks
 
+    # todo: move these methods to the 'WikiLink' classes...?
     #
     # this class is responsible for answering any questions
     # related to jekyll markdown documents
@@ -55,6 +56,13 @@ module Jekyll
         return docs[0]
       end
 
+      def get_doc_by_fpath(file_path)
+        Jekyll.logger.error("Jekyll-Wikilinks: Must provide a 'file_path'") if file_path.nil? || file_path.empty?
+        docs = @md_docs.select{ |d| d.relative_path == (file_path + ".md") }
+        return nil if docs.nil? || docs.empty? || docs.size > 1
+        return docs[0]
+      end
+
       def get_doc_by_url(url)
         Jekyll.logger.error("Jekyll-Wikilinks: Must provide a 'url'") if url.nil? || url.empty?
         docs = @md_docs.select{ |d| d.url == url }
@@ -78,12 +86,15 @@ module Jekyll
 
       # validators
 
-      def file_exists?(filename)
+      def file_exists?(filename, file_path=nil)
         Jekyll.logger.error("Jekyll-Wikilinks: Must provide a 'filename'") if filename.nil? || filename.empty?
-        docs = @md_docs.select{ |d| File.basename(d.basename, File.extname(d.basename)) == filename }
-        docs += @static_files.select{ |d| File.basename(d.relative_path) == filename }
-        return false if docs.nil? || docs.empty? || docs.size > 1
-        return true
+        if file_path.nil?
+          return false if get_doc_by_fname(filename).nil? && get_image_by_fname(filename).nil?
+          return true
+        else
+          return false if get_doc_by_fpath(file_path).nil?
+          return true
+        end
       end
 
       def doc_has_header?(doc, header)

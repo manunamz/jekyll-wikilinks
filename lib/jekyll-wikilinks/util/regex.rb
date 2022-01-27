@@ -22,7 +22,7 @@ module Jekyll
 
     # wikitext usable char requirements
     REGEX_LINK_TYPE_CHARS = /[^\n\s\!\#\^\|\]]+/i
-    REGEX_FILENAME_CHARS  = /[^\\\/:\#\^\|\[\]]+/i
+    REGEX_FILENAME_CHARS  = /[^\\:\#\^\|\[\]]+/i
     REGEX_HEADER_CHARS    = /[^\!\#\^\|\[\]]+/i
     REGEX_BLOCK_ID_CHARS  = /[^\\\/:\!\#\^\|\[\]^\n]+/i
     REGEX_LABEL_CHARS     = /(.+?)(?=\]{2}[^\]])/i

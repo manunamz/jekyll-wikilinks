@@ -76,6 +76,8 @@ module Jekyll
         end
         # replace text
         return if @wikilink_inlines.nil?
+        # process typed wikilinks first so we don't accidentally 
+        # overwrite them when handling untyped wikilinks
         self.sort_typed_first
         @wikilink_inlines.each do |wikilink|
           doc_content.gsub!(
@@ -129,7 +131,7 @@ module Jekyll
         inner_txt = wikilink.label_txt if wikilink.labelled?
         lnk_doc_rel_url = relative_url(linked_doc.url)
         
-        if (wikilink.level == "file")
+        if (wikilink.level == "file_path" || wikilink.level == "filename")
           inner_txt = "#{linked_doc['title'].downcase}" if inner_txt.nil?
           return build_html_embed(
             linked_doc['title'],

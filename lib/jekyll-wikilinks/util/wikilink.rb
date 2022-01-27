@@ -136,19 +136,30 @@ module Jekyll
     end
 
     class WikiLinkInline
-      attr_accessor :context_filename, :embed, :link_type, :filename, :header_txt, :block_id, :label_txt
+      attr_accessor :context_filename, :embed, :link_type, :file_path, :path_type, :filename, :header_txt, :block_id, :label_txt
 
+      FILE_PATH = "file_path"
       FILENAME = "filename"
       HEADER_TXT = "header_txt"
       BLOCK_ID = "block_id"
 
       # parameters ordered by appearance in regex
-      def initialize(doc_mngr, context_filename, embed, link_type, filename, header_txt, block_id, label_txt)
+      def initialize(doc_mngr, context_filename, embed, link_type, file_string, header_txt, block_id, label_txt)
+        if file_string.include?('/') && file_string[0] == '/'
+          @path_type = "absolute"
+          @file_path ||= file_string[1...] # remove leading '/' to match `jekyll_collection_doc.relative_path`
+          @filename ||= file_string.split('/').last
+        elsif file_string.include?('/') && file_string[0] != '/'
+          Jekyll.logger.error("Jekyll-Wikilinks: Relative file paths are not yet supported, please use absolute file paths that start with '/' for #{file_string}")
+          # todo:
+          # @path_type = "relative"
+        else
+          @filename ||= file_string
+        end
         @doc_mngr ||= doc_mngr
         @context_filename ||= context_filename
         @embed ||= embed
         @link_type ||= link_type
-        @filename ||= filename
         @header_txt ||= header_txt
         @block_id ||= block_id
         @label_txt ||= label_txt
@@ -164,35 +175,45 @@ module Jekyll
       def md_regex
         regex_embed = embedded? ? REGEX_LINK_EMBED : %r{}
         regex_link_type = is_typed? ? %r{#{@link_type}#{REGEX_LINK_TYPE}} : %r{}
-        filename = described?(FILENAME) ? @filename : ""
+        if !@file_path.nil?
+          file_string = described?(FILE_PATH) ? @file_path : ""
+          file_string = '/' + file_string if @path_type == "absolute"
+        else
+          file_string = described?(FILENAME) ? @filename : ""
+        end
         if described?(HEADER_TXT)
           header = %r{#{REGEX_LINK_HEADER}#{@header_txt}}
           block = %r{}
         elsif described?(BLOCK_ID)
           header = %r{}
           block = %r{#{REGEX_LINK_BLOCK}#{@block_id}}
-        elsif !described?(FILENAME)
+        elsif !described?(FILENAME) && !described?(FILE_PATH)
           Jekyll.logger.error("Jekyll-Wikilinks: WikiLinkInline.md_regex error")
         end
         label_ =  labelled? ? %r{#{REGEX_LINK_LABEL}#{label_txt}} : %r{}
-        return %r{#{regex_embed}#{regex_link_type}#{REGEX_LINK_LEFT}#{filename}#{header}#{block}#{label_}#{REGEX_LINK_RIGHT}}
+        return %r{#{regex_embed}#{regex_link_type}#{REGEX_LINK_LEFT}#{file_string}#{header}#{block}#{label_}#{REGEX_LINK_RIGHT}}
       end
 
       def md_str
         embed = embedded? ? "!" : ""
         link_type = is_typed? ? "#{@link_type}::" : ""
-        filename = described?(FILENAME) ? @filename : ""
+        if !@file_path.nil?
+          file_string = described?(FILE_PATH) ? @file_path : ""
+          file_string = '/' + file_string if @path_type == "absolute"
+        else
+          file_string = described?(FILENAME) ? @filename : ""
+        end
         if described?(HEADER_TXT)
           header = "\##{@header_txt}"
           block = ""
         elsif described?(BLOCK_ID)
           header = ""
           block = "\#\^#{@block_id}"
-        elsif !described?(FILENAME)
+        elsif !described?(FILENAME) && !described?(FILE_PATH)
           Jekyll.logger.error("Jekyll-Wikilinks: WikiLinkInline.md_str error")
         end
         label_ = labelled? ? "\|#{@label_txt}" : ""
-        return "#{embed}#{link_type}\[\[#{filename}#{header}#{block}#{label_}\]\]"
+        return "#{embed}#{link_type}\[\[#{file_string}#{header}#{block}#{label_}\]\]"
       end
 
       # 'fm' -> frontmatter
@@ -216,7 +237,11 @@ module Jekyll
       end
 
       def linked_doc
-        return @doc_mngr.get_doc_by_fname(@filename)
+        # by file path
+        return @doc_mngr.get_doc_by_fpath(@file_path) if !@file_path.nil?
+        # by filename
+        return @doc_mngr.get_doc_by_fname(@filename) if @file_path.nil?
+        return nil
       end
 
       def linked_img
@@ -258,6 +283,7 @@ module Jekyll
 
       # this method helps to make the 'WikiLinkInline.level' code read like a clean truth table.
       def described?(chunk)
+        return (!@file_path.nil? && !@file_path.empty?) if chunk == FILE_PATH
         return (!@filename.nil? && !@filename.empty?) if chunk == FILENAME
         return (!@header_txt.nil? && !@header_txt.empty?) if chunk == HEADER_TXT
         return (!@block_id.nil? && !@block_id.empty?) if chunk == BLOCK_ID
@@ -265,16 +291,17 @@ module Jekyll
       end
 
       def level
-        return "file" if described?(FILENAME) && !described?(HEADER_TXT) && !described?(BLOCK_ID)
-        return "header" if described?(FILENAME) && described?(HEADER_TXT) && !described?(BLOCK_ID)
-        return "block" if described?(FILENAME) && !described?(HEADER_TXT) && described?(BLOCK_ID)
+        return "file_path" if described?(FILE_PATH) && described?(FILENAME) && !described?(HEADER_TXT) && !described?(BLOCK_ID)
+        return "filename"  if !described?(FILE_PATH) && described?(FILENAME) && !described?(HEADER_TXT) && !described?(BLOCK_ID)
+        return "header"    if (described?(FILE_PATH) || described?(FILENAME)) && described?(HEADER_TXT) && !described?(BLOCK_ID)
+        return "block"     if (described?(FILE_PATH) || described?(FILENAME)) && !described?(HEADER_TXT) && described?(BLOCK_ID)
         return "invalid"
       end
 
       # validation methods
 
       def is_valid?
-        return false if !@doc_mngr.file_exists?(@filename)
+        return false if !@doc_mngr.file_exists?(@filename, @file_path)
         return false if (self.level == "header") && !@doc_mngr.doc_has_header?(self.linked_doc, @header_txt)
         return false if (self.level == "block") && !@doc_mngr.doc_has_block_id?(self.linked_doc, @block_id)
         return true
