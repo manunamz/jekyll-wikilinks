@@ -1,3 +1,4 @@
+## [0.0.12]
 ## [0.0.11] - 2022-01-27
 ### Added
 - Wikilink text can now contain an absolute file path to the desired file.
