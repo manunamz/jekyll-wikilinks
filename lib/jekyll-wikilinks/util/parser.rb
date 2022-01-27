@@ -127,24 +127,34 @@ module Jekyll
         # markdown file processing
         linked_doc = wikilink.linked_doc
         link_type_txt = wikilink.is_typed? ? " #{$wiki_conf.css_name("typed")} #{wikilink.link_type}" : ""
-        
-        inner_txt = wikilink.label_txt if wikilink.labelled?
         lnk_doc_rel_url = relative_url(linked_doc.url)
-        
+        if wikilink.labelled?
+          inner_txt = wikilink.label_txt
+        elsif linked_doc.data.keys.include?('title')
+          inner_txt = linked_doc.data['title'].downcase
+        # in case there is no 'title' frontmatter attribute 
+        # (i'm seeing deprecation warnings, but there might 
+        #  be bugs caused by not using this...)
+        elsif linked_doc.respond_to?(:title)
+          inner_txt = linked_doc.title.downcase
+        # pages don't have automatically generated titles
+        else
+          inner_txt = Jekyll::Utils.slugify(linked_doc.basename)
+        end
+        # level-specific
         if (wikilink.level == "file_path" || wikilink.level == "filename")
-          inner_txt = "#{linked_doc['title'].downcase}" if inner_txt.nil?
           return build_html_embed(
-            linked_doc['title'],
+            linked_doc.title,
             linked_doc.content,
             lnk_doc_rel_url
           ) if wikilink.embedded?
         elsif (wikilink.level == "header")
           # from: https://github.com/jekyll/jekyll/blob/6855200ebda6c0e33f487da69e4e02ec3d8286b7/Rakefile#L74
           lnk_doc_rel_url += "\#" + Jekyll::Utils.slugify(wikilink.header_txt)
-          inner_txt = "#{linked_doc['title'].downcase} > #{wikilink.header_txt.downcase}" if inner_txt.nil?
+          inner_txt += " > #{wikilink.header_txt.downcase}" if !wikilink.labelled?
         elsif (wikilink.level == "block")
           lnk_doc_rel_url += "\#" + wikilink.block_id
-          inner_txt = "#{linked_doc['title'].downcase} > ^#{wikilink.block_id}" if inner_txt.nil?
+          inner_txt += " > ^#{wikilink.block_id}" if !wikilink.labelled?
         else
           Jekyll.logger.error("Jekyll-Wikilinks: Invalid wikilink level")
         end
