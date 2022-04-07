@@ -7,7 +7,7 @@ gemspec
 
 gem "jekyll", "~> 4.2.0"
 
-gem "nokogiri", "~> 1.12.3"
+gem "nokogiri", "~> 1.13.3"
 
 gem "rake", "~> 13.0.3"
 gem "rspec", "~> 3.10"
