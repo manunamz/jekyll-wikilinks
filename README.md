@@ -45,7 +45,7 @@ wikilinks:
 
 `css.exclude`: Defines a list of css classes that should not have the `wiki` or `web` css classes added to it.
 
-- This is useful when there are other internal links that should not have the `web-link` css class added to it. For example, `kramdown` adds `footenote` and `reversefootnote` css classes to `a` elements that are footnotes. Since they are links internal to the site, they won't have `wiki-link`s added to them, but it is likely undesirable to have `web-link` added to these elements. This makes them good candidates to exclude from the plugin's css processing altogether and style those classes separately.
+- This is useful when there are other internal links that should not have the `web-link` css class added to it. For example, `kramdown` adds `footnote` and `reversefootnote` css classes to `a` elements that are footnotes. Since they are links internal to the site, they won't have `wiki-link`s added to them, but it is likely undesirable to have `web-link` added to these elements. This makes them good candidates to exclude from the plugin's css processing altogether and style those classes separately.
 
 `enabled`: Toggle to turn off the plugin or turn off.
 

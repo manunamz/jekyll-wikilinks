@@ -3,7 +3,7 @@
 ### Added
 - Wikilink text can now contain an absolute file path to the desired file.
 ### Fixed
-- Fixed internal title references in parser.
+- Fixed internal title references in parser (Addresses [#28](https://github.com/manunamz/jekyll-wikilinks/issues/28)).
 ## [0.0.10] - 2022-01-24
 ### Changed
 - Block Wikilinks now allow for partial lists; missing files are stored in the 'missing' attribute.
