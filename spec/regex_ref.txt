@@ -13,11 +13,11 @@ test text:
 
 # typed
 
-link_type::[[wikilink]].
+link-type::[[wikilink]].
 
-link_type::[[wikilink#header]].
+link-type::[[wikilink#header]].
 
-link_type::[[wikilink#^block_id]].
+link-type::[[wikilink#^block_id]].
 
 # labelled
 
@@ -47,21 +47,21 @@ link_type::[[wikilink#^block_id]].
 
 # typed embedded
 
-!link_type::[[wikilink]]
+!link-type::[[wikilink]]
 
-!link_type::[[wikilink#header]]
+!link-type::[[wikilink#header]]
 
-!link_type::[[wikilink#^block_id]]
+!link-type::[[wikilink#^block_id]]
 
 what if the !type::[[wikilink]] is inline?
 
 # typed labelled
 
-link_type::[[wikilink|label txt]].
+link-type::[[wikilink|label txt]].
 
-link_type::[[wikilink#header|label txt]].
+link-type::[[wikilink#header|label txt]].
 
-link_type::[[wikilink#^block_id|label txt]].
+link-type::[[wikilink#^block_id|label txt]].
 
 # stacked header-block
 

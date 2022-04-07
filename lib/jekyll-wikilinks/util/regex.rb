@@ -12,7 +12,7 @@ module Jekyll
     SUPPORTED_IMG_FORMATS = Set.new(['.png', '.jpg', '.gif', '.psd', '.svg'])
 
     # wikilink constants
-  	REGEX_LINK_LEFT       = /\[\[/
+    REGEX_LINK_LEFT       = /\[\[/
     REGEX_LINK_RIGHT      = /\]\]/
     REGEX_LINK_EMBED      = /(?<embed>\!)/
     REGEX_LINK_TYPE       = /\s*::\s*/

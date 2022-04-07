@@ -7,7 +7,7 @@ module Jekyll
     # wikilink classes know everything about the original markdown syntax and its semantic meaning
 
     class WikiLinkBlock
-      attr_accessor :link_type, :filenames
+      attr_reader :link_type, :filenames
 
       # parameters ordered by appearance in regex
       def initialize(doc_mngr, context_filename, link_type, bullet_type=nil)
@@ -136,7 +136,7 @@ module Jekyll
     end
 
     class WikiLinkInline
-      attr_accessor :context_filename, :embed, :link_type, :file_path, :path_type, :filename, :header_txt, :block_id, :label_txt
+      attr_reader :link_type, :filename, :header_txt, :block_id
 
       FILE_PATH = "file_path"
       FILENAME = "filename"
