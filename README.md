@@ -1,8 +1,6 @@
 # Jekyll-Wikilinks
 
-⚠️ This is gem is under active development! ⚠️
-
-⚠️ Expect breaking changes and surprises until otherwise noted (likely by v0.1.0 or v1.0.0). ⚠️
+⚠️ As of v0.0.13, this plugin has moved to [`jekyll-wikirefs`](https://github.com/wikibonsai/jekyll-wikirefs)
 
 Jekyll-Wikilinks adds wikilinking (the ability to reference local documents via the double square bracket syntax -- [[like this]]) support to jekyll -- and more.
 
