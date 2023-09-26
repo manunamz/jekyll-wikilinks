@@ -1,6 +1,6 @@
 # Jekyll-Wikilinks
 
-⚠️ As of v0.0.13, this plugin has moved to [`jekyll-wikirefs`](https://github.com/wikibonsai/jekyll-wikirefs)
+## ⚠️ As of v0.0.13, this plugin has moved to [`jekyll-wikirefs`](https://github.com/wikibonsai/jekyll-wikirefs)
 
 Jekyll-Wikilinks adds wikilinking (the ability to reference local documents via the double square bracket syntax -- [[like this]]) support to jekyll -- and more.
 
