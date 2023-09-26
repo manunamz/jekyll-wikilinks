@@ -1,6 +1,6 @@
 ## [0.0.12] - 2022-05-07
 ### Changed
-- Update nokugiri version.
+- Update nokogiri version.
 ## [0.0.11] - 2022-01-27
 ### Added
 - Wikilink text can now contain an absolute file path to the desired file.
